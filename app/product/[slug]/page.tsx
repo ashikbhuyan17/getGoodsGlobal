@@ -28,9 +28,9 @@ async function ProductPage({ params }: { params: { slug: string } }) {
   if (product?.status !== "success") notFound();
 
   return (
-    <main className="px-2">
+    <main>
       <ProductInfoBar slug={slug} />
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 px-2">
         <ProductPageClient
           bulkQuantities={bulkQuantities}
           product={product}
