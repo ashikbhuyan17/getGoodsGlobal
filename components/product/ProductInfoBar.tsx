@@ -10,7 +10,7 @@ export default async function ProductInfoBar({ slug }: { slug: string }) {
   const stock = product?.data?.product?.stock;
 
   return (
-    <div className="flex items-center justify-between border p-3 bg-white shadow-sm w-full mt-[-7px]">
+    <div className="flex items-center justify-between border p-3 bg-white shadow-sm w-full md:mt-[-7px]">
       {/* Left Section */}
       <div className="flex items-center gap-3">
         <InfoBarBack />

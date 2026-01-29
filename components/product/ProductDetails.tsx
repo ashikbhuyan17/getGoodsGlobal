@@ -27,53 +27,53 @@ export default function ProductDetails({
   setPrice: any;
   shippingchargeId: string;
 }) {
+  console.log("🚀 ~ ProductDetails ~ bulkQuantities:", bulkQuantities)
   const [image, setImage] = useState(
     `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
   );
 
   return (
-    <div className="p-6 flex flex-col md:flex-row mt-4 gap-4 overflow-x-hidden justify-center border-border">
+    <div className="p-6 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
       {/* Left Section - Image Gallery */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="flex lg:flex-col gap-2">
+      <div className="flex xl:flex-col gap-2">
+        <div
+          onClick={() =>
+            setImage(
+              `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
+            )
+          }
+          className="w-17 h-17 rounded-md overflow-hidden border cursor-pointer"
+        >
+          <Image
+            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`}
+            alt={product?.data?.product?.name}
+            width={68}
+            height={68}
+            className="object-cover w-full h-full"
+          />
+        </div>
+        {JSON.parse(product?.data?.product?.PostImage)?.map((img: string) => (
           <div
+            key={img}
             onClick={() =>
               setImage(
-                `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
+                `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
               )
             }
             className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
           >
             <Image
-              src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`}
+              src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
               alt={product?.data?.product?.name}
               width={64}
               height={64}
               className="object-cover w-full h-full"
             />
           </div>
-          {JSON.parse(product?.data?.product?.PostImage)?.map((img: string) => (
-            <div
-              key={img}
-              onClick={() =>
-                setImage(
-                  `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
-                )
-              }
-              className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
-            >
-              <Image
-                src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
-                alt={product?.data?.product?.name}
-                width={64}
-                height={64}
-                className="object-cover w-full h-full"
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="relative md:w-96 md:h-96 w-full h-full">
+        ))}
+      </div>
+      <div className="w-full">
+        <div className="relative  md:h-96 w-full h-full">
           <Dialog>
             <DialogTrigger asChild>
               <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
@@ -101,37 +101,45 @@ export default function ProductDetails({
       </div>
 
       {/* Right Section - Offer and Details */}
-      <div className="w-full max-w-sm">
+      <div className="w-full">
         <Card className="border-none shadow-none p-0">
           <CardContent className="p-0 shadow-none px-2 border-0 space-y-6">
             {bulkQuantities && (
-              <div className="bg-gray-50 rounded-md p-4">
-                <div
-                  className={cn(
-                    "grid justify-center items-center",
-                    bulkQuantities?.data?.length
-                      ? `grid-cols-${
-                          bulkQuantities?.data?.length < 3
-                            ? bulkQuantities?.data?.length
-                            : 3
-                        }`
-                      : "grid-cols-1",
-                  )}
-                >
-                  {bulkQuantities &&
-                    bulkQuantities?.data?.map(
-                      (bulk: any, i: number) =>
-                        i < 3 && (
-                          <div className="w-full" key={bulk?.id}>
-                            <p className="text-2xl font-semibold text-gray-800">
-                              ৳{bulk?.price}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              {bulk?.title}
-                            </p>
+              <div className="bg-gray-100 rounded-t-md overflow-hidden">
+                <div className="grid grid-cols-3 gap-0">
+                  {bulkQuantities?.data?.map(
+                    (bulk: any, i: number) =>
+                      i < 3 && (
+                        <div
+                          key={bulk?.id}
+                          className={cn(
+                            "relative px-4 py-6",
+                            i === 0 ? "bg-[#E7F2EF]" : "bg-gray-100"
+                          )}
+                        >
+                          <div className="flex flex-col items-center text-center">
+                            <div className="flex flex-col items-center gap-1 space-y-2">
+                              <p className="text-xl font-semibold text-gray-800">
+                                ৳{bulk?.price}
+                              </p>
+                              {bulk?.old_price && (
+                                <p className="text-sm text-gray-400 line-through">
+                                  ৳{bulk?.old_price}
+                                </p>
+                              )}
+                              <p className="text-sm text-[#777]">
+                                {bulk?.title}
+                              </p>
+                            </div>
                           </div>
-                        ),
-                    )}
+                          {i === 0 ? (
+                            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-cyan-400" />
+                          ) : (
+                            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200" />
+                          )}
+                        </div>
+                      ),
+                  )}
                 </div>
               </div>
             )}
@@ -168,7 +176,7 @@ export default function ProductDetails({
                       className={cn(
                         "object-cover p-0.5 rounded-md",
                         selectedColor?.id === color?.color?.id &&
-                          "border-2 border-primary",
+                        "border-2 border-primary",
                       )}
                     />
                   </div>
