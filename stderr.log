@@ -1,0 +1,5 @@
+(node:2444308) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/rashifas/getgoodsflobal.mamatazshop.com/next.config.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/rashifas/getgoodsflobal.mamatazshop.com/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ⚠ "next start" does not work with "output: standalone" configuration. Use "node .next/standalone/server.js" instead.

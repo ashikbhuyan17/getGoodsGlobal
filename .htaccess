@@ -1,0 +1,21 @@
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/danpitet/yousuf.danpitetech.com"
+PassengerBaseURI "/"
+PassengerNodejs "/home/danpitet/nodevenv/yousuf.danpitetech.com/24/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/rashifas/getgoodsflobal.mamatazshop.com"
+PassengerBaseURI "/"
+PassengerNodejs "/home/rashifas/nodevenv/getgoodsflobal.mamatazshop.com/22/bin/node"
+PassengerAppType node
+PassengerStartupFile server.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+SetEnv NEXT_PUBLIC_API_URL https://next.mamatazshop.com/api
+SetEnv NEXT_PUBLIC_BASE_URL https://getgoodsflobal.danpitetech.com
+SetEnv NEXT_PUBLIC_IMG_URL https://next.mamatazshop.com
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END

@@ -1,0 +1,17 @@
+import ProfileUpdateForm from "@/components/account/settings/ProfileUpdateForm";
+import { Card, CardContent } from "@/components/ui/card";
+import { fetcher } from "@/lib/fetcher";
+
+export default async function ProfilePage() {
+  const userData = await fetcher("/user-profile");
+
+  return (
+    <div className="w-full flex justify-center py-10 bg-white rounded-sm">
+      <Card className="w-full max-w-4xl p-6 rounded-2xl shadow-none border-none">
+        <CardContent>
+          <ProfileUpdateForm user={userData} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

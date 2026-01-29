@@ -1,0 +1,29 @@
+"use client";
+
+import { fetcher } from "@/lib/fetcher";
+import { LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
+
+function Logout() {
+  const router = useRouter();
+
+  const handleDelete = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const logoutData: any = await fetcher("/logout", { method: "POST" });
+    if (logoutData?.status) {
+      router.push("/");
+    }
+  };
+
+  return (
+    <button
+      onClick={handleDelete}
+      className="flex flex-col items-center gap-1 text-gray-700 hover:text-teal-600 transition-colors whitespace-nowrap"
+    >
+      <LogOut className="h-6 w-6" />
+      <span className="text-xs font-medium">Logout</span>
+    </button>
+  );
+}
+
+export default Logout;
