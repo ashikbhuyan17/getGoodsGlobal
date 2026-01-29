@@ -7,7 +7,7 @@ import { decodeSlug } from "@/lib/decodeSlug";
 function InfoBar({ slug }: { slug: string }) {
   const title = decodeSlug(slug);
   return (
-    <div className="flex items-center justify-between border rounded-xl p-3 bg-white shadow-sm w-full">
+    <div className="flex items-center justify-between border shadow-sm p-3 bg-white w-full mt-[-7px]">
       {/* Left Section */}
       <div className="flex items-center gap-3">
         <InfoBarBack />

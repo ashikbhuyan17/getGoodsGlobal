@@ -12,13 +12,15 @@ async function ShopPage({
   const { max, min } = await searchParams;
 
   return (
-    <div className="px-2">
-      <InfoBar slug={slug} />
-      <ProductList
-        max={Number(max) || 99999999}
-        min={Number(min) || 0}
-        slug={`/category-products/${slug}`}
-      />
+    <div>
+      <div> <InfoBar slug={slug} /></div>
+      <div className="px-2">
+        <ProductList
+          max={Number(max) || 99999999}
+          min={Number(min) || 0}
+          slug={`/category-products/${slug}`}
+        />
+      </div>
     </div>
   );
 }
