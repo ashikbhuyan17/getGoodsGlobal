@@ -2,14 +2,38 @@ import { Play } from "lucide-react";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 
-function VideoCard({ image, video }: { image: string; video?: string }) {
+function VideoCard({ 
+  image, 
+  video, 
+  title, 
+  date 
+}: { 
+  image: string; 
+  video?: string;
+  title?: string;
+  date?: string;
+}) {
+  // Format date from ISO string to DD/MM/YYYY
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch {
+      return dateString;
+    }
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
         <div className="cursor-pointer">
           <div className="relative">
             <Image
-              alt=""
+              alt={title || "Video thumbnail"}
               src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
               width={1200}
               height={1200}
@@ -20,10 +44,10 @@ function VideoCard({ image, video }: { image: string; video?: string }) {
             </span>
           </div>
           <div className="mt-2">
-            <h2 className="font-semibold text-sm">
-              Guangzhou Shipment Loading 10-11-2025
+            <h2 className="font-semibold text-sm line-clamp-2">
+              {title || "Video Title"}
             </h2>
-            <p className="text-xs text-muted-foreground">10/11/2025</p>
+            <p className="text-xs text-muted-foreground">{formatDate(date)}</p>
           </div>
         </div>
       </DialogTrigger>
