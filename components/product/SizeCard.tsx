@@ -95,32 +95,41 @@ function SizeCard({
   };
 
   return (
-    <div className="grid grid-cols-3 items-center border-b py-2">
-      <p>{size}</p>
-      <p>৳{price}</p>
+    <div className="grid grid-cols-3 gap-0 items-center py-3 px-4">
+      {/* Size Column */}
+      <p className="text-left text-gray-800">{size}</p>
 
-      {quantity < 1 ? (
-        <Button
-          onClick={() => {
-            setQuantity(1);
-            handleAddToCart(1);
-          }}
-          className="w-20"
-        >
-          Add
-        </Button>
-      ) : (
-        <QuantityUpdateBtn
-          handleAddToCart={handleAddToCart}
-          id={id}
-          setSizes={setSizes}
-          size={size}
-          quantity={quantity}
-          setQuantity={setQuantity}
-          max={max}
-          setPrice={setPrice}
-        />
-      )}
+      {/* Price Column */}
+      <div className="flex flex-col items-center gap-1">
+        <p className="text-lg font-semibold text-gray-800">৳{price}</p>
+      </div>
+
+      {/* Quantity Column */}
+      <div className="flex flex-col items-end gap-1">
+        {quantity < 1 ? (
+          <Button
+            onClick={() => {
+              setQuantity(1);
+              handleAddToCart(1);
+            }}
+            className=" text-white px-4 py-2 rounded-md"
+          >
+            Add
+          </Button>
+        ) : (
+          <QuantityUpdateBtn
+            handleAddToCart={handleAddToCart}
+            id={id}
+            setSizes={setSizes}
+            size={size}
+            quantity={quantity}
+            setQuantity={setQuantity}
+            max={max}
+            setPrice={setPrice}
+          />
+        )}
+        {/* <p className="text-sm text-gray-800">{max}</p> */}
+      </div>
     </div>
   );
 }

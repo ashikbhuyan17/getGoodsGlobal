@@ -73,7 +73,7 @@ export default function ProductDetails({
         ))}
       </div>
       <div className="w-full">
-        <div className="relative  md:h-96 w-full h-full">
+        <div className="relative  md:h-[500px] w-full h-full">
           <Dialog>
             <DialogTrigger asChild>
               <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
@@ -184,11 +184,23 @@ export default function ProductDetails({
               </div>
             </div>
             <ScrollArea className="h-56">
-              <div className="mt-4">
-                <div className="grid grid-cols-3 gap-3 border-b pb-2 text-gray-600 font-medium">
-                  <p>Size</p>
-                  <p>Price</p>
-                  <p>Quantity</p>
+              <div className="mt-4 border-2 border-[#EEEEEE] rounded-md overflow-hidden">
+                <div className="grid grid-cols-3 gap-3 p-2 border-gray-200">
+                  <div className="text-start">
+                    <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-start">
+                      Size
+                    </span>
+                  </div>
+                  <div className="text-center">
+                    <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-center">
+                      Price
+                    </span>
+                  </div>
+                  <div className="text-center">
+                    <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-center">
+                      Quantity
+                    </span>
+                  </div>
                 </div>
 
                 {product?.data?.productSizes?.map((size: any) => (
