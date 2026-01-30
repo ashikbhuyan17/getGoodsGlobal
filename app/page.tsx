@@ -4,6 +4,7 @@ import FeatureSection from "@/components/home/FeatureSection";
 import GallerySection from "@/components/home/GallerySection";
 import HeroSlider from "@/components/home/HeroSlider";
 import ProductsSlider from "@/components/home/ProductsSlider";
+import Footer from "@/components/common/Footer";
 import { fetcher } from "@/lib/fetcher";
 
 export default async function Home() {
@@ -28,6 +29,7 @@ export default async function Home() {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

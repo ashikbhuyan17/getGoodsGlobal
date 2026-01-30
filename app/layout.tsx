@@ -3,7 +3,6 @@ import { Jost } from "next/font/google";
 import "./globals.css";
 // import Sidebar from "@/components/common/Sidebar";
 import Header from "@/components/common/Header";
-import Footer from "@/components/common/Footer";
 import { fetcher } from "@/lib/fetcher";
 import { Toaster } from "sonner";
 import BottomNav from "@/components/common/BottomNav";
@@ -61,7 +60,6 @@ export default async function RootLayout({
           {children}
           {modal}
           <Toaster position="bottom-right" richColors />
-          <Footer />
         </main>
       </body>
     </html>
