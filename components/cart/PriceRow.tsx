@@ -10,11 +10,11 @@ export default function PriceRow({ label, value, children }: PriceRowProps) {
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
-        <span className="text-gray-600">{label}</span>
+        <span className="font-medium">{label}</span>
         {children}
       </div>
 
-      <span className="font-semibold">{value}</span>
+      <span className="font-semibold text-base">{value}</span>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import Link from "next/link";
 export default async function CartPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const cartProducts: any = await fetcher("/cart-products");
+  console.log("🚀 ~ CartPage ~ cartProducts:", cartProducts)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const productsWithTotals = cartProducts?.data?.map((product: any) => {

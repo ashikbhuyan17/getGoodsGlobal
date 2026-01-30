@@ -135,79 +135,82 @@ export default function CartSummary({
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 space-y-6">
-      <h2 className="text-xl font-semibold">Cart Summary</h2>
+    <div className="bg-white rounded-lg">
+      <h2 className="text-base font-bold text-center p-2 lg:p-4">Cart Summary</h2>
+      <p className="border-t border-gray-200"></p>
 
-      {/* Coupon Section */}
-      {page === "checkout" && (
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Apply Coupon</label>
+      <div className="p-2 lg:p-6 space-y-6">
+        {/* Coupon Section */}
+        {page === "checkout" && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Apply Coupon</label>
 
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={coupon}
-              onChange={(e) => setCoupon(e.target.value)}
-              placeholder="Enter coupon"
-              className="border rounded-md px-3 py-2 w-full"
-            />
-            <Button
-              onClick={handleCouponVerify}
-              disabled={loading}
-              className="bg-primary hover:bg-primary/95"
-            >
-              {loading ? "Checking..." : "Verify"}
-            </Button>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value)}
+                placeholder="Enter coupon"
+                className="border rounded-md px-3 py-2 w-full"
+              />
+              <Button
+                onClick={handleCouponVerify}
+                disabled={loading}
+                className="bg-primary hover:bg-primary/95"
+              >
+                {loading ? "Checking..." : "Verify"}
+              </Button>
+            </div>
+
+            {discount && page === "checkout" && (
+              <p className="text-green-600 text-sm">
+                Coupon applied! Discount: ৳{total - finalPrice}
+              </p>
+            )}
           </div>
+        )}
+
+        <div className="space-y-4">
+          <PriceRow label="Product price" value={`৳${total}`} />
 
           {discount && page === "checkout" && (
-            <p className="text-green-600 text-sm">
-              Coupon applied! Discount: ৳{total - finalPrice}
-            </p>
+            <PriceRow label="Discount" value={`-৳${total - finalPrice}`} />
+          )}
+
+          {discount && page === "checkout" && (
+            <div className="border-t pt-4">
+              <PriceRow label="Final price" value={`৳${finalPrice}`} />
+            </div>
           )}
         </div>
-      )}
 
-      <div className="space-y-4">
-        <PriceRow label="Product price" value={`৳${total}`} />
+        <div className="border border-dashed text-center border-primary bg-[#E3F5F9] rounded-lg p-4">
+          <p className="font-medium">Pay on delivery</p>
 
-        {discount && page === "checkout" && (
-          <PriceRow label="Discount" value={`-৳${total - finalPrice}`} />
-        )}
+          <div className="flex items-center font-medium justify-center gap-2">
+            <span>
+              ৳ {Number(finalPrice).toFixed()} + Shipping & Courier Charges
+            </span>
 
-        {discount && page === "checkout" && (
-          <div className="border-t pt-4">
-            <PriceRow label="Final price" value={`৳${finalPrice}`} />
+            <InfoIcon size={16} />
           </div>
+        </div>
+
+        {page === "checkout" ? (
+          <Button
+            onClick={handleOrder}
+            className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
+          >
+            Place Order & Pay
+          </Button>
+        ) : (
+          <Link prefetch href={"/checkout"}>
+            <Button className="w-full bg-primary hover:bg-primary/95 py-6 text-base">
+              Go to Checkout
+            </Button>
+          </Link>
         )}
       </div>
-
-      <div className="border-2 border-dashed border-primary rounded-lg p-4 space-y-2">
-        <p className="text-sm font-medium">Pay on delivery</p>
-
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-gray-600">
-            ৳{Number(finalPrice).toFixed()} + Shipping & Courier Charges
-          </span>
-
-          <InfoIcon size={16} className="text-gray-400" />
-        </div>
-      </div>
-
-      {page === "checkout" ? (
-        <Button
-          onClick={handleOrder}
-          className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
-        >
-          Place Order & Pay
-        </Button>
-      ) : (
-        <Link prefetch href={"/checkout"}>
-          <Button className="w-full bg-primary hover:bg-primary/95 py-6 text-base">
-            Go to Checkout
-          </Button>
-        </Link>
-      )}
     </div>
   );
 }

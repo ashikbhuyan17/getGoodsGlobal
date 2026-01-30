@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import UpdateCartModal from "./UpdateCartModal";
 
 interface CartItemRowProps {
@@ -24,17 +23,17 @@ export default function CartItemRow({
   onEdit,
 }: CartItemRowProps) {
   return (
-    <div className="flex items-center justify-between pl-10 py-3 border-b">
+    <div className="flex items-center justify-between py-1 text-sm font-medium">
       <div>
-        <p className="text-sm font-medium">Color: {color}</p>
-        {size && <p className="text-xs text-gray-500">Size: {size}</p>}
+        <p>Color: {color}</p>
+        {size && <p>Size: {size}</p>}
       </div>
-
+      <div >
+        {qty} x ৳{price}
+      </div>
       <div className="flex items-center gap-4">
-        <span className="text-sm">
-          {qty} x ৳{price}
-        </span>
-        <span className="text-sm font-semibold">৳{qty * price}</span>
+
+        <span>৳{qty * price}</span>
 
         {page === "cart" && (
           <UpdateCartModal
@@ -44,14 +43,14 @@ export default function CartItemRow({
             qty={qty}
             price={price}
           >
-            <Button
-              size="sm"
-              variant="outline"
+            <button
+              // size="sm"
+              // variant="outline"
               onClick={onEdit}
-              className="text-primary border-primary hover:bg-teal-50"
+              className="border-primary py-[2px]  rounded text-white  px-2 text-sm bg-primary"
             >
               Edit
-            </Button>
+            </button>
           </UpdateCartModal>
         )}
       </div>
