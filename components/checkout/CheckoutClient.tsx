@@ -17,6 +17,8 @@ function CheckoutClient({
     name: user?.data?.name,
     phone: user?.data?.phone,
     address: user?.data?.address ?? "",
+    district: user?.data?.district ?? "",
+    city: user?.data?.city ?? "",
     customer_id: user?.data?.id,
     payment_method: "Cash On Delivery",
   });

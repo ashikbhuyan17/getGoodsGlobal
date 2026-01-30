@@ -20,6 +20,8 @@ export default function CartSummary({
     name: string;
     phone: string;
     address: string;
+    district: string;
+    city: string;
     customer_id: number;
     payment_method: string;
   };
@@ -52,19 +54,45 @@ export default function CartSummary({
   const validateForm = () => {
     if (page !== "checkout") return true;
 
-    if (!formData?.name) return toast.error("Name is required"), false;
-    if (!formData?.phone) return toast.error("Phone number is required"), false;
+    if (!formData?.name || formData.name.trim() === "") {
+      toast.error("Name is required");
+      return false;
+    }
 
-    if (!/^\d{11}$/.test(formData.phone))
-      return toast.error("Phone must be 11 digits"), false;
+    if (!formData?.phone || formData.phone.trim() === "") {
+      toast.error("Phone number is required");
+      return false;
+    }
 
-    if (!formData?.address) return toast.error("Address is required"), false;
+    if (!/^\d{11}$/.test(formData.phone)) {
+      toast.error("Phone must be 11 digits");
+      return false;
+    }
 
-    if (!formData?.customer_id || formData.customer_id <= 0)
-      return toast.error("Invalid customer ID"), false;
+    if (!formData?.district || formData.district.trim() === "") {
+      toast.error("District is required");
+      return false;
+    }
 
-    if (!formData?.payment_method)
-      return toast.error("Please select a payment method"), false;
+    if (!formData?.city || formData.city.trim() === "") {
+      toast.error("City is required");
+      return false;
+    }
+
+    if (!formData?.address || formData.address.trim() === "") {
+      toast.error("Address is required");
+      return false;
+    }
+
+    if (!formData?.customer_id || formData.customer_id <= 0) {
+      toast.error("Invalid customer ID");
+      return false;
+    }
+
+    if (!formData?.payment_method) {
+      toast.error("Please select a payment method");
+      return false;
+    }
 
     return true;
   };

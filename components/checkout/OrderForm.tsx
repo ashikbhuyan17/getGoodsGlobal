@@ -3,6 +3,80 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "../ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const BANGLADESH_DISTRICTS = [
+  "Barguna",
+  "Barisal",
+  "Bhola",
+  "Jhalokati",
+  "Patuakhali",
+  "Pirojpur",
+  "Bandarban",
+  "Brahmanbaria",
+  "Chandpur",
+  "Chattogram",
+  "Cumilla",
+  "Cox's Bazar",
+  "Feni",
+  "Khagrachhari",
+  "Lakshmipur",
+  "Noakhali",
+  "Rangamati",
+  "Dhaka",
+  "Faridpur",
+  "Gazipur",
+  "Gopalganj",
+  "Kishoreganj",
+  "Madaripur",
+  "Manikganj",
+  "Munshiganj",
+  "Narayanganj",
+  "Narsingdi",
+  "Rajbari",
+  "Shariatpur",
+  "Tangail",
+  "Bagerhat",
+  "Chuadanga",
+  "Jashore",
+  "Jhenaidah",
+  "Khulna",
+  "Kushtia",
+  "Magura",
+  "Meherpur",
+  "Narail",
+  "Satkhira",
+  "Jamalpur",
+  "Mymensingh",
+  "Netrokona",
+  "Sherpur",
+  "Bogura",
+  "Joypurhat",
+  "Naogaon",
+  "Natore",
+  "Chapainawabganj",
+  "Pabna",
+  "Rajshahi",
+  "Sirajganj",
+  "Dinajpur",
+  "Gaibandha",
+  "Kurigram",
+  "Lalmonirhat",
+  "Nilphamari",
+  "Panchagarh",
+  "Rangpur",
+  "Thakurgaon",
+  "Habiganj",
+  "Moulvibazar",
+  "Sunamganj",
+  "Sylhet",
+];
 
 export default function OrderForm({
   formData,
@@ -12,6 +86,8 @@ export default function OrderForm({
     name: string;
     phone: string;
     address: string;
+    district: string;
+    city: string;
     customer_id: number;
     payment_method: string;
   };
@@ -45,6 +121,52 @@ export default function OrderForm({
               setFormData({ ...formData, phone: e.target.value })
             }
             value={formData?.phone}
+            placeholder="Enter phone number"
+            required
+            type="tel"
+            pattern="[0-9]{11}"
+            maxLength={11}
+          />
+        </div>
+
+        {/* District */}
+        <div className="flex flex-col space-y-1">
+          <Label htmlFor="district">
+            District <span className="text-red-500">*</span>
+          </Label>
+          <Select
+            value={formData?.district || ""}
+            onValueChange={(value) =>
+              setFormData({ ...formData, district: value })
+            }
+            required
+          >
+            <SelectTrigger className="w-full" id="district" aria-required="true">
+              <SelectValue placeholder="Select district" />
+            </SelectTrigger>
+            <SelectContent>
+              {BANGLADESH_DISTRICTS.map((district) => (
+                <SelectItem key={district} value={district}>
+                  {district}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* City */}
+        <div className="flex flex-col space-y-1">
+          <Label htmlFor="city">
+            City <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            value={formData?.city || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, city: e.target.value })
+            }
+            id="city"
+            placeholder="Enter city name"
+            required
           />
         </div>
 

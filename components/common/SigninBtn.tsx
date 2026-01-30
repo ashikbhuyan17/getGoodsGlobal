@@ -67,11 +67,10 @@ function SigninBtn() {
   return (
     <button
       onClick={handlePush}
-      className={`flex h-10 items-center gap-2 rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md ${
-        user?.data?.name ? "px-3 md:px-4" : "w-10 justify-center"
-      }`}
+      className={`flex h-10 items-center gap-2 rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md ${user?.data?.name ? "px-3 md:px-4" : "w-10 justify-center"
+        }`}
     >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
         <User className="h-4 w-4 text-primary" />
       </div>
       {user?.data?.name && (
