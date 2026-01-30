@@ -20,7 +20,7 @@ export default async function ProductInfoBar({ slug }: { slug: string }) {
           </h2>
 
           <div className="flex items-center gap-3 mt-1">
-            <span
+            {/* <span
               className={cn(
                 "text-xs px-2 py-0.5 rounded",
                 stock === 0
@@ -31,7 +31,7 @@ export default async function ProductInfoBar({ slug }: { slug: string }) {
               )}
             >
               {product?.data?.product?.stock} items in stock
-            </span>
+            </span> */}
 
             <div className="flex items-center text-yellow-400">
               {[...Array(5)].map((_, i) => (
