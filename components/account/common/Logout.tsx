@@ -11,7 +11,13 @@ function Logout() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const logoutData: any = await fetcher("/logout", { method: "POST" });
     if (logoutData?.status) {
+      // Refresh the page to update auth state
+      router.refresh();
       router.push("/");
+      // Reload after a short delay to ensure state is updated
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     }
   };
 

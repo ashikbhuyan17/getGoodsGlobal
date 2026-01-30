@@ -1,4 +1,4 @@
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { fetcher } from "@/lib/fetcher";
@@ -38,6 +38,13 @@ export default async function Header() {
               <ShoppingBag className="h-5 w-5" />
             </button>
           </Link>
+          <Link prefetch href="/wishlist">
+            <button className="flex md:h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100">
+              <Heart className="h-5 w-5" />
+            </button>
+          </Link>
+
+
 
           <SigninBtn />
         </div>

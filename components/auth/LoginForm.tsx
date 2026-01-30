@@ -65,11 +65,19 @@ export default function LoginForm({ method }: { method: "page" | "modal" }) {
 
       toast.success("Logged in successfully.");
 
+      // Refresh the page to update auth state
+      router.refresh();
+
       if (method === "modal") {
         router.back();
       } else {
         router.push("/account");
       }
+      
+      // Reload after a short delay to ensure state is updated
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
     } else {
       toast.error(logUser?.message || "Login failed");
     }
