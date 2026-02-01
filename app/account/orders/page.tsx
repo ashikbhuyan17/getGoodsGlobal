@@ -9,7 +9,6 @@ export default async function OrderPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = await fetcher('/user-order-history');
   const orders = res?.data || [];
-  console.log('🚀 ~ OrdersTable ~ orders:', orders);
 
   const formatStatus = (status: string) => {
     const statusMap: Record<string, { label: string; color: string }> = {

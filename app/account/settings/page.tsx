@@ -6,8 +6,8 @@ export default async function ProfilePage() {
   const userData = await fetcher("/user-profile");
 
   return (
-    <div className="w-full flex justify-center py-10 bg-white rounded-sm">
-      <Card className="w-full max-w-4xl p-6 rounded-2xl shadow-none border-none">
+    <div className="w-full flex justify-center py-2 bg-white rounded-sm max-md:mb-22">
+      <Card className="w-full max-w-4xl rounded-2xl shadow-none border-none">
         <CardContent>
           <ProfileUpdateForm user={userData} />
         </CardContent>
