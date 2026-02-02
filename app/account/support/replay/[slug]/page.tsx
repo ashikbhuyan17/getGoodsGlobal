@@ -1,180 +1,111 @@
-import Link from "next/link";
-import {
-  ChevronLeft,
-  MessageSquare,
-  Clock,
-  User,
-  ShieldCheck,
-} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { fetcher } from "@/lib/fetcher";
-import Replay from "@/components/tickets/Replay";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import TicketInfoBar from "@/components/account/support/TicketInfoBar";
+import TicketDetailsCard from "@/components/account/support/TicketDetailsCard";
+import LiveChat from "@/components/account/support/LiveChat";
+import { Paperclip } from "lucide-react";
 
-function formatDate(dt?: string) {
-  if (!dt) return "N/A";
-  return new Date(dt).toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+// Demo data matching the image
+const demoTicketData = {
+  ticketId: "ST8861",
+  category: "Wrong Product",
+  status: "Open",
+  manager: "谢鹏 Dora",
+  issueDescription: `Pink need 4 right leg flipflops
+Blue need 6 right leg flipflops
+White need 50 Left leg Flipflops
+Yellow Need 4 left leg flipflops`,
+  chatMessages: [
+    {
+      id: 1,
+      type: "user",
+      image: "/hero-1.jpg", // Demo image - pink items
+      created_at: "2026-01-17T14:06:00.000Z",
+    },
+    {
+      id: 2,
+      type: "user",
+      image: "/hero-2.jpg", // Demo image - blue items
+      created_at: "2026-01-17T14:06:00.000Z",
+    },
+    {
+      id: 3,
+      type: "user",
+      image: "/hero-3.jpg", // Demo image - yellow items
+      created_at: "2026-01-17T14:07:00.000Z",
+    },
+    {
+      id: 4,
+      type: "admin",
+      message: `Dear Team, 🌿 50 pieces - White (Left side) 🌿 6 pieces - Yellow (Left side) 🌿 6 pieces - Blue (Right side) 🌿 4 pieces - Pink (Right side) The above-listed sandals parts are missing. We kindly request you to send the missing items as per the correct list. Please check the list carefully before dispatching. Thank you very much for your support and cooperation.`,
+      created_at: "2026-01-17T14:14:00.000Z",
+    },
+  ],
+};
 
-export default async function TicketDetailPage({
+export default function TicketDetailPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const { slug } = await params;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res: any = await fetcher(`/ticket-replay-list/${slug}`);
-  const ticket = res?.data ?? [];
-
-  if (!ticket?.length) {
-    return <p className="p-6">No ticket found</p>;
-  }
+  // Use demo data instead of API call
+  const ticketData = demoTicketData;
+  const managerName = ticketData.manager;
+  const ticketId = ticketData.ticketId;
+  const category = ticketData.category;
+  const status = ticketData.status;
+  const issueDescription = ticketData.issueDescription;
 
   return (
-    <div className="min-h-screen bg-white rounded-sm p-4 md:p-8">
-      <div className="space-y-6">
-        {/* Back Navigation */}
-        <Link
-          href="/account/support"
-          className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors group"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Support
-        </Link>
+    <div className="">
+      {/* Ticket Info Bar */}
+      <TicketInfoBar ticketId={ticketId} />
 
-        {/* Ticket Header */}
-        <Card className="rounded-xl border-none shadow-sm bg-white overflow-hidden">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/30 pb-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                  <span className="font-mono font-medium">{slug}</span>
-                  <span>•</span>
-                  <span>{ticket?.[0]?.category ?? "Ticket"}</span>
+      <div className="py-3 px-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Ticket Details Card */}
+            <TicketDetailsCard
+              ticketId={ticketId}
+              category={category}
+              status={status}
+              manager={managerName}
+            />
+
+            {/* Issue Description Section */}
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardContent className="p-4 md:p-6">
+                <div className="mb-3">
+                  <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs px-2 py-1 rounded">
+                    Issue
+                  </Badge>
                 </div>
-                <CardTitle className="text-2xl font-bold text-slate-900 leading-tight">
-                  {ticket?.[0]?.message ?? "Ticket Conversation"}
-                </CardTitle>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Badge
+                <p className="text-sm text-gray-700 leading-relaxed mb-4 whitespace-pre-wrap">
+                  {issueDescription}
+                </p>
+                <Button
                   variant="outline"
-                  className="rounded-lg bg-emerald-50 text-emerald-700 border-emerald-100 px-3 py-1"
+                  className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                 >
-                  {ticket?.[0]?.status ?? "Open"}
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="rounded-lg bg-orange-50 text-orange-700 border-orange-100 px-3 py-1"
-                >
-                  {ticket?.[0]?.priority ?? "Normal"}
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-6">
-            <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
-              {ticket?.[0]?.message ?? ""}
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-4 text-xs text-slate-500 border-t border-slate-50 pt-4">
-              <div className="flex items-center gap-1.5">
-                <Clock className="h-3.5 w-3.5" />
-                Created on {formatDate(ticket?.[0]?.created_at)}
-              </div>
-              <div className="flex items-center gap-1.5">
-                <User className="h-3.5 w-3.5" />
-                User & Support Replies
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Replies */}
-        <div className="space-y-4 pt-4">
-          <div className="flex items-center gap-2 px-1">
-            <MessageSquare className="h-5 w-5 text-slate-400" />
-            <h2 className="text-lg font-semibold text-slate-900">
-              Conversation
-            </h2>
+                  <Paperclip className="h-4 w-4 mr-2" />
+                  Additional Files
+                </Button>
+                <p className="text-xs text-gray-500 mt-2">No File attached.</p>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {ticket?.map((it: any) => {
-            const isAdmin = !!it?.replay;
-            const text = it?.replay ?? it?.message ?? "";
-
-            return (
-              <div
-                key={it?.id}
-                className={`flex gap-4 ${
-                  isAdmin ? "flex-row" : "flex-row-reverse"
-                }`}
-              >
-                <Avatar className="h-10 w-10 border-2 border-white shadow-sm shrink-0">
-                  <AvatarImage src={it?.avatar ?? "/diverse-avatars.png"} />
-                  <AvatarFallback>{isAdmin ? "AG" : "US"}</AvatarFallback>
-                </Avatar>
-
-                <div
-                  className={`flex flex-col max-w-[85%] ${
-                    isAdmin ? "items-start" : "items-end"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-1 px-1">
-                    <span className="text-sm font-semibold text-slate-900">
-                      {isAdmin ? "Support Agent" : "Client"}
-                    </span>
-
-                    {isAdmin && (
-                      <Badge
-                        variant="outline"
-                        className="h-5 rounded-md bg-blue-50 text-blue-700 border-blue-100 text-[10px] uppercase tracking-wider font-bold"
-                      >
-                        <ShieldCheck className="h-3 w-3 mr-1" />
-                        Agent
-                      </Badge>
-                    )}
-
-                    <span className="text-[11px] text-slate-400">
-                      {formatDate(it?.created_at)}
-                    </span>
-                  </div>
-
-                  <Card
-                    className={`rounded-2xl border-none shadow-sm overflow-hidden py-4 ${
-                      isAdmin
-                        ? "bg-white rounded-tl-none"
-                        : "bg-slate-900 text-white rounded-tr-none"
-                    }`}
-                  >
-                    <CardContent className="px-5 py-0">
-                      <p
-                        className={`text-sm leading-relaxed ${
-                          isAdmin ? "text-slate-700" : "text-slate-100"
-                        }`}
-                      >
-                        {text}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            );
-          })}
+          {/* Right Column */}
+          <div className="space-y-6">
+            <LiveChat
+              ticketId={ticketId}
+              ticket={ticketData.chatMessages}
+              managerName={managerName}
+            />
+          </div>
         </div>
-
-        {/* Reply Section */}
-        <Replay id={slug} />
       </div>
     </div>
   );

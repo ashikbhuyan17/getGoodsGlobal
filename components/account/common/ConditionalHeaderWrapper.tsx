@@ -9,12 +9,14 @@ export default function ConditionalHeaderWrapper({
 }) {
   const pathname = usePathname();
   
-  // Don't show header on order details page
+  // Don't show header on order details page or support ticket details page
   const isOrderDetailsPage = pathname?.includes("/account/orders/") && 
                              pathname !== "/account/orders" &&
                              !pathname?.includes("/account/orders?");
   
-  if (isOrderDetailsPage) {
+  const isTicketDetailsPage = pathname?.includes("/account/support/replay/");
+  
+  if (isOrderDetailsPage || isTicketDetailsPage) {
     return null;
   }
   
