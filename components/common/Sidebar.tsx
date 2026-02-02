@@ -40,7 +40,7 @@ const Footer = ({ settings, contact }: { settings: any; contact: any }) => (
       </Link>
 
       <Link
-        href="/account/tickets"
+        href="/account/support"
         className="flex flex-col items-center gap-2 p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
       >
         <Headphones className="w-5 h-5" />

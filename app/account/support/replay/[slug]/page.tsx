@@ -42,11 +42,11 @@ export default async function TicketDetailPage({
       <div className="space-y-6">
         {/* Back Navigation */}
         <Link
-          href="/account/tickets"
+          href="/account/support"
           className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors group"
         >
           <ChevronLeft className="mr-1 h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Tickets
+          Back to Support
         </Link>
 
         {/* Ticket Header */}
@@ -55,7 +55,7 @@ export default async function TicketDetailPage({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 text-sm text-slate-500 mb-1">
-                  <span className="font-mono font-medium">{params?.slug}</span>
+                  <span className="font-mono font-medium">{slug}</span>
                   <span>•</span>
                   <span>{ticket?.[0]?.category ?? "Ticket"}</span>
                 </div>

@@ -41,7 +41,7 @@ export default async function Dashboard() {
                 </p>
               </div>
             </div>
-            <Link prefetch href="/account/tickets/create" className="mt-auto">
+            <Link prefetch href="/account/support/create" className="mt-auto">
               <Button className="w-full">Get Help Now</Button>
             </Link>
           </div>

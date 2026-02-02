@@ -83,7 +83,7 @@ export default function CreateTicketPage() {
       if (res?.status === true) {
         console.log(res);
         router.refresh();
-        router.push("/account/tickets");
+        router.push("/account/support");
         toast.success("Ticket created successfully!");
         form.reset();
       } else {
@@ -101,11 +101,11 @@ export default function CreateTicketPage() {
     <div className="min-h-screen bg-white rounded-sm p-4 md:p-8 font-sans">
       <div className="space-y-6">
         <Link
-          href="/account/tickets"
+          href="/account/support"
           className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors group"
         >
           <ChevronLeft className="mr-1 h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Tickets
+          Back to Support
         </Link>
 
         <div className="space-y-1">
