@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { GridIcon, ShoppingCart, Settings } from "lucide-react";
+import { GridIcon, ShoppingCart, Settings, CreditCard } from "lucide-react";
 import Link from "next/link";
 import Logout from "./Logout";
 import { fetcher } from "@/lib/fetcher";
@@ -36,6 +36,7 @@ async function Header() {
             {[
               { icon: GridIcon, label: "Dashboard", url: "/account" },
               { icon: ShoppingCart, label: "Orders", url: "/account/orders" },
+              { icon: CreditCard, label: "Payments", url: "/account/payments" },
               { icon: Settings, label: "Settings", url: "/account/settings" },
             ].map((item) => (
               <Link
