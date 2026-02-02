@@ -26,7 +26,7 @@ export default async function OrderPage() {
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 px-2">
       <div className="flex justify-start">
         <Button className="rounded px-6 py-2">Select All to Pay</Button>
       </div>
@@ -101,9 +101,8 @@ export default async function OrderPage() {
 
                       <td className="py-3 px-4">
                         <span
-                          className={`px-2 py-1 rounded text-sm font-medium ${
-                            formatStatus(order?.order_status).color
-                          }`}
+                          className={`px-2 py-1 rounded text-sm font-medium ${formatStatus(order?.order_status).color
+                            }`}
                         >
                           {formatStatus(order?.order_status).label}
                         </span>

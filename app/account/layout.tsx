@@ -1,12 +1,17 @@
-import Header from "@/components/account/common/Header";
 import React from "react";
+import Header from "@/components/account/common/Header";
+import ConditionalHeaderWrapper from "@/components/account/common/ConditionalHeaderWrapper";
 
 function AccountLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="px-2">
-      <Header />
-      {children}
-    </div>
+    <>
+      <ConditionalHeaderWrapper>
+        <Header />
+      </ConditionalHeaderWrapper>
+      <div >
+        {children}
+      </div>
+    </>
   );
 }
 

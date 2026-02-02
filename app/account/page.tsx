@@ -16,7 +16,7 @@ export default async function Dashboard() {
   const completed = dashboardOverview?.data?.completeOrders ?? 0;
 
   return (
-    <div className="w-full rounded space-y-4">
+    <div className="w-full rounded space-y-4 px-2">
       {/* Status cards + Support in one div (bg, shadow); Support on right */}
       <StatusCards
         pending={pending}
