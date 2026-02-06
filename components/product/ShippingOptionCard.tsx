@@ -18,21 +18,20 @@ export default function ShippingOptionCard({
 }: ShippingOptionCardProps) {
   return (
     <Card
-      className={`p-4 cursor-pointer rounded-xl transition border ${
-        active
-          ? "bg-[#E7F2EF] border-[#167389]"
-          : "bg-gray-100 border-transparent hover:border-gray-300"
-      }`}
+      className={`p-3 cursor-pointer rounded-xl transition border ${active
+        ? "bg-[#E7F2EF] border-[#67909b] border-2"
+        : "bg-gray-100 border-transparent hover:border-gray-300"
+        }`}
       onClick={onClick}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col items-center">
         <CheckCircle
           size={22}
           className={active ? "text-[#167389]" : "text-gray-400"}
         />
-        <span className="capitalize font-medium">{title}</span>
+        <span className="capitalize font-medium pt-1">{title}</span>
+        <p className="text-sm text-gray-500 font-semibold">{rate}</p>
       </div>
-      <p className="text-sm mt-1">{rate}</p>
     </Card>
   );
 }

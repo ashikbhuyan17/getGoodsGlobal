@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -18,29 +19,19 @@ export default function ProductSummary({
   shippingAreaSelected,
   setShippingAreaSelected,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   sizes: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   color: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   productId: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   price: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   isInWishlist: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bulkQuantities?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   shippingAreaSelected: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setShippingAreaSelected: any;
 }) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [shippingArea, setShippingArea] = useState<any>(null);
 
   useEffect(() => {
     (async function fetchData() {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const data: any = await fetcher("/shipping-area");
       setShippingArea(data);
       setShippingAreaSelected({
