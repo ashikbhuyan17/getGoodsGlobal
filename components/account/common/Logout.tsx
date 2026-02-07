@@ -1,7 +1,7 @@
 "use client";
 
 import { fetcher } from "@/lib/fetcher";
-import { LogOut } from "lucide-react";
+import { Power } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 function Logout() {
@@ -24,9 +24,9 @@ function Logout() {
   return (
     <button
       onClick={handleDelete}
-      className="flex flex-col items-center gap-1 text-gray-700 hover:text-teal-600 transition-colors whitespace-nowrap"
+      className="flex flex-col items-center gap-1 px-3 py-2 rounded text-gray-700 hover:text-teal-600 transition-colors whitespace-nowrap"
     >
-      <LogOut className="h-6 w-6" />
+      <Power className="h-6 w-6" />
       <span className="text-xs font-medium">Logout</span>
     </button>
   );
