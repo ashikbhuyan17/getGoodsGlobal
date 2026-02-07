@@ -25,11 +25,30 @@ export default async function AuthPage() {
           </div>
 
           {/* Auth Card */}
-          <Card className="p-6 shadow-elevated border-0 bg-card rounded-2xl">
+          <Card className="p-4 shadow-elevated border-0 bg-card rounded-2xl">
+            <div className="flex justify-center items-center">
+              <Image
+                width={120}
+                height={120}
+                src={`${process.env.NEXT_PUBLIC_IMG_URL}/${settings?.data?.white_logo}`}
+                alt="Global wholesale trading network"
+              // className="w-full  drop-shadow-xl"
+              />
+            </div>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="login">Sign In</TabsTrigger>
-                <TabsTrigger value="register">Create Account</TabsTrigger>
+              <TabsList className="mb-2 grid w-full grid-cols-2 gap-4 bg-transparent p-0">
+                <TabsTrigger
+                  value="login"
+                  className="rounded-lg border border-gray-200 bg-white data-[state=active]:bg-teal-600 data-[state=active]:text-white data-[state=active]:border-teal-600 transition-all"
+                >
+                  Sign In
+                </TabsTrigger>
+                <TabsTrigger
+                  value="register"
+                  className="rounded-lg border border-gray-200 bg-white data-[state=active]:bg-teal-600 data-[state=active]:text-white data-[state=active]:border-teal-600 transition-all"
+                >
+                  Create Account
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="login">
