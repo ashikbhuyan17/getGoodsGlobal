@@ -8,6 +8,7 @@ import { InfoIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import TermsModal from "@/components/checkout/TermsModal";
 
 export default function CartSummary({
   page = "cart",
@@ -35,6 +36,7 @@ export default function CartSummary({
   }>(null);
   const [loading, setLoading] = useState(false);
   const [finalPrice, setFinalPrice] = useState(total);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
     if (!discount) {
@@ -128,11 +130,15 @@ export default function CartSummary({
     setLoading(false);
   };
 
-  const handleOrder = async () => {
+  const handlePlaceOrderClick = () => {
     if (page !== "checkout") return;
-
     if (!validateForm()) return;
+    setShowTermsModal(true);
+  };
 
+  const handleAcceptTerms = async () => {
+    setShowTermsModal(false);
+    
     toast.loading("Placing your order...");
 
     try {
@@ -145,12 +151,14 @@ export default function CartSummary({
           discount,
         }),
       });
+      console.log("🚀 ~ handleAcceptTerms ~ orderData:", orderData)
 
       toast.dismiss();
 
       if (orderData?.status === "success") {
         toast.success("Order placed successfully!");
-        router.push("/account/orders");
+        const invoiceId = orderData?.data?.invoice_id || orderData?.data?.id;
+        router.push(`/payment/${invoiceId}`);
       } else {
         toast.error("Failed to place order. Try again.");
       }
@@ -225,12 +233,19 @@ export default function CartSummary({
         </div>
 
         {page === "checkout" ? (
-          <Button
-            onClick={handleOrder}
-            className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
-          >
-            Place Order & Pay
-          </Button>
+          <>
+            <Button
+              onClick={handlePlaceOrderClick}
+              className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
+            >
+              Place Order & Pay
+            </Button>
+            <TermsModal
+              open={showTermsModal}
+              onClose={() => setShowTermsModal(false)}
+              onAccept={handleAcceptTerms}
+            />
+          </>
         ) : (
           <Link prefetch href={"/checkout"}>
             <Button className="w-full bg-primary hover:bg-primary/95 py-6 text-base">
