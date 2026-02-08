@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Metadata } from "next";
 import { Jost } from "next/font/google";
 import "./globals.css";
@@ -26,12 +27,14 @@ export default async function RootLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const navItems: any = await fetcher("/categories");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const settings: any = await fetcher(`/settings`);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const contact: any = await fetcher(`/contact`);
+  let menuCategories: any = null;
+  try {
+    menuCategories = await fetcher("/menu-categories");
+  } catch (error) {
+    console.error("Error fetching menu categories:", error);
+  }
   return (
     <html lang="en">
       <head>
@@ -52,7 +55,7 @@ export default async function RootLayout({
             settings={settings}
             navItems={navItems?.data}
           /> */}
-          <Sidebar2 settings={settings} contact={contact} />
+          <Sidebar2 settings={settings} contact={contact} initialCategories={menuCategories} />
         </div>
         <BottomNav />
         <Header />
