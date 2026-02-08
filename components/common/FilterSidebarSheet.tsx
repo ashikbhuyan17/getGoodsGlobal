@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 interface PriceRange {
   id: string;
@@ -37,30 +37,124 @@ export function FilterSidebarSheet({ children }: FilterSidebarSheetProps) {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [selectedRanges, setSelectedRanges] = useState<string>("");
+  const [open, setOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Sync state with URL params when sheet opens
+  useEffect(() => {
+    if (!open) return;
+
+    const urlMin = searchParams.get("min");
+    const urlMax = searchParams.get("max");
+
+    // If no URL params, clear all state
+    if (!urlMin && !urlMax) {
+      setMinPrice("");
+      setMaxPrice("");
+      setSelectedRanges("");
+      return;
+    }
+
+    const min = urlMin ? Number(urlMin) : 0;
+    const max = urlMax ? Number(urlMax) : 99999999;
+
+    // Check if URL params match any price range
+    const matchingRange = PRICE_RANGES.find(
+      (range) => range.min === min && range.max === max
+    );
+
+    if (matchingRange) {
+      // If matches a range, select that range and clear manual inputs
+      setSelectedRanges(matchingRange.id);
+      setMinPrice("");
+      setMaxPrice("");
+    } else {
+      // If doesn't match a range, show in manual inputs and clear range selection
+      setSelectedRanges("");
+      setMinPrice(min === 0 ? "" : String(min));
+      setMaxPrice(max === 99999999 ? "" : String(max));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleRangeToggle = (rangeId: string) => {
-    setSelectedRanges(rangeId);
-  };
+    // Toggle: if same range clicked, deselect it
+    if (selectedRanges === rangeId) {
+      setSelectedRanges("");
+      setMinPrice("");
+      setMaxPrice("");
+      // Clear filters from URL
+      router.push(pathname);
+      router.refresh();
+      return;
+    }
 
-  const handleApplyFilters = () => {
-    console.log({
-      minPrice,
-      maxPrice,
-      selectedRanges,
-    });
-    if (!minPrice && !maxPrice) {
-      const ranges = PRICE_RANGES?.find((rng) => rng?.id === selectedRanges);
-      router.push(`?min=${ranges?.min}&max=${ranges?.max}`);
-    } else {
-      router.push(
-        `?min=${minPrice ? minPrice : 0}&max=${maxPrice ? maxPrice : 9999999}`
-      );
+    setSelectedRanges(rangeId);
+    // Clear manual price inputs when selecting a range
+    setMinPrice("");
+    setMaxPrice("");
+    
+    // Update URL immediately when range is selected
+    const ranges = PRICE_RANGES?.find((rng) => rng?.id === rangeId);
+    if (ranges) {
+      const url = `${pathname}?min=${ranges.min}&max=${ranges.max}`;
+      router.push(url);
+      router.refresh();
     }
   };
 
+  const handlePriceChange = (type: "min" | "max", value: string) => {
+    // Update state first
+    if (type === "min") {
+      setMinPrice(value);
+      // Clear selected range when manual input changes
+      if (selectedRanges) setSelectedRanges("");
+    } else {
+      setMaxPrice(value);
+      // Clear selected range when manual input changes
+      if (selectedRanges) setSelectedRanges("");
+    }
+
+    // Get updated values for URL
+    const newMinPrice = type === "min" ? value : minPrice;
+    const newMaxPrice = type === "max" ? value : maxPrice;
+
+    // Update URL with current values
+    // If both are empty, use defaults (which means no filter)
+    const currentMin = newMinPrice ? Number(newMinPrice) : 0;
+    const currentMax = newMaxPrice ? Number(newMaxPrice) : 99999999;
+    
+    // Only add query params if at least one is not default
+    if (currentMin > 0 || currentMax < 99999999) {
+      const url = `${pathname}?min=${currentMin}&max=${currentMax}`;
+      router.push(url);
+      router.refresh();
+    } else {
+      // If both are defaults, clear filters from URL
+      router.push(pathname);
+      router.refresh();
+    }
+  };
+
+  const handleClearRange = () => {
+    // Clear selected range and price inputs
+    setSelectedRanges("");
+    setMinPrice("");
+    setMaxPrice("");
+    // Clear filters from URL
+    router.push(pathname);
+    router.refresh();
+  };
+
+  const handleApplyFilters = () => {
+    // Close the sheet after applying filters
+    setOpen(false);
+  };
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent side="right" className="w-full sm:w-96 flex flex-col p-0">
         {/* Header */}
@@ -84,7 +178,7 @@ export function FilterSidebarSheet({ children }: FilterSidebarSheetProps) {
                   type="number"
                   placeholder="Min price"
                   value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
+                  onChange={(e) => handlePriceChange("min", e.target.value)}
                   className="bg-gray-100 border-gray-200 text-gray-900 placeholder:text-gray-400"
                 />
               </div>
@@ -96,7 +190,7 @@ export function FilterSidebarSheet({ children }: FilterSidebarSheetProps) {
                   type="number"
                   placeholder="Max price"
                   value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
+                  onChange={(e) => handlePriceChange("max", e.target.value)}
                   className="bg-gray-100 border-gray-200 text-gray-900 placeholder:text-gray-400"
                 />
               </div>
@@ -105,16 +199,26 @@ export function FilterSidebarSheet({ children }: FilterSidebarSheetProps) {
 
           {/* Price Ranges Section */}
           <div>
-            <h3 className="text-sm font-semibold text-teal-700 mb-4">
-              Price Ranges
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-semibold text-teal-700">
+                Price Ranges
+              </h3>
+              {(selectedRanges || minPrice || maxPrice) && (
+                <button
+                  onClick={handleClearRange}
+                  className="text-xs text-red-600 hover:text-red-700 font-medium underline"
+                >
+                  Clear Range
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {PRICE_RANGES.map((range) => (
                 <button
                   key={range.id}
                   onClick={() => handleRangeToggle(range.id)}
                   className={`flex items-center gap-3 p-1.5 rounded-lg transition-colors ${
-                    selectedRanges.includes(range.id)
+                    selectedRanges === range.id
                       ? "bg-gray-200"
                       : "bg-gray-100 hover:bg-gray-150"
                   }`}
@@ -123,7 +227,7 @@ export function FilterSidebarSheet({ children }: FilterSidebarSheetProps) {
                   <div>
                     <Check
                       className={`w-4 h-4 rounded-full border-2 shrink-0 transition-colors ${
-                        selectedRanges.includes(range.id)
+                        selectedRanges === range.id
                           ? "border-primary bg-primary text-white"
                           : "border-gray-300 text-gray-300 bg-transparent"
                       }`}
