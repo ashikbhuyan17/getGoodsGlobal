@@ -15,7 +15,6 @@ export default async function OrderDetailsPage({
   const { id } = await params;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const order: any = await fetcher(`/order-track/${id}`);
-
   if (!order?.data || order?.data?.length < 1) {
     notFound();
   }

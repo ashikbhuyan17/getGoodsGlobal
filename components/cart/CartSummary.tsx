@@ -138,7 +138,7 @@ export default function CartSummary({
 
   const handleAcceptTerms = async () => {
     setShowTermsModal(false);
-    
+
     toast.loading("Placing your order...");
 
     try {
@@ -157,7 +157,7 @@ export default function CartSummary({
 
       if (orderData?.status === "success") {
         toast.success("Order placed successfully!");
-        const invoiceId = orderData?.data?.invoice_id || orderData?.data?.id;
+        const invoiceId = orderData?.order_id;
         router.push(`/payment/${invoiceId}`);
       } else {
         toast.error("Failed to place order. Try again.");
