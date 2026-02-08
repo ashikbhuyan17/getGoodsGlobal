@@ -151,7 +151,6 @@ export default function CartSummary({
           discount,
         }),
       });
-      console.log("🚀 ~ handleAcceptTerms ~ orderData:", orderData)
 
       toast.dismiss();
 
