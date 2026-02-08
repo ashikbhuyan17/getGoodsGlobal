@@ -30,16 +30,16 @@ function VideoCard({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="cursor-pointer">
-          <div className="relative">
+        <div className="cursor-pointer w-full">
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-gray-100">
             <Image
               alt={title || "Video thumbnail"}
               src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
               width={1200}
-              height={1200}
-              className="w-full rounded-xl"
+              height={675}
+              className="w-full h-full object-cover rounded-xl"
             />
-            <span className="bg-cyan-500 p-1.5 rounded-full absolute bottom-2 right-2">
+            <span className="bg-cyan-500 p-1.5 rounded-full absolute bottom-2 right-2 z-10">
               <Play fill="#fff" className="text-white w-3.5 h-3.5" />
             </span>
           </div>
@@ -47,7 +47,7 @@ function VideoCard({
             <h2 className="font-semibold text-sm line-clamp-2">
               {title || "Video Title"}
             </h2>
-            <p className="text-xs text-muted-foreground">{formatDate(date)}</p>
+            <p className="text-xs text-muted-foreground mt-1">{formatDate(date)}</p>
           </div>
         </div>
       </DialogTrigger>

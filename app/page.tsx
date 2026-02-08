@@ -10,13 +10,20 @@ import { fetcher } from "@/lib/fetcher";
 export default async function Home() {
   const slides: any = await fetcher("/mainslider");
   const frontCategory: any = await fetcher("/front-category-products");
+  // Fetch gallery slider data
+  let galleryData: any = null;
+  try {
+    galleryData = await fetcher("/galleryslider");
+  } catch (error) {
+    console.error("Error fetching gallery slider:", error);
+  }
 
   return (
     <div>
       <HeroSlider slides={slides} />
       <div className="px-2">
         <FeatureSection />
-        <GallerySection />
+        <GallerySection galleryData={galleryData} />
         <CategorySection />
         <div className="space-y-4">
           {frontCategory?.data?.map((cat: any) => (
