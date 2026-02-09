@@ -33,7 +33,7 @@ export default function ProductDetails({
   );
 
   return (
-    <div className="p-6 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
+    <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
       {/* Left Section - Image Gallery */}
       <div className="flex xl:flex-col gap-2">
         <div
@@ -73,7 +73,7 @@ export default function ProductDetails({
         ))}
       </div>
       <div className="w-full">
-        <div className="relative  md:h-[500px] w-full h-full">
+        <div className="relative h-[200px] xl:h-[220px]  2xl:h-[400px] w-full ">
           <Dialog>
             <DialogTrigger asChild>
               <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
@@ -81,7 +81,7 @@ export default function ProductDetails({
               </div>
             </DialogTrigger>
 
-            <DialogContent className="aspect-square">
+            <DialogContent className="aspect-square  max-2xl:w-[400px]">
               <Image
                 src={image}
                 alt={product?.data?.product?.name}
@@ -93,9 +93,9 @@ export default function ProductDetails({
           <Image
             src={image}
             alt="main shoe"
-            width={700}
-            height={700}
-            className="rounded-lg shadow-md object-cover w-full h-full"
+            width={180}
+            height={180}
+            className="rounded-lg shadow-md object-contain lg:object-cover w-full h-full p-1"
           />
         </div>
       </div>
@@ -183,9 +183,9 @@ export default function ProductDetails({
                 ))}
               </div>
             </div>
-            <ScrollArea className="h-56">
+            <ScrollArea className="h-56 max-lg:w-full max-2xl:w-[320px]">
               <div className="mt-4 border-2 border-[#EEEEEE] rounded-md overflow-hidden">
-                <div className="grid grid-cols-3 gap-3 p-2 border-gray-200">
+                <div className="grid grid-cols-3 gap-3 p-1 py-2 border-gray-200">
                   <div className="text-start">
                     <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-start">
                       Size
@@ -196,7 +196,7 @@ export default function ProductDetails({
                       Price
                     </span>
                   </div>
-                  <div className="text-center">
+                  <div className="text-center ">
                     <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-center">
                       Quantity
                     </span>

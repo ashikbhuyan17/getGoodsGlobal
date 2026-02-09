@@ -67,7 +67,7 @@ export default function QuantityUpdateBtn({
   return (
     <div className="flex items-center gap-1">
       <Button
-        className="rounded-full w-6 h-6"
+        className="rounded-full w-5 h-5"
         size="icon"
         onClick={decrease}
         disabled={quantity <= min}
@@ -77,7 +77,7 @@ export default function QuantityUpdateBtn({
 
       <Input
         type="number"
-        className="w-16 px-0 text-center"
+        className="w-12 px-0 text-center"
         value={quantity}
         min={min}
         max={max}
@@ -85,7 +85,7 @@ export default function QuantityUpdateBtn({
       />
 
       <Button
-        className="rounded-full w-6 h-6"
+        className="rounded-full w-5 h-5"
         size="icon"
         onClick={increase}
         disabled={quantity >= max}
