@@ -129,7 +129,7 @@ export default function Sidebar2({
     categories.forEach((category) => {
       const subCategories = category.subcategories || [];
       subCategories.forEach((subCategory) => {
-        if (pathname === `/subcategory/${subCategory.slug}`) {
+        if (pathname === `/category/${category.slug}/subcategory/${subCategory.slug}`) {
           setOpenCategoryId(String(category.id));
           setSelectedSubCategoryId(String(subCategory.id));
         }
@@ -236,11 +236,11 @@ export default function Sidebar2({
                             const isSelected =
                               selectedSubCategoryId === String(subCategory.id);
                             const isSubCategoryActive =
-                              pathname === `/subcategory/${subCategory.slug}`;
+                              pathname === `/category/${category.slug}/subcategory/${subCategory.slug}`;
                             return (
                               <li key={subCategory.id}>
                                 <Link
-                                  href={`/subcategory/${subCategory.slug}`}
+                                  href={`/category/${category.slug}/subcategory/${subCategory.slug}`}
                                   onClick={() =>
                                     handleSubCategoryClick(
                                       String(category.id),

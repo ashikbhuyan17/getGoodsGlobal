@@ -2,28 +2,30 @@ import ProductList from "@/components/common/ProductList";
 import InfoBar from "@/components/shop/InfoBar";
 import { SubcategoryPills } from "@/components/shop/SubcategoryPills";
 
-async function ShopPage({
+async function SubcategoryPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams: { max?: string; min?: string };
+  params: Promise<{ slug: string; subcategorySlug: string }>;
+  searchParams: Promise<{ max?: string; min?: string }>;
 }) {
-  const { slug } = await params;
+  const { slug: categorySlug, subcategorySlug } = await params;
   const { max, min } = await searchParams;
 
   return (
     <div className="min-h-screen space-y-5">
-      <div>
-        <InfoBar slug={slug} />
-      </div>
+      <InfoBar slug={subcategorySlug} />
       <div className="px-2">
         <div className="bg-white rounded-sm border-border p-4 space-y-3">
-          <SubcategoryPills categorySlug={slug} />
+          <SubcategoryPills
+            categorySlug={categorySlug}
+            activeSubcategorySlug={subcategorySlug}
+          />
           <ProductList
             max={Number(max) || 99999999}
             min={Number(min) || 0}
-            slug={`/category-products/${slug}`}
+            slug={`/subcategory-products/${subcategorySlug}`}
+            categorySlug={categorySlug}
           />
         </div>
       </div>
@@ -31,4 +33,4 @@ async function ShopPage({
   );
 }
 
-export default ShopPage;
+export default SubcategoryPage;
