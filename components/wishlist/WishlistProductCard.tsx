@@ -75,10 +75,10 @@ export default function WishlistProductCard({
   }
 
   return (
-    <Card className="bg-white border border-gray-200 overflow-hidden  transition-shadow">
-      <CardContent className="p-0 flex flex-col">
+    <Card className="bg-white border border-gray-200 overflow-hidden transition-shadow h-full flex flex-col">
+      <CardContent className="p-0 flex flex-col h-full">
         {/* Image Section */}
-        <Link href={`/product/${slug}`} prefetch className="block">
+        <Link href={`/product/${slug}`} prefetch className="block shrink-0">
           <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
             <Image
               src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
@@ -91,7 +91,7 @@ export default function WishlistProductCard({
         </Link>
 
         {/* Info Section */}
-        <div className="px-3 flex flex-col flex-1 space-y-2">
+        <div className="px-3 pt-3 pb-0 flex flex-col flex-1 min-h-0">
           {/* Price */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[#ff0050] font-bold text-base">
@@ -105,22 +105,23 @@ export default function WishlistProductCard({
           </div>
 
           {/* Title */}
-          <Link href={`/product/${slug}`} prefetch>
-            <h3 className="text-sm text-gray-800 font-medium leading-tight line-clamp-2 hover:text-primary transition-colors">
+          <Link href={`/product/${slug}`} prefetch className="shrink-0">
+            <h3 className="text-sm text-gray-800 font-medium leading-tight line-clamp-2 hover:text-primary transition-colors mb-2">
               {title}
             </h3>
           </Link>
 
           {/* Remove Button - Bottom */}
-          <Button
-            onClick={handleRemove}
-            disabled={isRemoving}
-            variant="outline"
-            className={cn(
-              'w-full mt-auto border-gray-200 bg-white hover:bg-gray-50',
-              'flex items-center justify-center gap-2  h-auto'
-            )}
-          >
+          <div className="mt-auto">
+            <Button
+              onClick={handleRemove}
+              disabled={isRemoving}
+              variant="outline"
+              className={cn(
+                'w-full border-gray-200 bg-white hover:bg-gray-50',
+                'flex items-center justify-center gap-2 h-auto py-2'
+              )}
+            >
             {isRemoving ? (
               <Loader2 className="h-4 w-4 animate-spin text-[#279ACE]" />
             ) : (
@@ -131,7 +132,8 @@ export default function WishlistProductCard({
                 </span>
               </>
             )}
-          </Button>
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
