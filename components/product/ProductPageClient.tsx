@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import ProductSummary from "@/components/product/ProductSummary";
-import ProductDetails from "@/components/product/ProductDetails";
-import { useState } from "react";
+import ProductSummary from '@/components/product/ProductSummary';
+import ProductDetails from '@/components/product/ProductDetails';
+import { useState } from 'react';
 
 function ProductPageClient({
   product,
@@ -16,9 +16,8 @@ function ProductPageClient({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bulkQuantities?: any;
 }) {
-  console.log("🚀 ~ ProductPageClient ~ product:", product)
   const [selectedColor, setSelectedColor] = useState(
-    product?.data?.productColors[0]?.color
+    product?.data?.productColors?.[0]?.color || null
   );
   const [selectedSizes, setSelectedSizes] = useState({});
   const [price, setPrice] = useState([]);

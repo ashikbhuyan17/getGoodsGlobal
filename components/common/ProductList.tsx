@@ -97,8 +97,8 @@ async function ProductList({
   return (
     <div className="">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {filterdProduct?.map((product: any) => (
-          <div key={product?.id}>
+        {filterdProduct?.map((product: any) => {
+          return <div key={product?.id}>
             <ProductCard
               title={product?.name}
               slug={product?.slug}
@@ -106,8 +106,8 @@ async function ProductList({
               newPrice={product?.new_price}
               oldPrice={product?.old_price}
             />
-          </div>
-        ))}
+          </div>;
+        })}
       </div>
       {/* <div className="my-10">
         <PaginationComponent currentPage={1} totalPages={6} />
