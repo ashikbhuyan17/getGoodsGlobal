@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState, useEffect } from "react";
@@ -142,14 +143,15 @@ export default function CartSummary({
     toast.loading("Placing your order...");
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const orderPayload = {
+        ...formData,
+        total_price: finalPrice,
+        coupon_code: discount ? coupon : null,
+      };
+      console.log("🚀 ~ handleAcceptTerms ~ orderPayload:", orderPayload)
       const orderData: any = await fetcher("/order-place", {
         method: "POST",
-        body: JSON.stringify({
-          ...formData,
-          coupon_name: coupon,
-          discount,
-        }),
+        body: JSON.stringify(orderPayload),
       });
       console.log("🚀 ~ handleAcceptTerms ~ orderData:", orderData)
 
@@ -157,7 +159,7 @@ export default function CartSummary({
 
       if (orderData?.status === "success") {
         toast.success("Order placed successfully!");
-        const invoiceId = orderData?.order_id;
+        const invoiceId = orderData?.invoice_id;
         router.push(`/payment/${invoiceId}`);
       } else {
         toast.error("Failed to place order. Try again.");

@@ -8,28 +8,49 @@ import PaymentPageClient from './_components/PaymentPageClient';
 export default async function PaymentPage({
   params,
 }: {
-  params: Promise<{ orderId: string }>;
+  params: Promise<{ invoiceId: string }>;
 }) {
-  const { orderId } = await params;
+  const { invoiceId } = await params;
 
-  const order: any = await fetcher(`/order-track/${orderId}`);
+  // Fetch payment data (array of payments)
+  const payment: any = await fetcher(`/payment/${invoiceId}`);
 
-  // if (!order?.data || order.data.length < 1) {
-  //   notFound();
-  // }
+  // Fetch bank list
+  let bankList: any = null;
+  try {
+    bankList = await fetcher(`/bank-lists`);
+    // Handle error response
+    if (bankList?.status === 'error' || !bankList?.data) {
+      bankList = { data: [] };
+    }
+  } catch {
+    bankList = { data: [] };
+  }
 
-  const orderData = order.data[0];
-  const total = Number(orderData?.amount ?? 0);
-  const paid = Number(orderData?.paid_partial_payment_amount ?? 0);
-  const initialPayable = Math.max(0, total - paid);
-  const payable = initialPayable;
-  const orderLabel = orderData?.invoice_id
-    ? `SKY${orderData.invoice_id}`
-    : orderId
-      ? `SKY${orderId}`
-      : '—';
-  const advance = orderData?.advance ?? '50%';
-  const invoiceId = orderData?.invoice_id ?? orderId;
+  // Handle error response
+  if (
+    payment?.status === 'error' ||
+    !payment?.data ||
+    !Array.isArray(payment.data) ||
+    payment.data.length === 0
+  ) {
+    notFound();
+  }
+
+  // Get first payment to extract invoice_id
+  const firstPayment = payment.data[0];
+  // const invoiceId = firstPayment?.invoice_id ?? invoiceId;
+  const orderLabel = invoiceId ? `SKY${invoiceId}` : '—';
+
+  // Calculate total amount: first payment is 50% advance, so total = first payment * 2
+  const total = firstPayment?.amount > 0 ? firstPayment?.amount : 0;
+
+  const paid = 0;
+
+  // Payable Amount = 50% of total (remaining 50% after advance)
+  const payable = Math.round(total * 0.5);
+  const initialPayable = payable;
+  const advance = '50%';
 
   return (
     <div className="min-h-screen space-y-4">
@@ -53,7 +74,7 @@ export default async function PaymentPage({
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="hover:bg-gray-50 transition">
+                    <tr className="hover:bg-gray-50 transition font-semibold">
                       <td className="py-3 px-4">
                         <Link
                           href={`/account/orders/${invoiceId}`}
@@ -68,9 +89,9 @@ export default async function PaymentPage({
                       <td className="py-3 px-4">
                         <div className="flex flex-col gap-1">
                           <span>৳{payable}</span>
-                          <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium inline-block w-fit">
+                          {/* <div className="bg-orange-100 text-orange-700 px-2 py-1 rounded text-xs font-medium inline-block w-fit">
                             ৳{payable}
-                          </div>
+                          </div> */}
                         </div>
                       </td>
                     </tr>
@@ -81,7 +102,11 @@ export default async function PaymentPage({
           </div>
 
           {/* Right Section – client (interactive) */}
-          <PaymentPageClient initialPayable={initialPayable} />
+          <PaymentPageClient
+            initialPayable={initialPayable}
+            bankList={bankList}
+            invoiceId={invoiceId}
+          />
         </div>
       </div>
     </div>
