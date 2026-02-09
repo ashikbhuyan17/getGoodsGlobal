@@ -60,9 +60,9 @@ export default function Header() {
     <header className="px-2 pt-2">
       <div className="bg-white border-b border-gray-200 rounded mb-4">
         <div className="px-6 py-4">
-          <div className="flex items-center ">
+          <div className="flex items-center max-lg:flex-col  ">
             {/* User Profile Section */}
-            <div className="flex items-center gap-4 shrink-0 w-1/4">
+            <div className="flex items-center gap-4 shrink-0 lg:w-1/4">
               <Avatar className="h-14 w-14 bg-gray-300 shrink-0">
                 <AvatarFallback className="text-lg font-semibold text-gray-700">
                   {userInitials}
@@ -86,7 +86,7 @@ export default function Header() {
             </div>
 
             {/* Navigation Links Section */}
-            <nav className="flex gap-2 overflow-x-auto pb-2  justify-between ml-4 w-1/2 ">
+            <nav className="flex gap-2 overflow-x-auto pb-2  justify-between ml-4 w-full xl:w-1/2 ">
               {navItems.map((item) => {
                 const active = isActive(item.url);
                 return (

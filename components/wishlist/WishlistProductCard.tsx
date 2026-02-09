@@ -1,15 +1,16 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Heart, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { fetcher } from "@/lib/fetcher";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { Trash2, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { fetcher } from '@/lib/fetcher';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface WishlistProductCardProps {
   id: number;
@@ -37,18 +38,18 @@ export default function WishlistProductCard({
   const handleRemove = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     setIsRemoving(true);
 
     try {
-      const user: any = await fetcher("/user-profile");
+      const user: any = await fetcher('/user-profile');
       if (!user?.data?.id) {
-        router.push("/signin");
+        router.push('/signin');
         return;
       }
 
-      const res: any = await fetcher("/remove-wishlist", {
-        method: "POST",
+      const res: any = await fetcher('/remove-wishlist', {
+        method: 'POST',
         body: JSON.stringify({
           product_id: productId,
           user_id: user?.data?.id,
@@ -57,13 +58,13 @@ export default function WishlistProductCard({
 
       if (res?.status === true) {
         setIsRemoved(true);
-        toast.success("Removed from wishlist");
+        toast.success('Removed from wishlist');
         router.refresh();
       } else {
-        toast.error("Failed to remove from wishlist");
+        toast.error('Failed to remove from wishlist');
       }
     } catch (error) {
-      toast.error("Something went wrong");
+      toast.error('Something went wrong');
     } finally {
       setIsRemoving(false);
     }
@@ -74,44 +75,23 @@ export default function WishlistProductCard({
   }
 
   return (
-    <Card className="group relative overflow-hidden rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all duration-300 bg-white">
-      <CardContent className="p-0">
+    <Card className="bg-white border border-gray-200 overflow-hidden transition-shadow h-full flex flex-col">
+      <CardContent className="p-0 flex flex-col h-full">
         {/* Image Section */}
-        <Link href={`/product/${slug}`} prefetch className="block">
-          <div className="relative aspect-square bg-gray-50 w-full overflow-hidden">
+        <Link href={`/product/${slug}`} prefetch className="block shrink-0">
+          <div className="relative w-full aspect-square bg-gray-50 overflow-hidden">
             <Image
               src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
               alt={title}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 20vw, 16vw"
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover"
             />
-            
-            {/* Remove Button - Top Right */}
-            <div className="absolute top-2 right-2 z-10">
-              <Button
-                onClick={handleRemove}
-                disabled={isRemoving}
-                size="icon"
-                variant="secondary"
-                className={cn(
-                  "h-9 w-9 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white transition-all",
-                  "opacity-0 group-hover:opacity-100",
-                  isRemoving && "opacity-100"
-                )}
-              >
-                {isRemoving ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-red-600" />
-                ) : (
-                  <Heart className="h-4 w-4 text-red-600 fill-red-600" />
-                )}
-              </Button>
-            </div>
           </div>
         </Link>
 
         {/* Info Section */}
-        <div className="p-3 space-y-2">
+        <div className="px-3 pt-3 pb-0 flex flex-col flex-1 min-h-0">
           {/* Price */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[#ff0050] font-bold text-base">
@@ -123,13 +103,37 @@ export default function WishlistProductCard({
               </span>
             )}
           </div>
-          
+
           {/* Title */}
-          <Link href={`/product/${slug}`} prefetch>
-            <h3 className="text-sm text-gray-700 font-medium leading-tight line-clamp-2 hover:text-primary transition-colors">
+          <Link href={`/product/${slug}`} prefetch className="shrink-0">
+            <h3 className="text-sm text-gray-800 font-medium leading-tight line-clamp-2 hover:text-primary transition-colors mb-2">
               {title}
             </h3>
           </Link>
+
+          {/* Remove Button - Bottom */}
+          <div className="mt-auto">
+            <Button
+              onClick={handleRemove}
+              disabled={isRemoving}
+              variant="outline"
+              className={cn(
+                'w-full border-gray-200 bg-white hover:bg-gray-50',
+                'flex items-center justify-center gap-2 h-auto py-2'
+              )}
+            >
+            {isRemoving ? (
+              <Loader2 className="h-4 w-4 animate-spin text-[#279ACE]" />
+            ) : (
+              <>
+                <Trash2 className="h-4 w-4 text-[#279ACE]" />
+                <span className="text-[#279ACE] text-sm font-medium">
+                  Remove
+                </span>
+              </>
+            )}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

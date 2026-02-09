@@ -47,3 +47,26 @@ export async function uploadProfilePhoto(
     return { status: false, message: 'Upload failed' };
   }
 }
+
+/** Submit payment (multipart/form-data). Expects invoiceId and FormData with pay_slip_image, payment_method, invoice_id */
+export async function submitPayment(
+  invoiceId: string,
+  formData: FormData,
+): Promise<{ status?: boolean | string; message?: string; data?: unknown }> {
+  try {
+    const cookiesStore = await cookies();
+    const token = cookiesStore.get('token')?.value;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/payment/submit/${invoiceId}`,
+      {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      },
+    );
+    return res.json();
+  } catch (error) {
+    console.log('Submit payment error:', error);
+    return { status: false, message: 'Payment submission failed' };
+  }
+}

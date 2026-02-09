@@ -1,10 +1,10 @@
-import ProductDescription from "@/components/product/ProductDescription";
-import ProductInfoBar from "@/components/product/ProductInfoBar";
-import ProductPageClient from "@/components/product/ProductPageClient";
-import ProductSuggestions from "@/components/product/ProductSuggestions";
+import ProductDescription from '@/components/product/ProductDescription';
+import ProductInfoBar from '@/components/product/ProductInfoBar';
+import ProductPageClient from '@/components/product/ProductPageClient';
+import ProductSuggestions from '@/components/product/ProductSuggestions';
 // import SellerRatingCard from "@/components/product/SellerRatingCard";
-import { fetcher } from "@/lib/fetcher";
-import { notFound } from "next/navigation";
+import { fetcher } from '@/lib/fetcher';
+import { notFound } from 'next/navigation';
 
 async function ProductPage({ params }: { params: { slug: string } }) {
   const { slug } = await params;
@@ -12,7 +12,7 @@ async function ProductPage({ params }: { params: { slug: string } }) {
   const product: any = await fetcher(`/product-details/${slug}`);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const wishlist: any = await fetcher("/wishlists");
+  const wishlist: any = await fetcher('/wishlists');
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const bulkQuantities: any =
@@ -25,7 +25,7 @@ async function ProductPage({ params }: { params: { slug: string } }) {
     return item?.product?.id === product?.data?.product?.id;
   });
 
-  if (product?.status !== "success") notFound();
+  if (product?.status !== 'success') notFound();
 
   return (
     <main>
