@@ -95,13 +95,13 @@ function SizeCard({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-0 items-center py-3 px-4">
+    <div className="grid grid-cols-3 gap-0 items-center py-3 px-1">
       {/* Size Column */}
       <p className="text-left text-gray-800">{size}</p>
 
       {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
-        <p className="text-lg font-semibold text-gray-800">৳{price}</p>
+        <p className=" font-semibold text-gray-800">৳{price}</p>
       </div>
 
       {/* Quantity Column */}

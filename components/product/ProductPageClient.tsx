@@ -26,7 +26,7 @@ function ProductPageClient({
 
   return (
     <div className="w-full grid grid-cols-8 gap-4 rounded-sm mt-4">
-      <div className="bg-white col-span-8 lg:col-span-5 xl:col-span-6 rounded-sm">
+      <div className="bg-white col-span-8 lg:col-span-5  rounded-sm">
         <ProductDetails
           shippingchargeId={shippingAreaSelected?.id}
           bulkQuantities={bulkQuantities}
@@ -37,7 +37,7 @@ function ProductPageClient({
           product={product || {}}
         />
       </div>
-      <div className="col-span-8 lg:col-span-3 xl:col-span-2">
+      <div className="col-span-8 lg:col-span-3">
         <ProductSummary
           setShippingAreaSelected={setShippingAreaSelected}
           shippingAreaSelected={shippingAreaSelected}

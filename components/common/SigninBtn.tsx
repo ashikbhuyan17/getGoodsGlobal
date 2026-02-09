@@ -16,6 +16,7 @@ function SigninBtn() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const userData: any = await fetcher("/user-profile");
+      console.log("🚀 ~ fetchUser ~ userData:", userData)
       if (userData?.data?.email) {
         setUser(userData);
       } else {
@@ -67,16 +68,27 @@ function SigninBtn() {
   return (
     <button
       onClick={handlePush}
-      className={`flex h-10 items-center gap-2 rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md ${user?.data?.name ? "px-3 md:px-4" : "w-10 justify-center"
+      className={`flex h-10 items-center gap-2 rounded-full "
         }`}
     >
-      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
+      {/* <div className="flex h-10 w-10 shrink-0 items-center  rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md  justify-center">
         <User className="h-4 w-4 text-primary" />
-      </div>
-      {user?.data?.name && (
-        <span className="text-sm font-semibold text-gray-800 max-w-[120px] truncate">
-          {user.data.name}
+      </div> */}
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md">
+        <span className="text-xl font-semibold">
+          {user?.data?.name?.charAt(0).toUpperCase()}
         </span>
+      </div>
+
+      {user?.data?.name && (
+        <div className="flex flex-col justify-start items-start">
+          <p className="text-sm font-semibold text-gray-600 max-w-[120px] truncate">
+            {user.data.name}
+          </p>
+          <p className="text-xs font-semibold text-gray-600 max-w-[120px]">
+            {user.data.email}
+          </p>
+        </div>
       )}
     </button>
   );

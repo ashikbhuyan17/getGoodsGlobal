@@ -18,10 +18,10 @@ export default async function Header() {
   const wishlistCount = wishlist?.status === 'error' || !wishlist?.data ? 0 : wishlist.data.length;
 
   return (
-    <header className="bg-[#edd7c4] text-primary-foreground z-40 px-4 py-1 md:px-6 fixed top-0 w-full">
-      <div className="mx-auto flex items-center justify-between gap-4 md:pl-16">
+    <header className="bg-[#edd7c4] text-primary-foreground z-40 px-4 py-1 md:px-6 fixed top-0 w-full md:w-[calc(100%-14rem)] md:ml-56">
+      <div className="mx-auto flex items-center justify-between gap-4">
         {/* Logo */}
-        <div className="flex md:ml-40 items-center gap-2 whitespace-nowrap">
+        <div className="flex  items-center gap-2 whitespace-nowrap md:w-2/12">
           \
           <Link href="/" prefetch>
             <Image
@@ -35,12 +35,12 @@ export default async function Header() {
         </div>
 
         {/* Search Bar */}
-        <div className="flex flex-1 items-center gap-3 md:max-w-md">
+        <div className="flex flex-1 items-center gap-3 md:max-w-2/6">
           <SearchBar />
         </div>
 
         {/* Right Icons */}
-        <div className="hidden md:flex items-center gap-1 md:gap-3">
+        <div className="hidden md:flex items-center justify-end gap-1 md:gap-3 md:w-2/6 md:pr-10">
           <Link prefetch href="/cart">
             <button className="flex md:h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100">
               <ShoppingBag className="h-5 w-5" />

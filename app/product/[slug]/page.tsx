@@ -37,11 +37,11 @@ async function ProductPage({ params }: { params: { slug: string } }) {
           isInWishlist={isInWishlist}
         />
         <div className="w-full grid grid-cols-8 gap-4 rounded-sm mt-4">
-          <div className="bg-white px-4 pb-4 col-span-8 md:col-span-6 rounded-sm">
+          <div className="bg-white px-4 pb-4 col-span-8 lg:col-span-6 rounded-sm">
             {/* <SellerRatingCard /> */}
             <ProductDescription slug={slug} />
           </div>
-          <div className="col-span-8 md:col-span-2">
+          <div className="col-span-8 lg:col-span-2">
             <ProductSuggestions slug={slug} />
           </div>
         </div>
