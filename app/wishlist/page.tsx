@@ -10,7 +10,7 @@ export default async function WishlistPage() {
   const hasItems = wishlist?.data && wishlist?.data?.length > 0;
 
   return (
-    <main className="min-h-screen space-y-5">
+    <main className="min-h-screen space-y-5 max-md:pb-24">
       <WishlistInfoBar />
 
       <div className="px-2">
@@ -19,7 +19,7 @@ export default async function WishlistPage() {
         ) : (
           <>
             {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3  lg:grid-cols-5 xl:grid-cols-6 gap-4">
               {wishlist?.data?.map((item: any, index: number) => {
                 // Handle image - try image.image first, then PostImage array, then fallback
                 let productImage = item?.product?.image?.image;
