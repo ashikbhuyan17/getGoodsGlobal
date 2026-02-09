@@ -1,21 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import CategorySection from "@/components/home/CategorySection";
-import FeatureSection from "@/components/home/FeatureSection";
-import GallerySection from "@/components/home/GallerySection";
-import HeroSlider from "@/components/home/HeroSlider";
-import ProductsSlider from "@/components/home/ProductsSlider";
-import Footer from "@/components/common/Footer";
-import { fetcher } from "@/lib/fetcher";
+import CategorySection from '@/components/home/CategorySection';
+import FeatureSection from '@/components/home/FeatureSection';
+import GallerySection from '@/components/home/GallerySection';
+import HeroSlider from '@/components/home/HeroSlider';
+import ProductsSlider from '@/components/home/ProductsSlider';
+import Footer from '@/components/common/Footer';
+import { fetcher } from '@/lib/fetcher';
 
 export default async function Home() {
-  const slides: any = await fetcher("/mainslider");
-  const frontCategory: any = await fetcher("/front-category-products");
+  const slides: any = await fetcher('/mainslider');
+  const frontCategory: any = await fetcher('/front-category-products');
   // Fetch gallery slider data
   let galleryData: any = null;
   try {
-    galleryData = await fetcher("/galleryslider");
+    galleryData = await fetcher('/galleryslider');
   } catch (error) {
-    console.error("Error fetching gallery slider:", error);
+    console.error('Error fetching gallery slider:', error);
   }
 
   return (

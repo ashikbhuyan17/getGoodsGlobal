@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import Image from "next/image";
-import Autoplay from "embla-carousel-autoplay";
+import * as React from 'react';
+import Image from 'next/image';
+import Autoplay from 'embla-carousel-autoplay';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
-} from "@/components/ui/carousel";
+} from '@/components/ui/carousel';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function HeroSlider({ slides }: { slides: any }) {
@@ -28,7 +28,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {slides?.data?.map((slide: any, i: number) => (
             <CarouselItem
-              onClick={() => window.open(slide?.link, "_blank")}
+              onClick={() => window.open(slide?.link, '_blank')}
               key={i}
             >
               <div className="relative w-full cursor-pointer">
