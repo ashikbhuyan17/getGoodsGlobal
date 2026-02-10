@@ -110,13 +110,13 @@ export default function OrdersTopBar({
             type="text"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            onKeyPress={handleKeyPress}
             placeholder="Order ID"
-            className="border-y border-l border-r-0 rounded-l-lg px-3 h-10 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+            className="border-y border-r-0 border-l rounded-md px-3 py-1 w-[300px]"
           />
           <Button
             onClick={handleSearch}
-            className="bg-teal-600 hover:bg-teal-700 text-white rounded-r-lg rounded-l-none -ml-px px-4 h-10"
+            size="default"
+            className="bg-primary hover:bg-primary/95 ml-[-10px]"
           >
             Search
           </Button>
