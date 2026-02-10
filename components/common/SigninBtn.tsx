@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { User } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { fetcher } from "@/lib/fetcher";
+import { User } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { fetcher } from '@/lib/fetcher';
 
 function SigninBtn() {
   const pathname = usePathname();
@@ -15,8 +15,8 @@ function SigninBtn() {
   const fetchUser = async () => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userData: any = await fetcher("/user-profile");
-      console.log("🚀 ~ fetchUser ~ userData:", userData)
+      const userData: any = await fetcher('/user-profile');
+      console.log('🚀 ~ fetchUser ~ userData:', userData);
       if (userData?.data?.email) {
         setUser(userData);
       } else {
@@ -44,12 +44,12 @@ function SigninBtn() {
 
   const handlePush = () => {
     if (user?.data?.email) {
-      router.push("/account");
+      router.push('/account');
     } else {
-      if (pathname === "/signin") {
+      if (pathname === '/signin') {
         return;
       } else {
-        router.push("/signin");
+        router.push('/signin');
       }
     }
   };
@@ -71,14 +71,17 @@ function SigninBtn() {
       className={`flex h-10 items-center gap-2 rounded-full "
         }`}
     >
-      {/* <div className="flex h-10 w-10 shrink-0 items-center  rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md  justify-center">
-        <User className="h-4 w-4 text-primary" />
-      </div> */}
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md">
-        <span className="text-xl font-semibold">
-          {user?.data?.name?.charAt(0).toUpperCase()}
-        </span>
-      </div>
+      {user?.data?.name ? (
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md">
+          <span className="text-xl font-semibold">
+            {user?.data?.name?.charAt(0).toUpperCase()}
+          </span>
+        </div>
+      ) : (
+        <div className="flex h-10 w-10 shrink-0 items-center  rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md  justify-center">
+          <User className="h-4 w-4 text-primary" />
+        </div>
+      )}
 
       {user?.data?.name && (
         <div className="flex flex-col justify-start items-start">
