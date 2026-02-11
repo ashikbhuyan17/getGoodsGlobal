@@ -77,6 +77,7 @@ export default function ProductSummary({
         isInWishlist={isInWishlist}
         productId={productId}
         shipping={shippingAreaSelected?.id}
+        shippingchargeId={shippingAreaSelected?.id}
         sizes={sizes}
         color={color}
       />

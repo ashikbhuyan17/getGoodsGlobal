@@ -16,6 +16,7 @@ function ProductPageClient({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   bulkQuantities?: any;
 }) {
+  console.log("🚀 ~ ProductPageClient ~ product:", product)
   const [selectedColor, setSelectedColor] = useState(
     product?.data?.productColors?.[0]?.color || null
   );

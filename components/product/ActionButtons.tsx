@@ -7,20 +7,45 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
+import MinOrderModal from "./MinOrderModal";
 
 export default function ActionButtons({
   isInWishlist,
   productId,
+  shippingchargeId,
+  sizes,
+  color,
 }: {
   color: any;
   sizes: any;
   shipping: any;
+  shippingchargeId?: string | number;
   isInWishlist: any;
   productId: any;
 }) {
   const router = useRouter();
-
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
+  const [showMinOrderModal, setShowMinOrderModal] = useState(false);
+
+  const getTotalQuantity = () => {
+    if (typeof sizes !== "object" || sizes === null) return 0;
+    return Object.entries(sizes).reduce(
+      (sum, [, qty]) => sum + Number(qty || 0),
+      0
+    );
+  };
+
+  const buildBuyDetails = () => {
+    if (typeof sizes !== "object" || sizes === null || !color?.id) return [];
+    return Object.entries(sizes)
+      .filter(([, qty]) => Number(qty || 0) > 0)
+      .map(([size, quantity]) => ({
+        color_id: String(color.id),
+        size: String(size),
+        quantity: String(quantity),
+      }));
+  };
 
   const handleOrder = async (btn: "ord" | "crt") => {
     const user: any = await fetcher("/user-profile");
@@ -28,7 +53,51 @@ export default function ActionButtons({
       router.push("/signin");
       return;
     }
-    router.push(btn === "crt" ? "/cart" : "/checkout");
+    if (btn === "crt") {
+      router.push("/cart");
+      return;
+    }
+    // Buy Now
+    const totalQuantity = getTotalQuantity();
+    if (totalQuantity < 1) {
+      setShowMinOrderModal(true);
+      return;
+    }
+    const buyDetails = buildBuyDetails();
+    console.log("🚀 ~ handleOrder ~ buyDetails:", buyDetails)
+
+    if (buyDetails.length === 0 || !shippingchargeId) {
+      setShowMinOrderModal(true);
+      return;
+    }
+    setIsBuyNowLoading(true);
+    try {
+      const res: any = await fetcher("/product-buy-now", {
+        method: "POST",
+        body: JSON.stringify({
+          product_id: String(productId),
+          shippingcharge_id: String(shippingchargeId),
+          total_quantity: String(totalQuantity),
+          buy_details: buyDetails,
+        }),
+      });
+      const isSuccess =
+        res?.status === true ||
+        res?.status === "success" ||
+        res?.success === true ||
+        (res?.message &&
+          String(res.message).toLowerCase().includes("success"));
+      if (isSuccess) {
+        toast.success(res?.message || "Added to buy successfully");
+        router.push("/checkout?buyNow=1");
+      } else {
+        toast.error(res?.message || "Buy now failed. Try again.");
+      }
+    } catch (err) {
+      toast.error("Buy now failed. Try again.");
+    } finally {
+      setIsBuyNowLoading(false);
+    }
   };
 
   const handleWishlist = async () => {
@@ -86,12 +155,22 @@ export default function ActionButtons({
       </Button>
 
       <Button
+        disabled={isBuyNowLoading}
         onClick={() => handleOrder("ord")}
         size="lg"
         className="flex-1 bg-[#279ACE] hover:bg-[#1b8cbf]"
       >
-        Buy Now
+        {isBuyNowLoading ? (
+          <Loader2 className="animate-spin size-5" />
+        ) : (
+          "Buy Now"
+        )}
       </Button>
+
+      <MinOrderModal
+        open={showMinOrderModal}
+        onClose={() => setShowMinOrderModal(false)}
+      />
     </div>
   );
 }

@@ -3,15 +3,17 @@ import CartOrderGroup from "@/components/cart/CartOrderGroup";
 import CartItemRow from "@/components/cart/CartItemRow";
 import CartSummary from "@/components/cart/CartSummary";
 import OrderForm from "@/components/checkout/OrderForm";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 function CheckoutClient({
   cartProducts,
   user,
+  isBuyNow = false,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cartProducts: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user: any;
+  isBuyNow?: boolean;
 }) {
   const [formData, setFormData] = useState({
     name: user?.data?.name,
@@ -23,8 +25,17 @@ function CheckoutClient({
     payment_method: "Cash On Delivery",
   });
 
+  // cart-products: cartdetails; buy-products: buydetails (API returns buydetails)
+  const normalizedProducts = useMemo(() => {
+    const list = cartProducts?.data ?? [];
+    return list.map((p: any) => ({
+      ...p,
+      cartdetails: p?.cartdetails ?? p?.buydetails ?? p?.buy_details ?? [],
+    }));
+  }, [cartProducts?.data]);
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const productsWithTotals = cartProducts?.data?.map((product: any) => {
+  const productsWithTotals = normalizedProducts?.map((product: any) => {
     const itemTotal = product?.cartdetails?.reduce(
       (sum: number, item: { quantity: number; price: number }) => {
         return sum + Number(item?.quantity) * Number(item?.price);
@@ -36,7 +47,8 @@ function CheckoutClient({
       ...product,
       totalPrice: itemTotal,
     };
-  });
+  }) ?? [];
+  console.log("🚀 ~ CheckoutClient ~ productsWithTotals:", productsWithTotals)
 
   const grandTotal = productsWithTotals.reduce(
     (sum: number, product: { totalPrice: number }) => {
@@ -50,7 +62,7 @@ function CheckoutClient({
       <div className="lg:col-span-2 space-y-6">
         <OrderForm formData={formData} setFormData={setFormData} />
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {cartProducts?.data?.map((product: any) => (
+        {productsWithTotals?.map((product: any) => (
           <CartOrderGroup
             page="checkout"
             key={product?.id}
@@ -65,10 +77,11 @@ function CheckoutClient({
                 id={cart?.id}
                 page="checkout"
                 key={cart?.id}
-                color={product?.color}
+                color={cart?.color ?? product?.color ?? ""}
                 qty={Number(cart?.quantity)}
                 price={Number(cart?.price)}
                 size={cart?.size}
+                colorImage={`${process.env.NEXT_PUBLIC_IMG_URL}/${cart?.color_image}`}
               />
             ))}
           </CartOrderGroup>

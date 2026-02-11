@@ -1,10 +1,14 @@
 "use client";
 
+import { Eye } from "lucide-react";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import UpdateCartModal from "./UpdateCartModal";
+import Image from "next/image";
 
 interface CartItemRowProps {
   color: string;
   size?: string;
+  colorImage?: string | undefined;
   qty: number;
   id: number | string;
   price: number;
@@ -21,12 +25,42 @@ export default function CartItemRow({
   page = "cart",
   id,
   onEdit,
+  colorImage
 }: CartItemRowProps) {
   return (
     <div className="flex items-center justify-between py-1 text-sm font-medium">
-      <div>
-        <p>Color: {color}</p>
-        {size && <p>Size: {size}</p>}
+      <div className="flex items-center gap-x-3">
+        <div className="w-16 h-16 flex-shrink-0">
+          <div className="relative w-16 h-16">
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
+                  <Eye size={15} /> <span>Preview</span>
+                </div>
+              </DialogTrigger>
+
+              <DialogContent className="aspect-square max-w-md">
+                <Image
+                  src={colorImage}
+                  alt={color}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </DialogContent>
+            </Dialog>
+            <Image
+              src={colorImage}
+              alt={color}
+              width={64}
+              height={64}
+              className="w-full h-full rounded shadow-md object-cover"
+            />
+          </div>
+        </div>
+        <div>
+          <p>Color: {color}</p>
+          {size && <p>Size: {size}</p>}
+        </div>
       </div>
       <div >
         {qty} x ৳{price}
