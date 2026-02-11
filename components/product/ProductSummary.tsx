@@ -1,86 +1,51 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import ShippingOptionCard from "./ShippingOptionCard";
 import PriceDetails from "./PriceDetails";
-// import ShippingSummary from "./ShippingSummary";
 import ActionButtons from "./ActionButtons";
-import { fetcher } from "@/lib/fetcher";
+import { useProductStore } from "@/stores/useProductStore";
 
 export default function ProductSummary({
-  sizes,
-  color,
   productId,
   isInWishlist,
   bulkQuantities,
-  price,
-  shippingAreaSelected,
-  setShippingAreaSelected,
 }: {
-  sizes: any;
-  color: any;
-  productId: any;
-  price: any;
-  isInWishlist: any;
+  productId: string | number;
+  isInWishlist: boolean;
   bulkQuantities?: any;
-  shippingAreaSelected: any;
-  setShippingAreaSelected: any;
 }) {
-  const [shippingArea, setShippingArea] = useState<any>(null);
-
-  useEffect(() => {
-    (async function fetchData() {
-      const data: any = await fetcher("/shipping-area");
-      setShippingArea(data);
-      setShippingAreaSelected({
-        id: data?.data[0]?.id,
-        amount: data?.data[0]?.amount,
-      });
-    })();
-  }, [setShippingAreaSelected]);
-
-  let quantity;
-
-  if (typeof sizes === "object" && sizes !== null) {
-    quantity = Object.entries(sizes).reduce((prev, curr) => {
-      return prev + Number(curr[1]);
-    }, 0);
-  }
+  const shippingArea = useProductStore((s) => s.shippingArea);
+  const setShippingArea = useProductStore((s) => s.setShippingArea);
+  const shippingOptions = useProductStore((s) => s.shippingOptions);
+  const totalQuantity = useProductStore((s) => s.totalQuantity)();
+  const priceList = useProductStore((s) => s.priceList)();
 
   return (
     <Card className="px-4 rounded-sm border">
       <div className="grid grid-cols-2 gap-3">
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {shippingArea?.data?.map((item: any) => (
+        {shippingOptions.map((item) => (
           <ShippingOptionCard
             key={item?.id}
-            title={item?.name}
-            rate={`৳${item?.amount}`}
-            active={shippingAreaSelected?.id === item?.id}
+            title={item?.name ?? ""}
+            rate={`৳${item?.amount ?? 0}`}
+            active={shippingArea?.id === item?.id}
             onClick={() =>
-              setShippingAreaSelected({ id: item?.id, amount: item?.amount })
+              setShippingArea({ id: item?.id, amount: item?.amount })
             }
           />
         ))}
       </div>
 
       <PriceDetails
-        shipping={shippingAreaSelected?.amount}
-        price={price}
+        shipping={Number(shippingArea?.amount ?? 0)}
+        price={priceList}
         bulkQuantities={bulkQuantities}
-        quantity={quantity ?? 0}
+        quantity={totalQuantity}
       />
-      {/* <ShippingSummary /> */}
-      <ActionButtons
-        isInWishlist={isInWishlist}
-        productId={productId}
-        shipping={shippingAreaSelected?.id}
-        shippingchargeId={shippingAreaSelected?.id}
-        sizes={sizes}
-        color={color}
-      />
+
+      <ActionButtons isInWishlist={isInWishlist} productId={productId} />
     </Card>
   );
 }

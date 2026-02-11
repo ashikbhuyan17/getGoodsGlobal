@@ -1,134 +1,82 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
-import QuantityUpdateBtn from "../common/QuantityUpdateBtn";
-import { fetcher } from "@/lib/fetcher";
-import { useRouter } from "next/navigation";
-import { revalidateClient } from "@/action/revalidateClient";
+import { useProductStore } from "@/stores/useProductStore";
+import { MinusIcon, PlusIcon } from "lucide-react";
+import { Input } from "../ui/input";
 
 function SizeCard({
   size,
-  id,
   price,
-  setSizes,
-  max = 999999999,
-  setPrice,
   colorId,
-  productId,
-  shippingchargeId,
+  max = 999999999,
 }: {
-  size: string | number;
-  price: string | number;
-  setSizes: any;
-  id: number | string;
-  max?: number;
-  setPrice: any;
-  productId: string;
+  size: string;
+  price: number;
   colorId: string;
-  shippingchargeId: string;
+  max?: number;
 }) {
-  const [quantity, setQuantity] = useState(0);
-  const router = useRouter();
+  const setVariant = useProductStore((s) => s.setVariant);
+  const quantity =
+    useProductStore(
+      (s) =>
+        s.variants.find(
+          (v) => String(v.color_id) === String(colorId) && v.size === size
+        )?.quantity
+    ) ?? 0;
 
-  useEffect(() => {
-    (async () => {
-      const res: any = await fetcher(
-        `/get-qty?product_id=${productId}&color_id=${colorId}&size=${size}`
-      );
+  const update = (val: number) => {
+    const clamped = Math.max(0, Math.min(max, val));
+    setVariant(String(colorId), size, clamped, price);
+  };
 
-      const qty = Number(res?.data?.[0]?.quantity || 0);
-      setQuantity(qty);
-    })();
-  }, [productId, colorId, size]);
-
-  useEffect(() => {
-    // Update sizes
-    setSizes((prev: any) => {
-      if (quantity < 1) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { [size]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [size]: quantity };
-    });
-
-    // Update price
-    setPrice((prev: any[]) => {
-      const filtered = prev.filter((item) => item.id !== id);
-
-      if (quantity < 1) return filtered;
-
-      return [
-        ...filtered,
-        {
-          id,
-          price: Number(price),
-          quantity,
-        },
-      ];
-    });
-  }, [quantity, size, id, price, setSizes, setPrice]);
-
-  const handleAddToCart = async (qty: number) => {
-    const user: any = await fetcher("/user-profile");
-    if (!user?.data?.id) {
-      router.push("/signin");
-    } else {
-      await fetcher("/product-add-to-cart", {
-        method: "POSt",
-        body: JSON.stringify({
-          product_id: productId,
-          shippingcharge_id: shippingchargeId,
-          cart_details: [
-            {
-              color_id: colorId,
-              size,
-              quantity: qty,
-            },
-          ],
-        }),
-      });
-      revalidateClient("/", "layout");
-    }
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value, 10);
+    update(isNaN(val) ? 0 : val);
   };
 
   return (
     <div className="grid grid-cols-3 gap-0 items-center py-3 px-1">
-      {/* Size Column */}
       <p className="text-left text-gray-800">{size}</p>
-
-      {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
-        <p className=" font-semibold text-gray-800">৳{price}</p>
+        <p className="font-semibold text-gray-800">৳{price}</p>
       </div>
-
-      {/* Quantity Column */}
       <div className="flex flex-col items-end gap-1">
         {quantity < 1 ? (
           <Button
-            onClick={() => {
-              setQuantity(1);
-              handleAddToCart(1);
-            }}
-            className=" text-white px-4 py-2 rounded-md"
+            onClick={() => update(1)}
+            className="text-white px-4 py-2 rounded-md"
           >
             Add
           </Button>
         ) : (
-          <QuantityUpdateBtn
-            handleAddToCart={handleAddToCart}
-            id={id}
-            setSizes={setSizes}
-            size={size}
-            quantity={quantity}
-            setQuantity={setQuantity}
-            max={max}
-            setPrice={setPrice}
-          />
+          <div className="flex items-center gap-1">
+            <Button
+              className="rounded-full w-5 h-5"
+              size="icon"
+              onClick={() => update(quantity - 1)}
+              disabled={quantity <= 0}
+            >
+              <MinusIcon size={16} aria-hidden="true" />
+            </Button>
+            <Input
+              type="number"
+              className="w-12 px-0 text-center"
+              value={quantity}
+              min={0}
+              max={max}
+              onChange={onChange}
+            />
+            <Button
+              className="rounded-full w-5 h-5"
+              size="icon"
+              onClick={() => update(quantity + 1)}
+              disabled={quantity >= max}
+            >
+              <PlusIcon size={16} aria-hidden="true" />
+            </Button>
+          </div>
         )}
-        {/* <p className="text-sm text-gray-800">{max}</p> */}
       </div>
     </div>
   );

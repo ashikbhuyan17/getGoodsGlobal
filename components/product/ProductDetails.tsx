@@ -9,25 +9,19 @@ import { ScrollArea } from "../ui/scroll-area";
 import { Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import SizeCard from "./SizeCard";
+import { useProductStore } from "@/stores/useProductStore";
 
 export default function ProductDetails({
   product,
-  selectedColor,
-  setSelectedColor,
-  setSelectedSizes,
   bulkQuantities,
-  setPrice,
-  shippingchargeId,
 }: {
   product: any;
-  setSelectedSizes: any;
-  selectedColor: any;
-  setSelectedColor: any;
   bulkQuantities?: any;
-  setPrice: any;
-  shippingchargeId: string;
 }) {
-  console.log("🚀 ~ ProductDetails ~ bulkQuantities:", bulkQuantities)
+  const selectedColor = useProductStore((s) => s.selectedColor);
+  const setSelectedColor = useProductStore((s) => s.setSelectedColor);
+  const variants = useProductStore((s) => s.variants);
+  const colorQty = useProductStore((s) => s.colorQty);
   const [image, setImage] = useState(
     `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
   );
@@ -163,9 +157,9 @@ export default function ProductDetails({
                     }}
                     className="w-14 h-14 rounded-md overflow-hidden cursor-pointer"
                   >
-                    {Number(color?.color_qty) > 0 && (
+                    {colorQty(String(color?.color?.id ?? "")) > 0 && (
                       <span className="w-4 h-4 bg-primary text-white text-xs flex items-center justify-center rounded-full absolute -mt-1 -ml-1">
-                        {color?.color_qty}
+                        {colorQty(String(color?.color?.id ?? ""))}
                       </span>
                     )}
                     <Image
@@ -205,15 +199,10 @@ export default function ProductDetails({
 
                 {product?.data?.productSizes?.map((size: any) => (
                   <SizeCard
-                    shippingchargeId={shippingchargeId}
-                    colorId={selectedColor?.id}
-                    id={size?.id}
-                    productId={product?.data?.product?.id}
-                    setPrice={setPrice}
-                    setSizes={setSelectedSizes}
                     key={size?.id}
+                    colorId={String(selectedColor?.id ?? "")}
                     size={size?.size?.sizeName}
-                    price={size?.SalePrice}
+                    price={Number(size?.SalePrice)}
                     max={Number(size?.stock)}
                   />
                 ))}
