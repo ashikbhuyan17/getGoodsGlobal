@@ -10,12 +10,20 @@ export default async function Header() {
   const data: any = await fetcher(`/settings`);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let wishlist: any = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let cartProducts: any = null;
   try {
     wishlist = await fetcher("/wishlists");
   } catch {
     // Handle error gracefully
   }
-  const wishlistCount = wishlist?.status === 'error' || !wishlist?.data ? 0 : wishlist.data.length;
+  try {
+    cartProducts = await fetcher("/cart-products");
+  } catch {
+    // Handle error gracefully
+  }
+  const wishlistCount = wishlist?.status === "error" || !wishlist?.data ? 0 : wishlist.data.length;
+  const cartCount = cartProducts?.data?.length ?? 0;
 
   return (
     <header className="bg-[#edd7c4] text-primary-foreground z-40 px-4 py-1 md:px-6 fixed top-0 w-full md:w-[calc(100%-14rem)] md:ml-56">
@@ -42,8 +50,13 @@ export default async function Header() {
         {/* Right Icons */}
         <div className="hidden md:flex items-center justify-end gap-1 md:gap-3 md:w-2/6 md:pr-10">
           <Link prefetch href="/cart">
-            <button className="flex md:h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100">
+            <button className="relative flex md:h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100">
               <ShoppingBag className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
             </button>
           </Link>
           <Link prefetch href="/wishlist">

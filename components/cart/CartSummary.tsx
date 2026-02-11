@@ -161,7 +161,7 @@ export default function CartSummary({
         const invoiceId = orderData?.invoice_id;
         router.push(`/payment/${invoiceId}`);
       } else {
-        toast.error('Failed to place order. Try again.');
+        toast.error(orderData?.message ?? 'Failed to place order. Try again.');
       }
     } catch (err) {
       console.log(err);

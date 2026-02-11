@@ -1,36 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { useState } from "react";
-import { cn } from "@/lib/utils";
-import { ScrollArea } from "../ui/scroll-area";
-import { Eye } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import SizeCard from "./SizeCard";
+import Image from 'next/image';
+import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { ScrollArea } from '../ui/scroll-area';
+import { Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import SizeCard from './SizeCard';
+import { useProductStore } from '@/stores/useProductStore';
 
 export default function ProductDetails({
   product,
-  selectedColor,
-  setSelectedColor,
-  setSelectedSizes,
   bulkQuantities,
-  setPrice,
-  shippingchargeId,
 }: {
   product: any;
-  setSelectedSizes: any;
-  selectedColor: any;
-  setSelectedColor: any;
   bulkQuantities?: any;
-  setPrice: any;
-  shippingchargeId: string;
 }) {
-  console.log("🚀 ~ ProductDetails ~ bulkQuantities:", bulkQuantities)
   const [image, setImage] = useState(
     `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
   );
+
+  const selectedColor = useProductStore((s) => s.selectedColor);
+  const setSelectedColor = useProductStore((s) => s.setSelectedColor);
+  const colorQty = useProductStore((s) => s.colorQty);
+  // Subscribe to variants so color badge updates immediately when quantity changes
+  useProductStore((s) => s.variants);
 
   return (
     <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
@@ -52,25 +48,27 @@ export default function ProductDetails({
             className="object-cover w-full h-full"
           />
         </div>
-        {JSON.parse(product?.data?.product?.PostImage)?.map((img: string) => (
-          <div
-            key={img}
-            onClick={() =>
-              setImage(
-                `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
-              )
-            }
-            className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
-          >
-            <Image
-              src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
-              alt={product?.data?.product?.name}
-              width={64}
-              height={64}
-              className="object-cover w-full h-full"
-            />
-          </div>
-        ))}
+        {JSON.parse(product?.data?.product?.PostImage ?? '[]')?.map(
+          (img: string) => (
+            <div
+              key={img}
+              onClick={() =>
+                setImage(
+                  `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
+                )
+              }
+              className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
+            >
+              <Image
+                src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
+                alt={product?.data?.product?.name}
+                width={64}
+                height={64}
+                className="object-cover w-full h-full"
+              />
+            </div>
+          ),
+        )}
       </div>
       <div className="w-full">
         <div className="relative h-[200px] xl:h-[220px]  2xl:h-[400px] w-full ">
@@ -113,8 +111,8 @@ export default function ProductDetails({
                         <div
                           key={bulk?.id}
                           className={cn(
-                            "relative px-4 py-6",
-                            i === 0 ? "bg-[#E7F2EF]" : "bg-gray-100"
+                            'relative px-4 py-6',
+                            i === 0 ? 'bg-[#E7F2EF]' : 'bg-gray-100',
                           )}
                         >
                           <div className="flex flex-col items-center text-center">
@@ -146,7 +144,7 @@ export default function ProductDetails({
 
             <div>
               <p className="font-medium text-gray-700 mb-2">
-                Color :{" "}
+                Color :{' '}
                 <span className="text-primary cursor-pointer">
                   {selectedColor?.colorName}
                 </span>
@@ -163,20 +161,30 @@ export default function ProductDetails({
                     }}
                     className="w-14 h-14 rounded-md overflow-hidden cursor-pointer"
                   >
-                    {Number(color?.color_qty) > 0 && (
-                      <span className="w-4 h-4 bg-primary text-white text-xs flex items-center justify-center rounded-full absolute -mt-1 -ml-1">
-                        {color?.color_qty}
-                      </span>
-                    )}
+                    {(() => {
+                      const qty = colorQty(String(color?.color?.id ?? ''));
+                      return qty > 0 ? (
+                        <span
+                          className={cn(
+                            'bg-primary text-white text-xs flex items-center justify-center absolute -mt-1 -ml-1',
+                            qty <= 10
+                              ? 'w-5 h-5 min-w-5 min-h-5 rounded-full'
+                              : 'h-5 min-h-5 px-2 rounded-md',
+                          )}
+                        >
+                          {qty}
+                        </span>
+                      ) : null;
+                    })()}
                     <Image
                       src={`${process.env.NEXT_PUBLIC_IMG_URL}/${color?.Image}`}
                       alt="color1"
                       width={56}
                       height={56}
                       className={cn(
-                        "object-cover p-0.5 rounded-md",
+                        'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                        "border-2 border-primary",
+                          'border-2 border-primary',
                       )}
                     />
                   </div>
@@ -205,13 +213,8 @@ export default function ProductDetails({
 
                 {product?.data?.productSizes?.map((size: any) => (
                   <SizeCard
-                    shippingchargeId={shippingchargeId}
-                    colorId={selectedColor?.id}
-                    id={size?.id}
-                    productId={product?.data?.product?.id}
-                    setPrice={setPrice}
-                    setSizes={setSelectedSizes}
                     key={size?.id}
+                    colorId={String(selectedColor?.id ?? '')}
                     size={size?.size?.sizeName}
                     price={size?.SalePrice}
                     max={Number(size?.stock)}

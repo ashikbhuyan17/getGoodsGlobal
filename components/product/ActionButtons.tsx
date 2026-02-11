@@ -1,4 +1,5 @@
 "use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Heart, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,33 +8,149 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
+import MinOrderModal from "./MinOrderModal";
+import { useProductStore } from "@/stores/useProductStore";
 
 export default function ActionButtons({
   isInWishlist,
   productId,
 }: {
-  color: any;
-  sizes: any;
-  shipping: any;
   isInWishlist: any;
   productId: any;
 }) {
   const router = useRouter();
-
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
+  const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
+  const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
+  const [showMinOrderModal, setShowMinOrderModal] = useState(false);
 
-  const handleOrder = async (btn: "ord" | "crt") => {
+  const variants = useProductStore((s) => s.variants);
+  const totalQuantity = useProductStore((s) => s.totalQuantity());
+  const shippingArea = useProductStore((s) => s.shippingArea);
+
+  const buildCartDetails = () =>
+    variants
+      .filter((v) => v.quantity > 0)
+      .map((v) => ({
+        color_id: String(v.color_id),
+        size: String(v.size),
+        quantity: String(v.quantity),
+      }));
+
+  const checkAuthAndValidate = async () => {
     const user: any = await fetcher("/user-profile");
     if (!user?.data?.id) {
       router.push("/signin");
-      return;
+      return false;
     }
-    router.push(btn === "crt" ? "/cart" : "/checkout");
+    if (totalQuantity < 1) {
+      setShowMinOrderModal(true);
+      return false;
+    }
+    if (!shippingArea?.id) {
+      setShowMinOrderModal(true);
+      return false;
+    }
+    const cartDetails = buildCartDetails();
+    if (cartDetails.length === 0) {
+      setShowMinOrderModal(true);
+      return false;
+    }
+    return { user, cartDetails };
+  };
+
+  const handleAddToCart = async () => {
+    const validated = await checkAuthAndValidate();
+    if (!validated) return;
+
+    const { cartDetails } = validated;
+    setIsAddToCartLoading(true);
+    try {
+      const res: any = await fetcher("/product-add-to-cart", {
+        method: "POST",
+        body: JSON.stringify({
+          product_id: String(productId),
+          shippingcharge_id: String(shippingArea?.id),
+          total_quantity: String(totalQuantity),
+          cart_details: cartDetails,
+        }),
+      });
+      const isSuccess =
+        res?.status === true ||
+        res?.status === "success" ||
+        res?.success === true ||
+        (res?.message && String(res.message).toLowerCase().includes("success"));
+
+      if (isSuccess) {
+        toast.success(res?.message || "Added to cart");
+        window.location.href = "/cart";
+      } else {
+        toast.error(res?.message || "Failed to add to cart.");
+      }
+    } catch {
+      toast.error("Failed to add to cart.");
+    } finally {
+      setIsAddToCartLoading(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    const validated = await checkAuthAndValidate();
+    if (!validated) return;
+
+    const { cartDetails } = validated;
+    setIsBuyNowLoading(true);
+    try {
+      const addRes: any = await fetcher("/product-add-to-cart", {
+        method: "POST",
+        body: JSON.stringify({
+          product_id: String(productId),
+          shippingcharge_id: String(shippingArea?.id),
+          total_quantity: String(totalQuantity),
+          cart_details: cartDetails,
+        }),
+      });
+      const addSuccess =
+        addRes?.status === true ||
+        addRes?.status === "success" ||
+        addRes?.success === true ||
+        (addRes?.message && String(addRes.message).toLowerCase().includes("success"));
+
+      if (!addSuccess) {
+        toast.error(addRes?.message || "Failed to add to cart.");
+        return;
+      }
+
+      const buyRes: any = await fetcher("/product-buy-now", {
+        method: "POST",
+        body: JSON.stringify({
+          product_id: String(productId),
+          shippingcharge_id: String(shippingArea?.id),
+          total_quantity: String(totalQuantity),
+          buy_details: cartDetails,
+        }),
+      });
+      const buySuccess =
+        buyRes?.status === true ||
+        buyRes?.status === "success" ||
+        buyRes?.success === true ||
+        (buyRes?.message && String(buyRes.message).toLowerCase().includes("success"));
+
+      if (buySuccess) {
+        toast.success(buyRes?.message || "Proceeding to checkout");
+        window.location.href = "/checkout?buyNow=1";
+      } else {
+        toast.error(buyRes?.message || "Buy now failed. Try again.");
+      }
+    } catch {
+      toast.error("Buy now failed. Try again.");
+    } finally {
+      setIsBuyNowLoading(false);
+    }
   };
 
   const handleWishlist = async () => {
     setIsWishlistLoading(true);
-
     try {
       const user: any = await fetcher("/user-profile");
       if (!user?.data?.id) {
@@ -42,7 +159,6 @@ export default function ActionButtons({
       }
 
       const endpoint = isInWishlist ? "/remove-wishlist" : "/add-to-wishlist";
-
       const res: any = await fetcher(endpoint, {
         method: "POST",
         body: JSON.stringify({
@@ -81,17 +197,36 @@ export default function ActionButtons({
         )}
       </Button>
 
-      <Button onClick={() => handleOrder("crt")} size="lg" className="flex-1">
-        Add to Cart
+      <Button
+        disabled={isAddToCartLoading}
+        onClick={handleAddToCart}
+        size="lg"
+        className="flex-1"
+      >
+        {isAddToCartLoading ? (
+          <Loader2 className="animate-spin size-5" />
+        ) : (
+          "Add to Cart"
+        )}
       </Button>
 
       <Button
-        onClick={() => handleOrder("ord")}
+        disabled={isBuyNowLoading}
+        onClick={handleBuyNow}
         size="lg"
         className="flex-1 bg-[#279ACE] hover:bg-[#1b8cbf]"
       >
-        Buy Now
+        {isBuyNowLoading ? (
+          <Loader2 className="animate-spin size-5" />
+        ) : (
+          "Buy Now"
+        )}
       </Button>
+
+      <MinOrderModal
+        open={showMinOrderModal}
+        onClose={() => setShowMinOrderModal(false)}
+      />
     </div>
   );
 }

@@ -101,32 +101,26 @@ export default async function Footer() {
                   </p>
                 </div>
                 <Link
-                  href="mailto:skybuybd@gmail.com"
+                  href={`mailto:${contact?.data?.email}`}
                   className="flex items-center gap-3 group"
                 >
                   <Mail className="w-5 h-5 text-primary shrink-0" />
-                  <Link
-                    href={`mailto:${contact?.data?.email}`}
-                    className="text-gray-600 text-sm group-hover:text-primary transition-colors"
-                  >
+                  <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
                     {contact?.data?.email}
-                  </Link>
+                  </span>
                 </Link>
                 <Link
-                  href="tel:09613828606"
+                  href={`tel:${contact?.data?.phone}`}
                   className="flex items-center gap-3 group"
                 >
                   <Phone className="w-5 h-5 text-primary shrink-0" />
-                  <Link
-                    href={`tel:${contact?.data?.phone}`}
-                    className="text-gray-600 text-sm group-hover:text-primary transition-colors"
-                  >
+                  <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
                     {contact?.data?.phone}
-                  </Link>
+                  </span>
                 </Link>
                 <Link
                   href={contact?.data?.maplink}
-                  target="_blanck"
+                  target="_blank"
                   className="flex items-center gap-3 group text-left"
                 >
                   <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center shrink-0">

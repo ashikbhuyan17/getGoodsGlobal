@@ -25,6 +25,10 @@ async function ProductPage({ params }: { params: { slug: string } }) {
     return item?.product?.id === product?.data?.product?.id;
   });
 
+  // Fallback: fetch shipping if product doesn't have shippingCharge/shippingcharge
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const shippingArea: any = await fetcher('/shipping-area');
+
   if (product?.status !== 'success') notFound();
 
   return (
@@ -35,6 +39,7 @@ async function ProductPage({ params }: { params: { slug: string } }) {
           bulkQuantities={bulkQuantities}
           product={product}
           isInWishlist={isInWishlist}
+          shippingOptions={product?.data?.shippingCharge ?? product?.data?.shippingcharge ?? shippingArea?.data}
         />
         <div className="w-full grid grid-cols-8 gap-4 rounded-sm mt-4">
           <div className="bg-white px-4 pb-4 col-span-8 lg:col-span-6 rounded-sm">

@@ -78,7 +78,7 @@ export default function CartOrderGroup({
                       </div>
                     </DialogTrigger>
 
-                    <DialogContent className="aspect-square max-w-md">
+                    <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
                       <Image
                         src={image}
                         alt={title}
