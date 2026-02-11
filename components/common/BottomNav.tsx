@@ -58,6 +58,14 @@ export default async function BottomNav() {
   const settings: any = await fetcher(`/settings`);
   const contact: any = await fetcher(`/contact`);
 
+  let cartProducts: any = null;
+  try {
+    cartProducts = await fetcher("/cart-products");
+  } catch {
+    // Handle error gracefully
+  }
+  const cartCount = cartProducts?.data?.length ?? 0;
+
   return (
     <nav
       className="
@@ -84,8 +92,15 @@ export default async function BottomNav() {
 
         {/* Cart */}
         <li className="flex flex-col items-center">
-          <Link href="/cart" className="flex flex-col items-center">
-            <ShoppingBag className="h-5 w-5" />
+          <Link href="/cart" className="relative flex flex-col items-center">
+            <span className="relative inline-block">
+              <ShoppingBag className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 w-4 min-w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              )}
+            </span>
             <span>Cart</span>
           </Link>
         </li>

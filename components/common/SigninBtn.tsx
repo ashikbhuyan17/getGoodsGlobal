@@ -16,7 +16,6 @@ function SigninBtn() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const userData: any = await fetcher('/user-profile');
-      console.log('🚀 ~ fetchUser ~ userData:', userData);
       if (userData?.data?.email) {
         setUser(userData);
       } else {

@@ -48,7 +48,6 @@ function CheckoutClient({
       totalPrice: itemTotal,
     };
   }) ?? [];
-  console.log("🚀 ~ CheckoutClient ~ productsWithTotals:", productsWithTotals)
 
   const grandTotal = productsWithTotals.reduce(
     (sum: number, product: { totalPrice: number }) => {

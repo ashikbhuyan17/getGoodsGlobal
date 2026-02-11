@@ -36,7 +36,7 @@ export default async function RootLayout({
     console.error('Error fetching menu categories:', error);
   }
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link
           rel="stylesheet"
@@ -48,6 +48,7 @@ export default async function RootLayout({
       </head>
       <body
         className={`${jost.className} flex bg-background overflow-x-hidden`}
+        suppressHydrationWarning
       >
         <div className="hidden md:flex">
           {/* <Sidebar

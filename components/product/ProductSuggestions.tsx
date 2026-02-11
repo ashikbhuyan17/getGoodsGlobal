@@ -1,6 +1,6 @@
-import { fetcher } from "@/lib/fetcher";
-import Image from "next/image";
-import Link from "next/link";
+import { fetcher } from '@/lib/fetcher';
+import Image from 'next/image';
+import Link from 'next/link';
 
 async function ProductSuggestions({ slug }: { slug: string }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -14,8 +14,8 @@ async function ProductSuggestions({ slug }: { slug: string }) {
           <Link key={product?.id} href={`/product/${product?.slug}`}>
             <div className="flex items-center gap-2">
               <Image
-                alt={product?.name1}
                 src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product?.image?.image}`}
+                alt={slug}
                 width={1200}
                 height={1200}
                 className="w-28 h-28 rounded-lg"

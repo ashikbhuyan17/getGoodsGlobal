@@ -108,15 +108,13 @@ export default function Sidebar({
       </nav>
 
       {/* ---------------- MOBILE MENU BUTTON ---------------- */}
-      <div className="flex md:hidden p-3">
+      <li className="flex flex-col items-center md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
-          <SheetTrigger>
-            <li className="flex flex-col items-center">
-              <button className="flex flex-col items-center">
-                <Menu className="h-5 w-5" />
-                <span>Category</span>
-              </button>
-            </li>
+          <SheetTrigger asChild>
+            <button type="button" className="flex flex-col items-center">
+              <Menu className="h-5 w-5" />
+              <span>Category</span>
+            </button>
           </SheetTrigger>
 
           {/* ---------------- MOBILE SLIDING SIDEBAR ---------------- */}
@@ -153,7 +151,7 @@ export default function Sidebar({
             </ul>
           </SheetContent>
         </Sheet>
-      </div>
+      </li>
     </>
   );
 }

@@ -68,6 +68,7 @@ export default async function CartPage() {
                     qty={Number(cart?.quantity)}
                     price={Number(cart?.price)}
                     size={cart?.size}
+                    colorImage={`${process.env.NEXT_PUBLIC_IMG_URL}/${cart?.color_image}`}
                   />
                 ))}
               </CartOrderGroup>
