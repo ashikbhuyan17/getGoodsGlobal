@@ -32,7 +32,7 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Method:</span>
           <Badge className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-            {payment?.payment_method || payment?.method || "N/A"}
+            {payment?.payment_method || payment?.order_type || payment?.method || "N/A"}
           </Badge>
         </div>
 
@@ -48,17 +48,29 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
         <div className="flex justify-between items-center">
           <span className="text-sm text-gray-600">Amount:</span>
           <span className="text-sm font-medium text-gray-900">
-            ৳{payment?.amount || payment?.paid_amount || "N/A"}
+            ৳{payment?.amount ?? payment?.paid_amount ?? "N/A"}
           </span>
         </div>
 
+        {/* Payment Due */}
+        {payment?.payment_due_amount != null && Number(payment.payment_due_amount) >= 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Due:</span>
+            <span className="text-sm font-medium text-gray-900">
+              ৳{payment.payment_due_amount}
+            </span>
+          </div>
+        )}
+
         {/* Transaction ID */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Trx ID:</span>
-          <span className="text-sm font-medium text-gray-900 font-mono">
-            {payment?.transaction_id || payment?.trx_id || payment?.trxid || "N/A"}
-          </span>
-        </div>
+        {(payment?.bkash_tranxId || payment?.transaction_id || payment?.trx_id) && (
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-gray-600">Trx ID:</span>
+            <span className="text-sm font-medium text-gray-900 font-mono">
+              {payment?.bkash_tranxId || payment?.transaction_id || payment?.trx_id || "N/A"}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
