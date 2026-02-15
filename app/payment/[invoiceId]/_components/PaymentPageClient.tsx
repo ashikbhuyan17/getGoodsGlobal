@@ -29,18 +29,18 @@ export default function PaymentPageClient({
   const paymentAccounts =
     bankList?.data && Array.isArray(bankList.data) && bankList.data.length > 0
       ? bankList.data
-          .filter((bank: any) => bank.status === '1')
-          .map((bank: any) => ({
-            id: String(bank.id),
-            name: bank.account_name,
-            icon: bank.image
-              ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
-              : '/bank-placeholder.png',
-            accountName: bank.account_name,
-            accountNumber: bank.account_number,
-            branch: bank.branch || 'N/A',
-            routingNo: bank.routing_number || 'N/A',
-          }))
+        .filter((bank: any) => bank.status === '1')
+        .map((bank: any) => ({
+          id: String(bank.id),
+          name: bank.account_name,
+          icon: bank.image
+            ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
+            : '/bank-placeholder.png',
+          accountName: bank.account_name,
+          accountNumber: bank.account_number,
+          branch: bank.branch || 'N/A',
+          routingNo: bank.routing_number || 'N/A',
+        }))
       : [];
 
   const [selectedPayment, setSelectedPayment] = useState<string>(
@@ -122,11 +122,10 @@ export default function PaymentPageClient({
                     key={account.id}
                     type="button"
                     onClick={() => setSelectedPayment(account.id)}
-                    className={`relative p-4 border-2 rounded-lg transition-all ${
-                      isSelected
-                        ? 'border-teal-600 bg-teal-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
+                      ? 'border-teal-600 bg-teal-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
                   >
                     {isSelected && (
                       <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
@@ -156,7 +155,7 @@ export default function PaymentPageClient({
             <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
               <div className="px-4 py-3 border-b">
                 <h3 className="text-base font-semibold text-gray-900">
-                  Bank Details
+                  {selectedAccount.accountName} Details
                 </h3>
               </div>
               <div className="divide-y">
@@ -176,22 +175,24 @@ export default function PaymentPageClient({
                     {selectedAccount.accountNumber}
                   </div>
                 </div>
-                <div className="grid grid-cols-12 border-b">
-                  <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                    Branch
+                {selectedAccount.accountName != 'BKash' && <>
+                  <div className="grid grid-cols-12 border-b">
+                    <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                      Branch
+                    </div>
+                    <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                      {selectedAccount.branch}
+                    </div>
                   </div>
-                  <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                    {selectedAccount.branch}
+                  <div className="grid grid-cols-12 border-b last:border-b-0">
+                    <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                      Routing No
+                    </div>
+                    <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                      {selectedAccount.routingNo}
+                    </div>
                   </div>
-                </div>
-                <div className="grid grid-cols-12 border-b last:border-b-0">
-                  <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                    Routing No
-                  </div>
-                  <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                    {selectedAccount.routingNo}
-                  </div>
-                </div>
+                </>}
               </div>
             </div>
           )}
