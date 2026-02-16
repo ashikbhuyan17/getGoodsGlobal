@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   GridIcon,
   ShoppingCart,
@@ -9,12 +9,13 @@ import {
   Headphones,
   Truck,
   Star,
-} from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import Logout from "./Logout";
-import { useEffect, useState } from "react";
-import { fetcher } from "@/lib/fetcher";
+  RotateCcw,
+} from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Logout from './Logout';
+import { useEffect, useState } from 'react';
+import { fetcher } from '@/lib/fetcher';
 
 interface UserData {
   data?: {
@@ -29,32 +30,34 @@ export default function Header() {
   const [user, setUser] = useState<UserData | null>(null);
 
   useEffect(() => {
-    fetcher("/user-profile").then((data: unknown) => {
+    fetcher('/user-profile').then((data: unknown) => {
       setUser(data as UserData);
     });
   }, []);
 
   const navItems = [
-    { icon: GridIcon, label: "Dashboard", url: "/account" },
-    { icon: ShoppingCart, label: "Orders", url: "/account/orders" },
-    { icon: CreditCard, label: "Payments", url: "/account/payments" },
-    { icon: Truck, label: "Delivery", url: "/account/delivery" },
-    { icon: Headphones, label: "Support", url: "/account/support" },
-    { icon: Settings, label: "Settings", url: "/account/settings" },
+    { icon: GridIcon, label: 'Dashboard', url: '/account' },
+    { icon: ShoppingCart, label: 'Orders', url: '/account/orders' },
+    { icon: CreditCard, label: 'Payments', url: '/account/payments' },
+    { icon: Truck, label: 'Delivery', url: '/account/delivery' },
+    { icon: Headphones, label: 'Support', url: '/account/support' },
+    { icon: RotateCcw, label: 'Refunds', url: '/account/refunds' },
+    { icon: Settings, label: 'Settings', url: '/account/settings' },
   ];
 
   const isActive = (url: string) => {
-    if (url === "/account") {
-      return pathname === "/account";
+    if (url === '/account') {
+      return pathname === '/account';
     }
     return pathname?.startsWith(url);
   };
 
-  const userInitials = user?.data?.name
-    ?.split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase() || "U";
+  const userInitials =
+    user?.data?.name
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase() || 'U';
 
   return (
     <header className="px-2 pt-2">
@@ -70,10 +73,10 @@ export default function Header() {
               </Avatar>
               <div>
                 <p className="font-semibold  text-base">
-                  {user?.data?.name || "User"}
+                  {user?.data?.name || 'User'}
                 </p>
                 <p className="text-sm mt-0.5">
-                  {user?.data?.email || "user@example.com"}
+                  {user?.data?.email || 'user@example.com'}
                 </p>
                 {/* Points Badge */}
                 <div className="mt-2 inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
@@ -94,17 +97,22 @@ export default function Header() {
                     prefetch
                     href={item.url}
                     key={item.label}
-                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded transition-colors whitespace-nowrap ${active
-                      ? "bg-gray-100"
-                      : "hover:bg-gray-50"
-                      }`}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded transition-colors whitespace-nowrap ${
+                      active ? 'bg-gray-100' : 'hover:bg-gray-50'
+                    }`}
                   >
                     <item.icon
-                      className={`h-6 w-6 ${active ? "text-teal-600" : "text-gray-700"
-                        }`}
+                      className={`h-6 w-6 ${
+                        active ? 'text-teal-600' : 'text-gray-700'
+                      }`}
                     />
-                    <span className={`text-xs font-medium ${active ? "text-teal-600" : "text-gray-700"
-                      }`}>{item.label}</span>
+                    <span
+                      className={`text-xs font-medium ${
+                        active ? 'text-teal-600' : 'text-gray-700'
+                      }`}
+                    >
+                      {item.label}
+                    </span>
                   </Link>
                 );
               })}
