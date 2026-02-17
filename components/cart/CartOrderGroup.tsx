@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "../ui/dialog";
 
 interface CartOrderGroupProps {
   orderId: string;
@@ -79,6 +79,8 @@ export default function CartOrderGroup({
                     </DialogTrigger>
 
                     <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
+                      <DialogTitle className="sr-only">Image preview: {title}</DialogTitle>
+                      <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
                       <Image
                         src={image}
                         alt={title}

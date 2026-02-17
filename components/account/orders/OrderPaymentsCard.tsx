@@ -23,42 +23,61 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
     }
   };
 
+  const Row = ({
+    label,
+    value,
+  }: {
+    label: string;
+    value: React.ReactNode;
+  }) => (
+    <div className="grid grid-cols-12 border-b last:border-b-0">
+      <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-3 text-sm text-gray-600 font-medium">
+        {label}
+      </div>
+      <div className="col-span-8 md:col-span-9 px-4 py-3 text-sm text-gray-900">
+        {value}
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-white rounded-lg p-4 md:p-6 border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Payments</h3>
-      
-      <div className="space-y-3">
-        {/* Payment Method */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Method:</span>
-          <Badge className="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full">
-            {payment?.payment_method || payment?.method || "N/A"}
-          </Badge>
-        </div>
+    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="px-4 py-3 border-b">
+        <h3 className="text-base font-semibold text-gray-900">
+          Payments
+        </h3>
+      </div>
 
-        {/* Date */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Date:</span>
-          <span className="text-sm font-medium text-gray-900">
-            {formatDate(payment?.created_at || payment?.date || payment?.payment_date)}
-          </span>
-        </div>
-
-        {/* Amount */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Amount:</span>
-          <span className="text-sm font-medium text-gray-900">
-            ৳{payment?.amount || payment?.paid_amount || "N/A"}
-          </span>
-        </div>
-
-        {/* Transaction ID */}
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-600">Trx ID:</span>
-          <span className="text-sm font-medium text-gray-900 font-mono">
-            {payment?.transaction_id || payment?.trx_id || payment?.trxid || "N/A"}
-          </span>
-        </div>
+      <div className="divide-y">
+        <Row
+          label="Method"
+          value={
+            <Badge className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">
+              {payment?.payment_method || payment?.order_type || payment?.method || "N/A"}
+            </Badge>
+          }
+        />
+        <Row
+          label="Date"
+          value={formatDate(payment?.created_at || payment?.date || payment?.payment_date)}
+        />
+        <Row
+          label="Amount"
+          value={`৳${payment?.amount ?? payment?.paid_amount ?? payment?.advance ?? payment?.paid_partial_payment_amount ?? "N/A"}`}
+        />
+        {payment?.payment_due_amount != null && Number(payment.payment_due_amount) >= 0 && (
+          <Row label="Due" value={`৳${payment.payment_due_amount}`} />
+        )}
+        {(payment?.bkash_tranxId || payment?.transaction_id || payment?.trx_id) && (
+          <Row
+            label="Trx ID"
+            value={
+              <span className="font-mono">
+                {payment?.bkash_tranxId || payment?.transaction_id || payment?.trx_id}
+              </span>
+            }
+          />
+        )}
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ async function CheckoutPage({
   const cartProducts: any = await fetcher(
     isBuyNow ? "/buy-products" : "/cart-products"
   );
+  console.log("🚀 ~ CheckoutPage ~ cartProducts:", cartProducts)
   const user = await fetcher("/user-profile");
 
   return (

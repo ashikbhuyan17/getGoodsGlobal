@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginForm from "@/components/auth/LoginForm";
@@ -22,6 +22,8 @@ function ModalAuthPage() {
       open={pathname === "/signin"}
     >
       <DialogContent className="border-0 bg-card rounded-2xl">
+        <DialogTitle className="sr-only">Sign in or create account</DialogTitle>
+        <DialogDescription className="sr-only">Sign in to your account or create a new account</DialogDescription>
         {/* <DialogHeader>
           <div className="mb-2">
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">

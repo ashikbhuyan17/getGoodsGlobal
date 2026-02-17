@@ -181,7 +181,7 @@ export default function CartSummary({
       <div className="p-2 lg:p-6 space-y-2">
         <div className="space-y-4">
           <PriceRow label="Product price" value={`৳${total}`} />
-          <PriceRow label="Pay now" value={`৳${total / 2}`} discount={50} />
+          {/* <PriceRow label="Pay now" value={`৳${total / 2}`} discount={50} /> */}
 
           {discount && page === 'checkout' && (
             <PriceRow label="Discount" value={`-৳${total - finalPrice}`} />

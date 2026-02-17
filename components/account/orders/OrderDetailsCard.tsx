@@ -88,7 +88,7 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           label="Delivery Method"
           value={
             <Badge className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full">
-              {data?.delivery_method || "N/A"}
+              {data?.delivery_method || data?.order_type || "N/A"}
             </Badge>
           }
         />
@@ -97,21 +97,21 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           label="Shipping Method"
           value={
             <Badge className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full">
-              {data?.shipping_method || "N/A"}
+              {data?.shipping_method || data?.order_type || "N/A"}
             </Badge>
           }
         />
 
         <Row
           label="Advance Payment"
-          value={data?.advance_payment || data?.advance_payment_percentage || "N/A"}
+          value={data?.advance_payment ?? data?.advance ?? data?.paid_partial_payment_amount ?? "N/A"}
         />
 
         <Row
           label="Shipping Charge"
           value={
-            data?.shipping_charge
-              ? `৳${data.shipping_charge} Per Kg`
+            data?.shipping_charge != null
+              ? `৳${data.shipping_charge}`
               : "N/A"
           }
         />

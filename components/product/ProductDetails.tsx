@@ -7,7 +7,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
 import { Eye } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from '../ui/dialog';
 import SizeCard from './SizeCard';
 import { useProductStore } from '@/stores/useProductStore';
 
@@ -80,6 +80,8 @@ export default function ProductDetails({
             </DialogTrigger>
 
             <DialogContent className="aspect-square  max-2xl:w-[400px]">
+              <DialogTitle className="sr-only">Image preview: {product?.data?.product?.name}</DialogTitle>
+              <DialogDescription className="sr-only">Preview of product image</DialogDescription>
               <Image
                 src={image}
                 alt={product?.data?.product?.name}

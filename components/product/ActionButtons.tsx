@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 import MinOrderModal from "./MinOrderModal";
+import AddToCartModal from "./AddToCartModal";
 import { useProductStore } from "@/stores/useProductStore";
 
 export default function ActionButtons({
@@ -23,6 +24,7 @@ export default function ActionButtons({
   const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
   const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
   const [showMinOrderModal, setShowMinOrderModal] = useState(false);
+  const [showAddToCartModal, setShowAddToCartModal] = useState(false);
 
   const variants = useProductStore((s) => s.variants);
   const totalQuantity = useProductStore((s) => s.totalQuantity());
@@ -82,8 +84,7 @@ export default function ActionButtons({
         (res?.message && String(res.message).toLowerCase().includes("success"));
 
       if (isSuccess) {
-        toast.success(res?.message || "Added to cart");
-        window.location.href = "/cart";
+        setShowAddToCartModal(true);
       } else {
         toast.error(res?.message || "Failed to add to cart.");
       }
@@ -226,6 +227,11 @@ export default function ActionButtons({
       <MinOrderModal
         open={showMinOrderModal}
         onClose={() => setShowMinOrderModal(false)}
+      />
+
+      <AddToCartModal
+        open={showAddToCartModal}
+        onClose={() => setShowAddToCartModal(false)}
       />
     </div>
   );

@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import { Eye } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 interface ImagePreviewProps {
   src: string;
@@ -41,6 +47,8 @@ export default function ImagePreview({
           </div>
         </DialogTrigger>
         <DialogContent className={`${previewWidth} ${previewHeight} p-0 overflow-hidden`}>
+          <DialogTitle className="sr-only">Image preview: {alt}</DialogTitle>
+          <DialogDescription className="sr-only">Preview of {alt}</DialogDescription>
           <div className="relative w-full h-full min-h-[300px]">
             <Image
               src={imageUrl}

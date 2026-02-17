@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -154,6 +154,8 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
               </button>
             </DialogTrigger>
             <DialogContent className="aspect-square max-w-md p-0 overflow-hidden">
+              <DialogTitle className="sr-only">Profile photo preview</DialogTitle>
+              <DialogDescription className="sr-only">Preview of your profile photo</DialogDescription>
               <div className="relative w-full h-full min-h-70">
                 {displayImageUrl ? (
                   <Image

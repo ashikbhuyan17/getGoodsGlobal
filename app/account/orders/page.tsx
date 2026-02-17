@@ -10,6 +10,7 @@ export default async function OrderPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = await fetcher('/user-order-history');
   const orders = res?.data || [];
+  console.log('🚀 ~ OrderPage ~ orders:', orders);
 
   const formatStatus = (status: string) => {
     const statusMap: Record<string, { label: string; color: string }> = {
@@ -53,7 +54,7 @@ export default async function OrderPage() {
               <tbody>
                 {orders?.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-gray-400">
+                    <td colSpan={7} className="text-center py-12 text-gray-400">
                       <div className="flex flex-col items-center">
                         <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" />
                         No orders found
@@ -67,14 +68,12 @@ export default async function OrderPage() {
                     const paidAmount = Number(
                       order?.paid_partial_payment_amount || 0,
                     );
-                    const dueAmount = totalPrice - paidAmount;
+                    const dueAmount =
+                      order?.payment_due_amount != null
+                        ? Number(order.payment_due_amount)
+                        : totalPrice - paidAmount;
 
-                    const totalItems = order?.order_details?.reduce(
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      (sum: number, item: any) => sum + Number(item?.qty),
-                      0,
-                    );
-
+                    const firstItem = order?.order_details?.[0];
                     return (
                       <tr
                         key={order?.id}
@@ -84,20 +83,15 @@ export default async function OrderPage() {
                           <span className="font-medium">
                             ORD-{order?.invoice_id}
                           </span>
-                          <span className="block text-xs font-medium mt-0.5">
+                          <span className="block text-xs font-medium mt-0.5 text-gray-500">
                             {formatDate(order?.created_at)}
                           </span>
                         </td>
 
                         <td className="py-3 px-4">
                           <OrderProductCell
-                            imageUrl={
-                              order?.order_details?.[0]?.product_image ?? null
-                            }
-                            title={
-                              order?.order_details?.[0]?.product_name ??
-                              'Product'
-                            }
+                            imageUrl={firstItem?.product_color_image ?? null}
+                            title={firstItem?.product_name ?? 'Product'}
                           />
                         </td>
 

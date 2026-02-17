@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { Eye } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 
 const DEFAULT_PRODUCT_IMAGE = '/hero-1.jpg';
 
@@ -31,6 +31,8 @@ export default function OrderProductCell({
             </div>
           </DialogTrigger>
           <DialogContent className="aspect-square max-w-md p-0 overflow-hidden">
+            <DialogTitle className="sr-only">Image preview: {title}</DialogTitle>
+            <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
             <div className="relative w-full h-full min-h-70">
               <Image
                 src={src}
