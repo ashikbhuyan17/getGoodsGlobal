@@ -1,6 +1,6 @@
 import { Play } from "lucide-react";
 import Image from "next/image";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "../ui/dialog";
 
 function VideoCard({ 
   image, 
@@ -53,6 +53,8 @@ function VideoCard({
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[65vw] max-w-[70vw] w-full h-[80vh] py-10 px-14 overflow-hidden">
+        <DialogTitle className="sr-only">Video: {title || "Video"}</DialogTitle>
+        <DialogDescription className="sr-only">Watch video content</DialogDescription>
         {video ? (
           <iframe
             className="w-full h-full rounded-sm"

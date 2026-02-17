@@ -1,6 +1,6 @@
 "use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,6 +17,7 @@ export default function TermsModal({ open, onClose, onAccept }: TermsModalProps)
       <DialogContent className="max-w-3xl max-h-[90vh] p-0">
         <DialogHeader className="px-6 py-4 border-b flex flex-row items-center justify-between">
           <DialogTitle className="text-lg font-semibold">Terms & Conditions</DialogTitle>
+          <DialogDescription className="sr-only">Review order terms and conditions before proceeding</DialogDescription>
           {/* <button
             onClick={onClose}
             className="rounded-full p-1 hover:bg-gray-100 transition-colors"

@@ -1,63 +1,48 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
-import ImagePreview from "@/components/common/ImagePreview";
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import ImagePreview from '@/components/common/ImagePreview';
+import { fetcher } from '@/lib/fetcher';
 
-// Demo data matching the image
-const demoPayments = [
-  {
-    paymentId: "SP1769848937483",
-    date: "31/01/2026 02:42 PM",
-    orders: [
-      { orderId: "SKY251721", amount: 1575 },
-    ],
-    amount: 1575,
-    method: "Bank",
-    status: "Approved",
-  },
-  {
-    paymentId: "SP1769800166778",
-    date: "31/01/2026 01:09 AM",
-    orders: [
-      { orderId: "SKY251247", amount: 573 },
-      { orderId: "SKY251298", amount: 550 },
-      { orderId: "SKY251299", amount: 1147 },
-      { orderId: "SKY251300", amount: 545 },
-      { orderId: "SKY251301", amount: 618 },
-      { orderId: "SKY251302", amount: 551 },
-      { orderId: "SKY251303", amount: 560 },
-      { orderId: "SKY251304", amount: 608 },
-      { orderId: "SKY251305", amount: 1031 },
-      { orderId: "SKY251306", amount: 518 },
-      { orderId: "SKY251307", amount: 1359 },
-      { orderId: "SKY251308", amount: 1164 },
-      { orderId: "SKY251311", amount: 501 },
-    ],
-    amount: 9357,
-    method: "Bank",
-    status: "Approved",
-  },
-  {
-    paymentId: "SP1769799525316",
-    date: "31/01/2026 12:58 AM",
-    orders: [
-      { orderId: "SKY251298", amount: 550 },
-      { orderId: "SKY251299", amount: 1147 },
-      { orderId: "SKY251300", amount: 545 },
-      { orderId: "SKY251301", amount: 618 },
-      { orderId: "SKY251302", amount: 551 },
-      { orderId: "SKY251303", amount: 560 },
-      { orderId: "SKY251304", amount: 604 },
-      { orderId: "SKY251305", amount: 1031 },
-      { orderId: "SKY251306", amount: 518 },
-    ],
-    amount: 6124,
-    method: "Balance",
-    status: "Approved",
-  },
-];
+function formatDateTime(dateString: string) {
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return dateString;
+  }
+}
 
-export default function PaymentsPage() {
+function getPaymentStatusStyle(status: string) {
+  const statusStr = String(status || '').toLowerCase();
+  if (statusStr === 'pending') return 'bg-yellow-100 text-yellow-700';
+  if (statusStr === 'partial-paid') return 'bg-blue-100 text-blue-700';
+  if (statusStr === 'paid' || statusStr === 'approved')
+    return 'bg-green-100 text-green-700';
+  return 'bg-gray-100 text-gray-700';
+}
+
+function getPaymentStatusLabel(status: string) {
+  const statusStr = String(status || '').toLowerCase();
+  if (statusStr === 'pending') return 'Pending';
+  if (statusStr === 'partial-paid') return 'Partial Paid';
+  if (statusStr === 'paid' || statusStr === 'approved') return 'Paid';
+  return status || 'N/A';
+}
+
+export default async function PaymentsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const res: any = await fetcher('/payments');
+  const payments = res?.data || [];
+
   return (
     <div className="w-full space-y-4 px-2 pb-20">
       <Card className="rounded shadow">
@@ -66,7 +51,7 @@ export default function PaymentsPage() {
             <thead className="border-b">
               <tr>
                 <th className="py-3 px-4 font-semibold">Payment ID</th>
-                <th className="py-3 px-4 font-semibold">Orders</th>
+                <th className="py-3 px-4 font-semibold">Order</th>
                 <th className="py-3 px-4 font-semibold">Amount</th>
                 <th className="py-3 px-4 font-semibold">Method</th>
                 <th className="py-3 px-4 font-semibold">Status</th>
@@ -74,7 +59,7 @@ export default function PaymentsPage() {
             </thead>
 
             <tbody>
-              {demoPayments.length === 0 ? (
+              {payments.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
@@ -84,69 +69,81 @@ export default function PaymentsPage() {
                   </td>
                 </tr>
               ) : (
-                demoPayments.map((payment) => (
-                  <tr key={payment.paymentId} className="hover:bg-gray-50 transition">
-                    {/* Payment ID Column */}
-                    <td className="py-3 px-4">
-                      <Link
-                        href={`/account/payments/${payment.paymentId}`}
-                        className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
-                      >
-                        {payment.paymentId}
-                      </Link>
-                      <span className="block text-xs font-medium mt-0.5 text-gray-500">
-                        {payment.date}
-                      </span>
-                    </td>
+                payments.map((payment: Record<string, unknown>) => {
+                  const order = payment?.order as
+                    | { invoice_id?: string }
+                    | undefined;
+                  const invoiceId = order?.invoice_id;
 
-                    {/* Orders Column */}
-                    <td className="py-3 px-4">
-                      <div className="flex flex-col gap-0.5">
-                        {payment.orders.map((order, index) => (
+                  return (
+                    <tr
+                      key={String(payment?.id)}
+                      className="hover:bg-gray-50 transition"
+                    >
+                      <td className="py-3 px-4">
+                        <span className="font-medium">
+                          {String(payment?.payment_id || 'N/A')}
+                        </span>
+                        <span className="block text-xs font-medium mt-0.5 text-gray-500">
+                          {formatDateTime(String(payment?.created_at || ''))}
+                        </span>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {invoiceId ? (
                           <Link
-                            key={index}
-                            href={`/account/orders/${order.orderId.replace("SKY", "")}`}
-                            className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                            href={`/account/orders/${invoiceId}`}
+                            className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
                           >
-                            {order.orderId} - ৳{order.amount}
+                            ORD-{invoiceId}
                           </Link>
-                        ))}
-                      </div>
-                    </td>
+                        ) : (
+                          <span className="text-gray-500">—</span>
+                        )}
+                      </td>
 
-                    {/* Amount Column */}
-                    <td className="py-3 px-4">৳{payment.amount}</td>
+                      <td className="py-3 px-4">
+                        ৳{String(payment?.amount ?? 'N/A')}
+                      </td>
 
-                    {/* Method Column */}
-                    <td className="py-3 px-4">
-                      {payment.method === "Bank" ? (
+                      <td className="py-3 px-4">
                         <div className="flex flex-col items-start gap-1.5">
                           <ImagePreview
-                            src="/placeholder-product.png"
-                            alt="Bank Receipt"
+                            src={
+                              String(
+                                payment?.method_image ??
+                                  payment?.pay_slip_image ??
+                                  payment?.image ??
+                                  '',
+                              ) || '/placeholder-product.png'
+                            }
+                            alt={String(
+                              payment?.payment_method || 'Payment method',
+                            )}
                             width={32}
                             height={32}
                             className="shrink-0 rounded"
                           />
-                          <Badge className="bg-blue-600 text-white hover:bg-blue-700 px-3 py-1 rounded-md text-xs font-medium border-0">
-                            Bank
+                          <Badge className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-1 rounded-md text-xs font-medium border-0">
+                            {String(payment?.payment_method || 'N/A')}
                           </Badge>
                         </div>
-                      ) : (
-                        <Badge className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-1 rounded-md text-xs font-medium border-0">
-                          Balance
-                        </Badge>
-                      )}
-                    </td>
+                      </td>
 
-                    {/* Status Column */}
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-1 rounded text-sm font-medium bg-green-600 text-white">
-                        {payment.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
+                      <td className="py-3 px-4">
+                        <span
+                          className={`px-2 py-1 rounded text-sm font-medium ${getPaymentStatusStyle(
+                            String(payment?.payment_status || ''),
+                          )}`}
+                        >
+                          {getPaymentStatusLabel(
+                            String(payment?.payment_status || ''),
+                          )}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

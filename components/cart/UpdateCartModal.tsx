@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -71,6 +72,7 @@ function UpdateCartModal({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Cart Item</DialogTitle>
+            <DialogDescription className="sr-only">Update quantity or remove this item from your cart</DialogDescription>
           </DialogHeader>
           <div>
             <div className="flex items-center justify-between">

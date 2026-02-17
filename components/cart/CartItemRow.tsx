@@ -1,7 +1,7 @@
 'use client';
 
 import { Eye } from 'lucide-react';
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from '../ui/dialog';
 import UpdateCartModal from './UpdateCartModal';
 import Image from 'next/image';
 
@@ -42,6 +42,8 @@ export default function CartItemRow({
               </DialogTrigger>
 
               <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
+                <DialogTitle className="sr-only">Image preview: {color}</DialogTitle>
+                <DialogDescription className="sr-only">Preview of {color}</DialogDescription>
                 <Image
                   src={imageSrc}
                   alt={color}

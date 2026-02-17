@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -35,10 +36,10 @@ export default function AddToCartModal({ open, onClose }: AddToCartModalProps) {
         <DialogHeader>
           <DialogTitle className="text-base font-medium text-primary">
             Added to Cart
-            <p className="text-gray-800 text-sm font-medium mt-2">
-              Product added to cart successfully
-            </p>
           </DialogTitle>
+          <DialogDescription className="text-gray-800 text-sm font-medium mt-2">
+            Product added to cart successfully
+          </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end gap-5 pt-1">
           <Button

@@ -3,6 +3,7 @@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -21,10 +22,10 @@ export default function MinOrderModal({ open, onClose }: MinOrderModalProps) {
           <DialogTitle className="text-lg font-semibold text-gray-900">
             Minimum Order Quantity 1
           </DialogTitle>
+          <DialogDescription className="text-gray-600 text-center py-2">
+            সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে
+          </DialogDescription>
         </DialogHeader>
-        <p className="text-gray-600 text-center py-2">
-          সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে
-        </p>
         <div className="flex justify-center pt-2">
           <Button onClick={onClose} className="bg-[#279ACE] hover:bg-[#1b8cbf]">
             OK
