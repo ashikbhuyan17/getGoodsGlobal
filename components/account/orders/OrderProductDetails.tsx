@@ -13,6 +13,26 @@ interface OrderProductDetailsProps {
 // Default product image
 const DEFAULT_PRODUCT_IMAGE = "/placeholder-product.png";
 
+/** Get product image from nested product.PostImage (JSON array string) or fallbacks */
+function getProductImage(item: Record<string, unknown>): string {
+  const img = item?.product_image || item?.image;
+  if (img && typeof img === "string") return img;
+
+  const product = item?.product as { PostImage?: string } | undefined;
+  if (!product?.PostImage) return DEFAULT_PRODUCT_IMAGE;
+
+  try {
+    const arr = JSON.parse(product.PostImage) as string[];
+    const first = arr?.[0];
+    if (first) {
+      return `${process.env.NEXT_PUBLIC_IMG_URL || ""}/public/images/product/slider/${first}`;
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_PRODUCT_IMAGE;
+}
+
 export default function OrderProductDetails({ orderDetails, orderData }: OrderProductDetailsProps) {
   if (!orderDetails || orderDetails.length === 0) {
     return (
@@ -23,17 +43,17 @@ export default function OrderProductDetails({ orderDetails, orderData }: OrderPr
   }
 
   // Group products by product_id or product_name
-  const productGroups = orderDetails.reduce((acc: any, item: any) => {
-    const key = item?.product_id || item?.product_name || "unknown";
+  const productGroups = orderDetails.reduce((acc: Record<string, Record<string, unknown>>, item: Record<string, unknown>) => {
+    const key = String(item?.product_id ?? item?.product_name ?? "unknown");
     if (!acc[key]) {
       acc[key] = {
         product_id: item?.product_id,
         product_name: item?.product_name || "N/A",
-        product_image: item?.product_image || item?.image || DEFAULT_PRODUCT_IMAGE,
+        product_image: getProductImage(item),
         variants: [],
-      };
+      } as Record<string, unknown>;
     }
-    acc[key].variants.push(item);
+    (acc[key].variants as unknown[]).push(item);
     return acc;
   }, {});
 
@@ -124,13 +144,23 @@ export default function OrderProductDetails({ orderDetails, orderData }: OrderPr
                     </tr>
                   </thead>
                   <tbody>
-                    {product.variants.map((variant: any, vIndex: number) => {
-                      const variantImage = variant?.variant_image || variant?.product_image || product.product_image || DEFAULT_PRODUCT_IMAGE;
-                      const variantPrice = Number(variant?.sale_price || variant?.price || 0);
-                      const variantQty = Number(variant?.qty || 0);
+                    {(product.variants as Record<string, unknown>[]).map((variant: Record<string, unknown>, vIndex: number) => {
+                      const nestedProduct = variant?.product as { colors?: { colorName?: string }[] } | undefined;
+                      const variantImage =
+                        (variant?.variant_image as string) ||
+                        (variant?.product_image as string) ||
+                        getProductImage(variant) ||
+                        (product.product_image as string) ||
+                        DEFAULT_PRODUCT_IMAGE;
+                      const variantPrice = Number(variant?.sale_price ?? variant?.price ?? 0);
+                      const variantQty = Number(variant?.qty ?? 0);
                       const variantTotal = variantQty * variantPrice;
-                      const variantColor = variant?.product_color || variant?.color || "N/A";
-                      const variantSize = variant?.product_size || variant?.size || "N/A";
+                      const variantColor =
+                        (variant?.product_color as string) ??
+                        (variant?.color as string) ??
+                        nestedProduct?.colors?.[0]?.colorName ??
+                        "N/A";
+                      const variantSize = (variant?.product_size as string) ?? (variant?.size as string) ?? "N/A";
 
                       return (
                         <tr key={vIndex} className="border-b border-gray-100 hover:bg-gray-50">
@@ -191,60 +221,63 @@ export default function OrderProductDetails({ orderDetails, orderData }: OrderPr
             </div>
 
             {/* Price Summary - Matching Image UI */}
-            <div className="border-t pt-4 space-y-2">
-              {/* Product Price */}
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-900">Product Price:</span>
-                <span className="font-medium text-gray-900">৳{Math.round(totals.productPrice)}</span>
-              </div>
+            <div className="flex justify-end items-center">
 
-              {/* Ramadan Offer */}
-              {totals.discount > 0 && (
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-900">Ramadan Offer:</span>
-                    {totals.discountPercentage && (
-                      <Badge className="bg-red-100 text-red-700 text-xs px-1.5 py-0.5 rounded">
-                        {totals.discountPercentage}%
-                      </Badge>
-                    )}
+              <div className="space-y-2 w-1/2">
+                {/* Product Price */}
+                <div className="flex justify-between font-semibold items-center text-sm">
+                  <span className="text-gray-900">Product Price:</span>
+                  <span className="font-medium text-gray-900">৳{Math.round(totals.productPrice)}</span>
+                </div>
+
+                {/* Ramadan Offer */}
+                {totals.discount > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-900">Ramadan Offer:</span>
+                      {totals.discountPercentage && (
+                        <Badge className="bg-red-100 text-red-700 text-xs px-1.5 py-0.5 rounded">
+                          {totals.discountPercentage}%
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="font-medium text-red-600">- ৳{Math.round(totals.discount)}</span>
                   </div>
-                  <span className="font-medium text-red-600">- ৳{Math.round(totals.discount)}</span>
+                )}
+
+                {/* China Local Courier Charge */}
+                {totals.chinaCourier > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-900">China Local Courier Charge:</span>
+                    <span className="font-medium text-green-600">+ ৳{Math.round(totals.chinaCourier)}</span>
+                  </div>
+                )}
+
+                {/* Total */}
+                <div className="flex justify-between items-center text-sm font-semibold pt-2">
+                  <span className="text-gray-900">Total:</span>
+                  <span className="text-gray-900">৳{Math.round(totals.total)}</span>
                 </div>
-              )}
 
-              {/* China Local Courier Charge */}
-              {totals.chinaCourier > 0 && (
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-900">China Local Courier Charge:</span>
-                  <span className="font-medium text-green-600">+ ৳{Math.round(totals.chinaCourier)}</span>
-                </div>
-              )}
+                {/* Paid */}
 
-              {/* Total */}
-              <div className="flex justify-between items-center text-sm font-semibold pt-2">
-                <span className="text-gray-900">Total:</span>
-                <span className="text-gray-900">৳{Math.round(totals.total)}</span>
-              </div>
-
-              {/* Paid */}
-              {totals.paid > 0 && (
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex justify-between font-semibold items-center text-sm pt-2">
                   <span className="text-gray-900">Paid:</span>
                   <span className="font-medium text-red-600">- ৳{Math.round(totals.paid)}</span>
                 </div>
-              )}
 
-              {/* Due */}
-              {totals.due > 0 && (
-                <div className="flex justify-between items-center text-sm font-semibold pt-2">
-                  <span className="text-gray-900">Due:</span>
-                  <span className="text-gray-900">
-                    <span>৳{Math.round(totals.due)}</span>
-                    <span className="text-gray-500 font-normal"> + Shipping Charge</span>
-                  </span>
-                </div>
-              )}
+
+                {/* Due */}
+                {totals.due > 0 && (
+                  <div className="flex justify-between items-center text-sm font-semibold pt-2">
+                    <span className="text-gray-900">Due:</span>
+                    <span className="text-gray-900">
+                      <span>৳{Math.round(totals.due)}</span>
+                      <span className="text-gray-500 font-normal"> + Shipping Charge</span>
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         );
