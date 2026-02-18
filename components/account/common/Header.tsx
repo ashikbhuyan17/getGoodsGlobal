@@ -89,7 +89,7 @@ export default function Header() {
             </div>
 
             {/* Navigation Links Section */}
-            <nav className="flex gap-2 overflow-x-auto pb-2  justify-between ml-4 w-full xl:w-1/2 ">
+            <nav className="flex gap-2 overflow-x-auto pb-2  justify-between ml-4 w-full 2xl:w-1/2 ">
               {navItems.map((item) => {
                 const active = isActive(item.url);
                 return (
@@ -97,19 +97,16 @@ export default function Header() {
                     prefetch
                     href={item.url}
                     key={item.label}
-                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded transition-colors whitespace-nowrap ${
-                      active ? 'bg-gray-100' : 'hover:bg-gray-50'
-                    }`}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded transition-colors whitespace-nowrap ${active ? 'bg-gray-100' : 'hover:bg-gray-50'
+                      }`}
                   >
                     <item.icon
-                      className={`h-6 w-6 ${
-                        active ? 'text-teal-600' : 'text-gray-700'
-                      }`}
+                      className={`h-6 w-6 ${active ? 'text-teal-600' : 'text-gray-700'
+                        }`}
                     />
                     <span
-                      className={`text-xs font-medium ${
-                        active ? 'text-teal-600' : 'text-gray-700'
-                      }`}
+                      className={`text-xs font-medium ${active ? 'text-teal-600' : 'text-gray-700'
+                        }`}
                     >
                       {item.label}
                     </span>

@@ -31,11 +31,11 @@ export default function ImagePreview({
 }: ImagePreviewProps) {
   // Default placeholder image
   const DEFAULT_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='12'%3ENo Image%3C/text%3E%3C/svg%3E";
-  
+
   const imageUrl = !src || src === "/placeholder-product.png"
     ? DEFAULT_IMAGE
     : src.startsWith("http") || src.startsWith("data:")
-      ? src 
+      ? src
       : `${process.env.NEXT_PUBLIC_IMG_URL}/${src}`;
 
   return (
@@ -46,16 +46,26 @@ export default function ImagePreview({
             <Eye size={12} /> <span className="text-xs">Preview</span>
           </div>
         </DialogTrigger>
-        <DialogContent className={`${previewWidth} ${previewHeight} p-0 overflow-hidden`}>
+        <DialogContent className="
+                    p-0 
+                    border-0 
+                    bg-transparent 
+                    w-[350px] 
+                    max-w-[350px]
+                    lg:w-[400px] 
+                    lg:max-w-[400px]
+                    xl:w-[540px] 
+                    xl:max-w-[540px]
+                  ">
           <DialogTitle className="sr-only">Image preview: {alt}</DialogTitle>
           <DialogDescription className="sr-only">Preview of {alt}</DialogDescription>
-          <div className="relative w-full h-full min-h-[300px]">
+          <div className="relative w-full aspect-square">
             <Image
               src={imageUrl}
               alt={alt}
               fill
               className="object-cover rounded-lg"
-              sizes="(max-width: 448px) 100vw, 448px"
+              sizes="(max-width: 1024px) 350px, 540px"
             />
           </div>
         </DialogContent>
@@ -67,6 +77,6 @@ export default function ImagePreview({
         height={height}
         className="w-full h-full rounded shadow-md object-cover border border-gray-200"
       />
-    </div>
+    </div >
   );
 }

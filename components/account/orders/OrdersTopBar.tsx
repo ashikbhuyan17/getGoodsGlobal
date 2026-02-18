@@ -86,7 +86,7 @@ export default function OrdersTopBar({
       </div>
 
       {/* Right Section - Filter by Status + Order ID Search */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 max-lg:flex-wrap">
         {/* Filter by Status Dropdown */}
         <Select
           value={selectedStatus || undefined}

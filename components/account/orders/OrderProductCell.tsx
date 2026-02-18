@@ -30,19 +30,37 @@ export default function OrderProductCell({
               <Eye size={14} /> <span>Preview</span>
             </div>
           </DialogTrigger>
-          <DialogContent className="aspect-square max-w-md p-0 overflow-hidden">
-            <DialogTitle className="sr-only">Image preview: {title}</DialogTitle>
-            <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
-            <div className="relative w-full h-full min-h-70">
+          <DialogContent
+            className="
+                    p-0 
+                    border-0 
+                    bg-transparent 
+                    w-[350px] 
+                    max-w-[350px]
+                    lg:w-[350px] 
+                    lg:max-w-[350px]
+                    xl:w-[540px] 
+                    xl:max-w-[540px]
+                  "
+          >
+            <DialogTitle className="sr-only">
+              Image preview: {title}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Preview of {title}
+            </DialogDescription>
+
+            <div className="relative w-full aspect-square">
               <Image
                 src={src}
                 alt={title}
                 fill
                 className="object-cover rounded-lg"
-                sizes="(max-width: 448px) 100vw, 448px"
+                sizes="(max-width: 1024px) 350px, 540px"
               />
             </div>
           </DialogContent>
+
         </Dialog>
         <Image
           src={src}
