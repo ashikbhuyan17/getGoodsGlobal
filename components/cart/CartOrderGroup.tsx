@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { fetcher } from "@/lib/fetcher";
-import { Eye, Trash2 } from "lucide-react";
+import { Check, Eye, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from "../ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface CartOrderGroupProps {
   orderId: string;
@@ -17,6 +17,8 @@ interface CartOrderGroupProps {
   children: ReactNode;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   product: any;
+  isSelected?: boolean;
+  onSelectChange?: (selected: boolean) => void;
 }
 
 export default function CartOrderGroup({
@@ -26,6 +28,8 @@ export default function CartOrderGroup({
   children,
   product,
   page = "cart",
+  isSelected = true,
+  onSelectChange,
 }: CartOrderGroupProps) {
   const totalItems = product?.cartdetails?.reduce(
     (total: number, prev: { quantity: number }) =>
@@ -54,10 +58,39 @@ export default function CartOrderGroup({
     }
   };
 
+  const handleSelectClick = () => {
+    if (onSelectChange) {
+      onSelectChange(!isSelected);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-lg p-6 space-y-4">
+    <div
+      className={cn(
+        "rounded-lg p-6 space-y-4 transition-colors",
+        isSelected || page !== "cart"
+          ? "bg-white"
+          : "bg-gray-100 opacity-60"
+      )}
+    >
       {/* Header */}
       <div className="flex items-center gap-4">
+        {/* Selection Indicator */}
+        {page === "cart" && (
+          <button
+            onClick={handleSelectClick}
+            className={cn(
+              "shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+              isSelected
+                ? "bg-teal-600 hover:bg-teal-700"
+                : "bg-gray-200 border-2 border-gray-300 hover:bg-gray-300"
+            )}
+            aria-label={isSelected ? "Deselect item" : "Select item"}
+          >
+            {isSelected && <Check className="w-4 h-4 text-white" />}
+          </button>
+        )}
+        
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div className="flex gap-4 flex-1 items-center">
@@ -69,7 +102,7 @@ export default function CartOrderGroup({
                 className="w-24 h-24 rounded object-cover"
               /> */}
 
-              <div className="w-16 h-16 flex-shrink-0">
+              <div className="w-16 h-16 shrink-0">
                 <div className="relative w-16 h-16">
                   <Dialog>
                     <DialogTrigger asChild>
@@ -126,11 +159,11 @@ export default function CartOrderGroup({
 
       {/* Footer */}
       <div className="flex justify-between items-center pt-4">
-        <div className="text-xs py-[2px] px-[6px] border border-blue-200 text-[#0958d9] font-medium bg-[#E6F4FF] rounded">
+        <div className="text-xs py-0.5 px-1.5 border border-blue-200 text-[#0958d9] font-medium bg-[#E6F4FF] rounded">
           {totalItems} Items
         </div>
 
-        <div className="text-xs py-[2px] px-[6px] border border-red-200 text-[#d4380d] font-medium bg-[#FFF2E8] rounded">
+        <div className="text-xs py-0.5 px-1.5 border border-red-200 text-[#d4380d] font-medium bg-[#FFF2E8] rounded">
           <span className="text-[10px]">৳</span>{totalPrice}
         </div>
       </div>

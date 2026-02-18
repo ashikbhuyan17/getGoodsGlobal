@@ -15,6 +15,8 @@ export default function CartSummary({
   page = 'cart',
   total,
   formData,
+  allDeselected,
+  onCheckoutClick,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -27,6 +29,8 @@ export default function CartSummary({
     customer_id: number;
     payment_method: string;
   };
+  allDeselected?: boolean;
+  onCheckoutClick?: () => void;
 }) {
   const router = useRouter();
 
@@ -147,12 +151,10 @@ export default function CartSummary({
         total_price: finalPrice,
         coupon_code: discount ? coupon : null,
       };
-      console.log('🚀 ~ handleAcceptTerms ~ orderPayload:', orderPayload);
       const orderData: any = await fetcher('/order-place', {
         method: 'POST',
         body: JSON.stringify(orderPayload),
       });
-      console.log('🚀 ~ handleAcceptTerms ~ orderData:', orderData);
 
       toast.dismiss();
 
@@ -210,7 +212,7 @@ export default function CartSummary({
                 onClick={handleCouponVerify}
                 disabled={loading}
                 size="lg"
-                className="bg-primary hover:bg-primary/95 ml-[-10px]"
+                className="bg-primary hover:bg-primary/95 -ml-2.5"
               >
                 {loading ? 'Checking...' : 'Apply'}
               </Button>
@@ -250,6 +252,13 @@ export default function CartSummary({
               onAccept={handleAcceptTerms}
             />
           </>
+        ) : onCheckoutClick ? (
+          <Button
+            onClick={onCheckoutClick}
+            className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
+          >
+            Go to Checkout
+          </Button>
         ) : (
           <Link prefetch href={'/checkout'}>
             <Button className="w-full bg-primary hover:bg-primary/95 py-6 text-base">
