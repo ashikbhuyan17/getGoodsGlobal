@@ -14,7 +14,6 @@ export default async function PaymentPage({
 
   // Fetch payment data (array of payments)
   const payment: any = await fetcher(`/payment/${invoiceId}`);
-
   // Fetch bank list
   let bankList: any = null;
   try {
@@ -28,17 +27,12 @@ export default async function PaymentPage({
   }
 
   // Handle error response
-  if (
-    payment?.status === 'error' ||
-    !payment?.data ||
-    !Array.isArray(payment.data) ||
-    payment.data.length === 0
-  ) {
+  if (payment?.status === 'error' || !payment?.data) {
     notFound();
   }
 
   // Get first payment to extract invoice_id
-  const firstPayment = payment.data[0];
+  const firstPayment = payment.data;
   // const invoiceId = firstPayment?.invoice_id ?? invoiceId;
   const orderLabel = invoiceId ? `SKY${invoiceId}` : '—';
 
@@ -47,10 +41,12 @@ export default async function PaymentPage({
 
   const paid = 0;
 
-  // Payable Amount = 50% of total (remaining 50% after advance)
-  const payable = Math.round(total * 0.5);
+  // Advance is a percentage (e.g., 50 means 50%)
+  const advance = firstPayment?.advanced ?? 0;
+
+  // Payable Amount = 20% of total amount
+  const payable = firstPayment?.payable ?? 0;
   const initialPayable = payable;
-  const advance = '50%';
 
   return (
     <div className="min-h-screen space-y-4">
@@ -84,7 +80,7 @@ export default async function PaymentPage({
                         </Link>
                       </td>
                       <td className="py-3 px-4">৳{total}</td>
-                      <td className="py-3 px-4">{advance}</td>
+                      <td className="py-3 px-4">{advance}%</td>
                       <td className="py-3 px-4">৳{paid}</td>
                       <td className="py-3 px-4">
                         <div className="flex flex-col gap-1">

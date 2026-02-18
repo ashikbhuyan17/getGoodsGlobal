@@ -44,18 +44,18 @@ export default function PaymentPageClient({
       : [];
 
   const [selectedPayment, setSelectedPayment] = useState<string>(
-    paymentAccounts.length > 0 ? String(paymentAccounts[0].id) : ''
+    paymentAccounts.length > 0 ? String(paymentAccounts[0].id) : '',
   );
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [paymentAmount, setPaymentAmount] = useState<string>(
-    String(initialPayable)
+    String(initialPayable),
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const selectedAccount = paymentAccounts.find(
-    (acc: any) => acc.id === selectedPayment
+    (acc: any) => acc.id === selectedPayment,
   );
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -175,24 +175,26 @@ export default function PaymentPageClient({
                     {selectedAccount.accountNumber}
                   </div>
                 </div>
-                {selectedAccount.accountName != 'BKash' && <>
-                  <div className="grid grid-cols-12 border-b">
-                    <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                      Branch
+                {selectedAccount.accountName != 'BKash' && (
+                  <>
+                    <div className="grid grid-cols-12 border-b">
+                      <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                        Branch
+                      </div>
+                      <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                        {selectedAccount.branch}
+                      </div>
                     </div>
-                    <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                      {selectedAccount.branch}
+                    <div className="grid grid-cols-12 border-b last:border-b-0">
+                      <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                        Routing No
+                      </div>
+                      <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                        {selectedAccount.routingNo}
+                      </div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-12 border-b last:border-b-0">
-                    <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                      Routing No
-                    </div>
-                    <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                      {selectedAccount.routingNo}
-                    </div>
-                  </div>
-                </>}
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -243,7 +245,7 @@ export default function PaymentPageClient({
               htmlFor="paymentAmount"
               className="text-sm font-medium mb-2 block text-gray-900"
             >
-              Payment Amount
+              Payable Amount
             </Label>
             <Input
               id="paymentAmount"
