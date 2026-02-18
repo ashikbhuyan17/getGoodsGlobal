@@ -6,30 +6,53 @@ import { fetcher } from '@/lib/fetcher';
 import Link from 'next/link';
 import OrdersTopBar from '@/components/account/orders/OrdersTopBar';
 
-export default async function OrderPage() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res: any = await fetcher('/user-order-history');
-  const orders = res?.data || [];
+function buildOrdersSlug(status?: string, keyword?: string): string {
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (keyword?.trim()) params.set('keyword', keyword.trim());
+  const qs = params.toString();
+  return `/user-order-history${qs ? `?${qs}` : ''}`;
+}
 
-  const formatStatus = (status: string) => {
-    const statusMap: Record<string, { label: string; color: string }> = {
-      '1': { label: 'Pending', color: 'text-yellow-700 bg-yellow-100' },
-      '2': { label: 'Processing', color: 'text-blue-700 bg-blue-100' },
-      '3': { label: 'Delivered', color: 'text-green-700 bg-green-100' },
+export default async function OrderPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string; keyword?: string }>;
+}) {
+  const params = await searchParams;
+
+  const [statusRes, ordersRes] = await Promise.all([
+    fetcher<{ data?: { id: number; name: string; slug: string; status: string }[] }>(
+      '/order-status',
+    ),
+    fetcher<{ data?: unknown[] }>(buildOrdersSlug(params.status, params.keyword)),
+  ]);
+
+  const orderStatuses = statusRes?.data || [];
+  const orders = ordersRes?.data || [];
+
+  const statusMap = Object.fromEntries(
+    orderStatuses.map((s) => [String(s.id), s.name]),
+  );
+
+  const formatStatus = (status: string | number) => {
+    const label = statusMap[String(status)] ?? 'Unknown';
+    const colorMap: Record<string, string> = {
+      '1': 'text-yellow-700 bg-yellow-100',
+      '2': 'text-blue-700 bg-blue-100',
+      '3': 'text-green-700 bg-green-100',
+      '6': 'text-green-700 bg-green-100',
+      '9': 'text-green-700 bg-green-100',
+      '4': 'text-red-700 bg-red-100',
+      '22': 'text-blue-700 bg-blue-100',
     };
-
-    return (
-      statusMap[status] || {
-        label: 'Unknown',
-        color: 'text-gray-500 bg-gray-100',
-      }
-    );
+    const color = colorMap[String(status)] ?? 'text-gray-500 bg-gray-100';
+    return { label, color };
   };
 
   return (
     <div className="w-full space-y-4 pb-20">
-      {/* Top Bar */}
-      <OrdersTopBar />
+      <OrdersTopBar orderStatuses={orderStatuses} />
 
       <div className="px-2">
         <Card className="rounded shadow">
@@ -73,6 +96,8 @@ export default async function OrderPage() {
                         : totalPrice - paidAmount;
 
                     const firstItem = order?.order_details?.[0];
+                    const status = formatStatus(order?.order_status ?? '');
+
                     return (
                       <tr
                         key={order?.id}
@@ -102,11 +127,9 @@ export default async function OrderPage() {
 
                         <td className="py-3 px-4">
                           <span
-                            className={`px-2 py-1 rounded text-sm font-medium ${
-                              formatStatus(order?.order_status).color
-                            }`}
+                            className={`px-2 py-1 rounded text-sm font-medium ${status.color}`}
                           >
-                            {formatStatus(order?.order_status).label}
+                            {status.label}
                           </span>
                         </td>
 

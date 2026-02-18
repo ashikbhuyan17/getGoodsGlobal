@@ -41,7 +41,6 @@ export default async function DeliveryPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = await fetcher(slug);
   const deliveries = res?.data || [];
-  console.log('🚀 ~ DeliveryPage ~ deliveries:', deliveries);
 
   return (
     <div className="w-full space-y-4 pb-20">
