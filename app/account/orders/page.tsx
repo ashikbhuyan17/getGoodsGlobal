@@ -10,7 +10,6 @@ export default async function OrderPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = await fetcher('/user-order-history');
   const orders = res?.data || [];
-  console.log('🚀 ~ OrderPage ~ orders:', orders);
 
   const formatStatus = (status: string) => {
     const statusMap: Record<string, { label: string; color: string }> = {
@@ -112,14 +111,29 @@ export default async function OrderPage() {
                         </td>
 
                         <td className="py-3 px-4">
-                          <Link
-                            prefetch
-                            href={`/account/orders/${order?.invoice_id}`}
-                          >
-                            <Button size="sm" className="rounded">
-                              Details
-                            </Button>
-                          </Link>
+                          <div className="flex items-center gap-2">
+                            {dueAmount > 0 && (
+                              <Link
+                                prefetch
+                                href={`/payment/${order?.invoice_id}`}
+                              >
+                                <Button
+                                  size="sm"
+                                  className="rounded bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                  Pay
+                                </Button>
+                              </Link>
+                            )}
+                            <Link
+                              prefetch
+                              href={`/account/orders/${order?.invoice_id}`}
+                            >
+                              <Button size="sm" className="rounded">
+                                Details
+                              </Button>
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     );
