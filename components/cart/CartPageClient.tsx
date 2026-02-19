@@ -1,10 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import CartOrderGroup from "@/components/cart/CartOrderGroup";
-import CartItemRow from "@/components/cart/CartItemRow";
-import CartSummary from "@/components/cart/CartSummary";
-import { toast } from "sonner";
+import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import CartOrderGroup from '@/components/cart/CartOrderGroup';
+import CartItemRow from '@/components/cart/CartItemRow';
+import CartSummary from '@/components/cart/CartSummary';
+import { toast } from 'sonner';
+import { cartOrderProducts } from '@/lib/fetcher';
 
 interface CartPageClientProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -13,13 +15,15 @@ interface CartPageClientProps {
 
 export default function CartPageClient({ cartProducts }: CartPageClientProps) {
   // Initialize all items as selected by default
-  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(() => {
-    const initial: Record<string, boolean> = {};
-    cartProducts?.data?.forEach((product: { id: string }) => {
-      initial[product.id] = true;
-    });
-    return initial;
-  });
+  const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
+    () => {
+      const initial: Record<string, boolean> = {};
+      cartProducts?.data?.forEach((product: { id: string }) => {
+        initial[product.id] = true;
+      });
+      return initial;
+    },
+  );
 
   const handleSelectChange = (productId: string, selected: boolean) => {
     setSelectedItems((prev) => ({
@@ -30,18 +34,29 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
 
   // Calculate total only for selected items
   const selectedTotal = useMemo(() => {
-    return cartProducts?.data?.reduce((sum: number, product: any) => {
-      if (selectedItems[product.id]) {
-        const itemTotal = product?.cartdetails?.reduce(
-          (itemSum: number, item: { quantity: number; price: number }) => {
-            return itemSum + Number(item?.quantity) * Number(item?.price);
+    return (
+      cartProducts?.data?.reduce(
+        (
+          sum: number,
+          product: {
+            id: string;
+            cartdetails?: { quantity: number; price: number }[];
           },
-          0
-        );
-        return sum + itemTotal;
-      }
-      return sum;
-    }, 0) || 0;
+        ) => {
+          if (selectedItems[product.id]) {
+            const itemTotal = product?.cartdetails?.reduce(
+              (itemSum: number, item: { quantity: number; price: number }) => {
+                return itemSum + Number(item?.quantity) * Number(item?.price);
+              },
+              0,
+            );
+            return sum + (itemTotal ?? 0);
+          }
+          return sum;
+        },
+        0,
+      ) || 0
+    );
   }, [cartProducts?.data, selectedItems]);
 
   // Check if all items are deselected
@@ -50,13 +65,40 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
     return selectedCount === 0 && cartProducts?.data?.length > 0;
   }, [selectedItems, cartProducts?.data?.length]);
 
-  const handleCheckoutClick = () => {
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const router = useRouter();
+
+  const handleCheckoutClick = async () => {
     if (allDeselected) {
-      toast.error("Please select at least one item from your cart to proceed.");
+      toast.error('Please select at least one item from your cart to proceed.');
       return;
     }
-    // Navigate to checkout
-    window.location.href = "/checkout";
+    const data = (cartProducts?.data ?? []) as { id: string }[];
+    const selectedCartIds = data
+      .filter((p) => selectedItems[p.id])
+      .map((p) => String(p.id));
+    if (!selectedCartIds.length) {
+      toast.error('Please select at least one item from your cart to proceed.');
+      return;
+    }
+    setCheckoutLoading(true);
+    try {
+      const result = await cartOrderProducts(selectedCartIds);
+      const success =
+        result?.status === true ||
+        result?.status === 'success' ||
+        (result?.message &&
+          String(result.message).toLowerCase().includes('success'));
+      if (success) {
+        router.push(`/checkout?cart_ids=${selectedCartIds.join(',')}`);
+      } else {
+        toast.error(result?.message || 'Failed to proceed to checkout.');
+      }
+    } catch {
+      toast.error('Failed to proceed to checkout.');
+    } finally {
+      setCheckoutLoading(false);
+    }
   };
 
   return (
@@ -71,7 +113,9 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
             title={product?.product_name}
             product={product}
             isSelected={selectedItems[product.id] ?? true}
-            onSelectChange={(selected) => handleSelectChange(product.id, selected)}
+            onSelectChange={(selected) =>
+              handleSelectChange(product.id, selected)
+            }
           >
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {product?.cartdetails?.map((cart: any) => (
@@ -90,10 +134,11 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
       </div>
 
       {/* Cart Summary */}
-      <CartSummary 
-        total={selectedTotal} 
+      <CartSummary
+        total={selectedTotal}
         allDeselected={allDeselected}
         onCheckoutClick={handleCheckoutClick}
+        isCheckoutLoading={checkoutLoading}
       />
     </>
   );

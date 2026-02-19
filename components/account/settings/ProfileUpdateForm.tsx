@@ -97,7 +97,6 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
       formData.append('image', file);
       formData.append('photo', file);
       const res = await uploadProfilePhoto(formData);
-      console.log("🚀 ~ handlePhotoChange ~ res:", res)
       if (res?.status) {
         toast.success(res?.message ?? 'Photo updated');
         setPreviewUrl(null);

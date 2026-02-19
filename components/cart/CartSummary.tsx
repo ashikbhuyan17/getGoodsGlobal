@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import PriceRow from './PriceRow';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
-import { InfoIcon } from 'lucide-react';
+import { InfoIcon, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -17,6 +17,9 @@ export default function CartSummary({
   formData,
   allDeselected,
   onCheckoutClick,
+  isCheckoutLoading = false,
+  cartIds,
+  isBuyNow = false,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -31,6 +34,11 @@ export default function CartSummary({
   };
   allDeselected?: boolean;
   onCheckoutClick?: () => void;
+  isCheckoutLoading?: boolean;
+  /** Cart IDs to send with order-place (checkout from cart). */
+  cartIds?: number[];
+  /** When true, call buy-order-place instead of order-place. */
+  isBuyNow?: boolean;
 }) {
   const router = useRouter();
 
@@ -150,8 +158,10 @@ export default function CartSummary({
         ...formData,
         total_price: finalPrice,
         coupon_code: discount ? coupon : null,
+        ...(!isBuyNow && cartIds?.length ? { cart_ids: cartIds } : {}),
       };
-      const orderData: any = await fetcher('/order-place', {
+      const endpoint = isBuyNow ? '/buy-order-place' : '/order-place';
+      const orderData: any = await fetcher(endpoint, {
         method: 'POST',
         body: JSON.stringify(orderPayload),
       });
@@ -238,34 +248,61 @@ export default function CartSummary({
           </div>
         </div>
 
-        {page === 'checkout' ? (
-          <>
+        {
+          page === 'checkout' ? (
+            <>
+              <Button
+                onClick={handlePlaceOrderClick}
+                className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
+              >
+                Place Order & Pay
+              </Button>
+              <TermsModal
+                open={showTermsModal}
+                onClose={() => setShowTermsModal(false)}
+                onAccept={handleAcceptTerms}
+              />
+            </>
+          ) : (
             <Button
-              onClick={handlePlaceOrderClick}
+              onClick={onCheckoutClick}
+              disabled={isCheckoutLoading}
               className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
             >
-              Place Order & Pay
+              {isCheckoutLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait...
+                </>
+              ) : (
+                'Go to Checkout'
+              )}
             </Button>
-            <TermsModal
-              open={showTermsModal}
-              onClose={() => setShowTermsModal(false)}
-              onAccept={handleAcceptTerms}
-            />
-          </>
-        ) : onCheckoutClick ? (
-          <Button
-            onClick={onCheckoutClick}
-            className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
-          >
-            Go to Checkout
-          </Button>
-        ) : (
-          <Link prefetch href={'/checkout'}>
-            <Button className="w-full bg-primary hover:bg-primary/95 py-6 text-base">
-              Go to Checkout
-            </Button>
-          </Link>
-        )}
+          )
+
+          // onCheckoutClick ? (
+          //   <Button
+          //     onClick={onCheckoutClick}
+          //     disabled={isCheckoutLoading}
+          //     className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
+          //   >
+          //     {isCheckoutLoading ? (
+          //       <>
+          //         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          //         Please wait...
+          //       </>
+          //     ) : (
+          //       'Go to Checkout'
+          //     )}
+          //   </Button>
+          // ) : (
+          //   <Link prefetch href={'/checkout'}>
+          //     <Button className="w-full bg-primary hover:bg-primary/95 py-6 text-base">
+          //       Go to Checkout
+          //     </Button>
+          //   </Link>
+          // )
+        }
       </div>
     </div>
   );

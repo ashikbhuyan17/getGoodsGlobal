@@ -81,7 +81,6 @@ export default function CreateTicketPage() {
       });
 
       if (res?.status === true) {
-        console.log(res);
         router.refresh();
         router.push("/account/support");
         toast.success("Ticket created successfully!");

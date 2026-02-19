@@ -56,6 +56,8 @@ function CheckoutClient({
     0
   );
 
+  const cartIds = isBuyNow ? undefined : productsWithTotals.map((p: { id: string | number }) => Number(p.id));
+
   return (
     <div className="mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-6">
@@ -88,7 +90,7 @@ function CheckoutClient({
       </div>
 
       {/* Cart Summary */}
-      <CartSummary formData={formData} total={grandTotal} page="checkout" />
+      <CartSummary formData={formData} total={grandTotal} page="checkout" cartIds={cartIds} isBuyNow={isBuyNow} />
     </div>
   );
 }

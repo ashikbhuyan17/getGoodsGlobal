@@ -48,6 +48,31 @@ export async function uploadProfilePhoto(
   }
 }
 
+/** GET cart-order-products with selected cart IDs. Used before redirecting to checkout. */
+export async function cartOrderProducts(
+  cartIds: string[],
+): Promise<{ status?: boolean | string; message?: string; data?: unknown }> {
+  if (!cartIds?.length) {
+    return { status: false, message: 'No cart items selected' };
+  }
+  try {
+    const query = cartIds
+      .map((id) => `cart_ids[]=${encodeURIComponent(id)}`)
+      .join('&');
+    const slug = `/cart-order-products?${query}`;
+    console.log('🚀 ~ cartOrderProducts ~ slug:', slug);
+    const result = await fetcher<{
+      status?: boolean | string;
+      message?: string;
+      data?: unknown;
+    }>(slug);
+    return result;
+  } catch (error) {
+    console.log('Cart order products error:', error);
+    return { status: false, message: 'Failed to prepare cart for checkout' };
+  }
+}
+
 /** Submit payment (multipart/form-data). Expects invoiceId and FormData with pay_slip_image, payment_method, invoice_id */
 export async function submitPayment(
   invoiceId: string,
