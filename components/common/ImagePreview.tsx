@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { Eye } from "lucide-react";
+import Image from 'next/image';
+import { Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogDescription,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
 interface ImagePreviewProps {
   src: string;
@@ -25,18 +25,20 @@ export default function ImagePreview({
   alt,
   width = 64,
   height = 64,
-  className = "",
-  previewWidth = "max-w-md",
-  previewHeight = "aspect-square",
+  className = '',
+  previewWidth = 'max-w-md',
+  previewHeight = 'aspect-square',
 }: ImagePreviewProps) {
   // Default placeholder image
-  const DEFAULT_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='12'%3ENo Image%3C/text%3E%3C/svg%3E";
+  const DEFAULT_IMAGE =
+    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-size='12'%3ENo Image%3C/text%3E%3C/svg%3E";
 
-  const imageUrl = !src || src === "/placeholder-product.png"
-    ? DEFAULT_IMAGE
-    : src.startsWith("http") || src.startsWith("data:")
-      ? src
-      : `${process.env.NEXT_PUBLIC_IMG_URL}/${src}`;
+  const imageUrl =
+    !src || src === '/placeholder-product.png'
+      ? DEFAULT_IMAGE
+      : src.startsWith('http') || src.startsWith('data:')
+        ? src
+        : `${process.env.NEXT_PUBLIC_IMG_URL}/${src}`;
 
   return (
     <div className={`relative ${className}`} style={{ width, height }}>
@@ -46,7 +48,8 @@ export default function ImagePreview({
             <Eye size={12} /> <span className="text-xs">Preview</span>
           </div>
         </DialogTrigger>
-        <DialogContent className="
+        <DialogContent
+          className="
                     p-0 
                     border-0 
                     bg-transparent 
@@ -56,9 +59,12 @@ export default function ImagePreview({
                     lg:max-w-[400px]
                     xl:w-[540px] 
                     xl:max-w-[540px]
-                  ">
+                  "
+        >
           <DialogTitle className="sr-only">Image preview: {alt}</DialogTitle>
-          <DialogDescription className="sr-only">Preview of {alt}</DialogDescription>
+          <DialogDescription className="sr-only">
+            Preview of {alt}
+          </DialogDescription>
           <div className="relative w-full aspect-square">
             <Image
               src={imageUrl}
@@ -77,6 +83,6 @@ export default function ImagePreview({
         height={height}
         className="w-full h-full rounded shadow-md object-cover border border-gray-200"
       />
-    </div >
+    </div>
   );
 }
