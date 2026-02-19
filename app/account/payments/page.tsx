@@ -71,9 +71,10 @@ export default async function PaymentsPage() {
               ) : (
                 payments.map((payment: Record<string, unknown>) => {
                   const order = payment?.order as
-                    | { invoice_id?: string }
+                    | { invoice_id?: string; pay_slip_image?: string | null }
                     | undefined;
                   const invoiceId = order?.invoice_id;
+                  const paySlipImage = order?.pay_slip_image;
 
                   return (
                     <tr
@@ -107,23 +108,16 @@ export default async function PaymentsPage() {
                       </td>
 
                       <td className="py-3 px-4">
-                        <div className="flex flex-col items-start gap-1.5">
-                          <ImagePreview
-                            src={
-                              String(
-                                payment?.method_image ??
-                                  payment?.pay_slip_image ??
-                                  payment?.image ??
-                                  '',
-                              ) || '/placeholder-product.png'
-                            }
-                            alt={String(
-                              payment?.payment_method || 'Payment method',
-                            )}
-                            width={32}
-                            height={32}
-                            className="shrink-0 rounded"
-                          />
+                        <div className="flex flex-col items-start gap-2">
+                          {paySlipImage ? (
+                            <ImagePreview
+                              src={paySlipImage}
+                              alt={`Payment slip ORD-${invoiceId || 'N/A'}`}
+                              width={48}
+                              height={48}
+                              className="shrink-0 rounded border border-gray-200"
+                            />
+                          ) : null}
                           <Badge className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-1 rounded-md text-xs font-medium border-0">
                             {String(payment?.payment_method || 'N/A')}
                           </Badge>

@@ -59,9 +59,9 @@ export default async function OrderPage({
 
       <div className="px-2">
         <Card className="rounded shadow">
-          <div className="px-2">
+          {/* <div className="px-2">
             <Button className="rounded px-6 py-2">Select All to Pay</Button>
-          </div>
+          </div> */}
           <CardContent className="p-0 overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="border-b">
