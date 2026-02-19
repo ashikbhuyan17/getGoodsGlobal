@@ -5,7 +5,7 @@ import { fetcher } from "@/lib/fetcher";
 
 export default async function CartPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cartProducts: any = await fetcher("/cart-products");
+  const cartProducts: any = await fetcher("/cart-products", { cache: 'no-store' });
 
 
   if (cartProducts?.data?.length === 0) {

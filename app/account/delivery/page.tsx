@@ -39,7 +39,7 @@ export default async function DeliveryPage({
   const slug = buildDeliverySlug(params.status, params.keyword);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res: any = await fetcher(slug);
+  const res: any = await fetcher(slug, { cache: 'no-store' });
   const deliveries = res?.data || [];
 
   return (
@@ -76,7 +76,9 @@ export default async function DeliveryPage({
                   deliveries.map((d: Record<string, unknown>) => {
                     const invoiceId = d?.invoice_id;
                     const amount = Number(d?.amount ?? 0);
-                    const paid = Number(d?.paid_partial_payment_amount ?? 0);
+                    const paidAmount = Number(
+                      d?.paid_partial_payment_amount ?? 0,
+                    );
                     const due = Number(d?.payment_due_amount ?? 0);
                     const shipping = d?.shipping as
                       | { area?: string }
@@ -109,11 +111,11 @@ export default async function DeliveryPage({
                           </Badge>
                         </td>
                         <td className="py-3 px-4">৳{amount}</td>
-                        <td className="py-3 px-4">৳{paid}</td>
+                        <td className="py-3 px-4">৳{paidAmount}</td>
                         <td className="py-3 px-4">৳{due}</td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
-                            {paid <= 0 && (
+                            {paidAmount < amount && (
                               <Link href={`/payment/${invoiceId}`}>
                                 <Button
                                   size="sm"

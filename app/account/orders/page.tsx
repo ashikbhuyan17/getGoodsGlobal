@@ -22,10 +22,13 @@ export default async function OrderPage({
   const params = await searchParams;
 
   const [statusRes, ordersRes] = await Promise.all([
-    fetcher<{ data?: { id: number; name: string; slug: string; status: string }[] }>(
-      '/order-status',
+    fetcher<{
+      data?: { id: number; name: string; slug: string; status: string }[];
+    }>('/order-status', { cache: 'no-store' }),
+    fetcher<{ data?: unknown[] }>(
+      buildOrdersSlug(params.status, params.keyword),
+      { cache: 'no-store' },
     ),
-    fetcher<{ data?: unknown[] }>(buildOrdersSlug(params.status, params.keyword)),
   ]);
 
   const orderStatuses = statusRes?.data || [];
@@ -135,7 +138,7 @@ export default async function OrderPage({
 
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            {dueAmount > 0 && (
+                            {paidAmount <= 0 && (
                               <Link
                                 prefetch
                                 href={`/payment/${order?.invoice_id}`}
