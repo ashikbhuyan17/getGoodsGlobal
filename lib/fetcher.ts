@@ -73,6 +73,59 @@ export async function cartOrderProducts(
   }
 }
 
+/** Create ticket (JSON). Sends customer_id, name, email, phone, message, type, image (optional base64) */
+export async function createTicket(body: {
+  customer_id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  type: string;
+  image?: string;
+}): Promise<{ status?: boolean; message?: string }> {
+  try {
+    const cookiesStore = await cookies();
+    const token = cookiesStore.get('token')?.value;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket-store`,
+      {
+        method: 'POST',
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      },
+    );
+    return res.json();
+  } catch (error) {
+    console.log('Create ticket error:', error);
+    return { status: false, message: 'Failed to create ticket' };
+  }
+}
+
+/** Submit ticket reply (form-data). Expects FormData with ticket_id, message, image (optional base64) */
+export async function submitTicketReply(
+  formData: FormData,
+): Promise<{ status?: boolean; message?: string }> {
+  try {
+    const cookiesStore = await cookies();
+    const token = cookiesStore.get('token')?.value;
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/ticket-replay-submit`,
+      {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      },
+    );
+    return res.json();
+  } catch (error) {
+    console.log('Submit ticket reply error:', error);
+    return { status: false, message: 'Failed to send reply' };
+  }
+}
+
 /** Submit payment (multipart/form-data). Expects invoiceId and FormData with pay_slip_image, payment_method, invoice_id */
 export async function submitPayment(
   invoiceId: string,

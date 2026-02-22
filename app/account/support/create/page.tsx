@@ -11,14 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 import {
   Form,
@@ -28,23 +21,37 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { fetcher } from "@/lib/fetcher";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { fetcher, createTicket } from "@/lib/fetcher";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+const TICKET_TYPES = [
+  "Refund Support",
+  "Order section Problem",
+  "Delivery Issue",
+  "Product Quality",
+  "Payment Issue",
+  "General Support",
+] as const;
+
 const TicketSchema = z.object({
   name: z.string().min(1, "Name is required"),
-
   email: z.string().min(1, "Email is required").email("Invalid email address"),
-
   phone: z
     .string()
     .regex(
       /^01[0-9]{9}$/,
       "Phone must be a valid Bangladeshi number (11 digits)"
     ),
-
   message: z.string().min(3, "Message is required"),
+  type: z.string().min(1, "Type is required"),
 });
 
 export default function CreateTicketPage() {
@@ -58,6 +65,7 @@ export default function CreateTicketPage() {
       email: "",
       phone: "",
       message: "",
+      type: "General Support",
     },
   });
 
@@ -65,154 +73,175 @@ export default function CreateTicketPage() {
     try {
       setLoading(true);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const user: any = await fetcher("/user-profile");
+      const user = await fetcher<{ data?: { id?: string } }>("/user-profile");
+      const customerId = String(user?.data?.id ?? "");
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res: any = await fetcher("/ticket-store", {
-        method: "POST",
-        body: JSON.stringify({
-          customer_id: user?.data?.id,
-          name: values.name,
-          email: values.email,
-          phone: values.phone,
-          message: values.message,
-        }),
+      const res = await createTicket({
+        customer_id: customerId,
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        message: values.message,
+        type: values.type,
       });
 
       if (res?.status === true) {
-        router.refresh();
-        router.push("/account/support");
         toast.success("Ticket created successfully!");
-        form.reset();
+        window.location.href = "/account/support";
       } else {
-        toast.error("Failed to create ticket. Please try again.");
+        toast.error(res?.message || "Failed to create ticket. Please try again.");
       }
     } catch (err) {
       toast.error("Failed to create ticket. Please try again.");
-      console.log(err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white rounded-sm p-4 md:p-8 font-sans">
-      <div className="space-y-6">
-        <Link
-          href="/account/support"
-          className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors group"
-        >
-          <ChevronLeft className="mr-1 h-4 w-4 group-hover:-translate-x-0.5 transition-transform" />
-          Back to Support
-        </Link>
-
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Create New Ticket
-          </h1>
-          <p className="text-slate-500">Submit a new support request.</p>
+    <div className="w-full space-y-4 px-2 pb-20">
+      {/* Header - matches support list page */}
+      <div className="bg-white rounded-sm border border-gray-200 shadow-sm">
+        <div className="px-4 py-4 flex items-center gap-4">
+          <Link
+            href="/account/support"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4 text-gray-600" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">
+              Create New Ticket
+            </h1>
+            <p className="text-sm text-gray-500 mt-0.5">
+              Submit a support request and we&apos;ll get back to you soon
+            </p>
+          </div>
         </div>
-
-        <Card className="rounded-xl border-none shadow-sm bg-white">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/30">
-            <CardTitle>Ticket Details</CardTitle>
-            <CardDescription>Fill out all required fields.</CardDescription>
-          </CardHeader>
-
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <CardContent className="p-6 space-y-6">
-                <div className="grid gap-6 md:grid-cols-2">
-                  {/* Name */}
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Boss"
-                            {...field}
-                            className="rounded-xl"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Email */}
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="boss@email.com"
-                            {...field}
-                            className="rounded-xl"
-                            type="email"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Phone */}
-                  <FormField
-                    control={form.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="017XXXXXXXX"
-                            {...field}
-                            className="rounded-xl"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Message */}
-                  <FormField
-                    control={form.control}
-                    name="message"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>Message</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Describe your issue here..."
-                            className="rounded-xl min-h-[140px] resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-
-              <CardFooter className="p-6 border-t bg-slate-50/30 flex justify-end">
-                <Button type="submit" disabled={loading}>
-                  <Send className="mr-2 h-4 w-4" />
-                  {loading ? "Submitting..." : "Submit Ticket"}
-                </Button>
-              </CardFooter>
-            </form>
-          </Form>
-        </Card>
       </div>
+
+      <Card className="rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="p-6 space-y-6">
+              <div className="grid gap-6 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Your name"
+                          {...field}
+                          className="rounded-lg border-gray-300 focus-visible:ring-teal-500"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-600" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="your@email.com"
+                          {...field}
+                          type="email"
+                          className="rounded-lg border-gray-300 focus-visible:ring-teal-500"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-600" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Phone</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="017XXXXXXXX"
+                          {...field}
+                          className="rounded-lg border-gray-300 focus-visible:ring-teal-500"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-600" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Category</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="rounded-lg border-gray-300 focus:ring-teal-500">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {TICKET_TYPES.map((t) => (
+                            <SelectItem key={t} value={t}>
+                              {t}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage className="text-red-600" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Message</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe your issue in detail. Include order ID if applicable..."
+                        className="rounded-lg min-h-[120px] resize-none border-gray-300 focus-visible:ring-teal-500"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-600" />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+
+            <div className="border-t border-gray-100 px-6 py-4 bg-gray-50/50 flex justify-end">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-6"
+              >
+                <Send className="mr-2 h-4 w-4" />
+                {loading ? "Submitting..." : "Submit Ticket"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </Card>
     </div>
   );
 }

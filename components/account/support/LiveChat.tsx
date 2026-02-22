@@ -1,12 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Plus } from "lucide-react";
-import { fetcher } from "@/lib/fetcher";
+import { submitTicketReply } from "@/lib/fetcher";
 import { useRouter } from "next/navigation";
 import ImagePreview from "@/components/common/ImagePreview";
+import { toast } from "sonner";
+
+const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || "";
 
 function formatDate(dt?: string) {
   if (!dt) return "N/A";
@@ -33,44 +36,58 @@ export default function LiveChat({
   managerName,
 }: LiveChatProps) {
   const [message, setMessage] = useState("");
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
-
-    // For demo UI, just clear the message
-    // In production, uncomment the API call below
-    setMessage("");
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // const res: any = await fetcher("/ticket-replay-submit", {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     ticket_id: ticketId,
-    //     message: message,
-    //   }),
-    // });
-
-    // if (res?.status === true) {
-    //   setMessage("");
-    //   router.refresh();
-    // }
-  };
-
-  // Check if message contains image URL or is an image
-  const isImageMessage = (item: any) => {
-    return !!item?.image;
-  };
-
-  const getImageUrl = (item: any) => {
-    if (item?.image) {
-      // If it's a full URL, return as is, otherwise treat as relative path
-      if (item.image.startsWith("http") || item.image.startsWith("data:")) {
-        return item.image;
-      }
-      return item.image;
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => setImageBase64(reader.result as string);
+      reader.readAsDataURL(file);
     }
-    return null;
+    e.target.value = "";
+  };
+
+  const handleSendMessage = async () => {
+    if (!message.trim() && !imageBase64) return;
+
+    setSending(true);
+    try {
+      const formData = new FormData();
+      formData.append("ticket_id", ticketId);
+      formData.append("message", message.trim() || "");
+      if (imageBase64) {
+        formData.append("image", imageBase64);
+        setImageBase64(null);
+      }
+
+      const res = await submitTicketReply(formData);
+
+      if (res?.status === true) {
+        setMessage("");
+        router.refresh();
+        toast.success("Message sent");
+      } else {
+        toast.error(res?.message || "Failed to send message");
+      }
+    } catch {
+      toast.error("Failed to send message");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const isImageMessage = (item: Record<string, unknown>) => !!item?.image;
+
+  const getImageUrl = (item: Record<string, unknown>) => {
+    const img = item?.image;
+    if (!img) return null;
+    const s = String(img);
+    if (s.startsWith("http") || s.startsWith("data:")) return s;
+    return `${IMG_URL}/${s}`;
   };
 
   return (
@@ -83,23 +100,21 @@ export default function LiveChat({
 
       {/* Chat Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {ticket?.map((it: any) => {
+        {(ticket as Record<string, unknown>[])?.map((it) => {
           const isAdmin = it?.type === "admin" || !!it?.replay;
-          const text = it?.replay ?? it?.message ?? "";
+          const text = String(it?.replay ?? it?.message ?? "");
           const hasImage = isImageMessage(it);
           const imageUrl = hasImage ? getImageUrl(it) : null;
           const displayText = hasImage && imageUrl ? "" : text;
 
           return (
             <div
-              key={it?.id}
+              key={String(it?.id ?? Math.random())}
               className={`flex ${isAdmin ? "justify-start" : "justify-end"}`}
             >
               <div
-                className={`max-w-[75%] ${
-                  isAdmin ? "items-start" : "items-end"
-                } flex flex-col`}
+                className={`max-w-[75%] ${isAdmin ? "items-start" : "items-end"
+                  } flex flex-col`}
               >
                 {/* Image Message - Right aligned for user, left for admin */}
                 {hasImage && imageUrl && (
@@ -114,11 +129,10 @@ export default function LiveChat({
                       />
                     </div>
                     <p
-                      className={`text-xs text-gray-500 mt-1 ${
-                        isAdmin ? "text-left" : "text-right"
-                      }`}
+                      className={`text-xs text-gray-500 mt-1 ${isAdmin ? "text-left" : "text-right"
+                        }`}
                     >
-                      {formatDate(it?.created_at)}
+                      {formatDate(String(it?.created_at ?? ""))}
                     </p>
                   </div>
                 )}
@@ -126,21 +140,19 @@ export default function LiveChat({
                 {/* Text Message */}
                 {displayText && (
                   <div
-                    className={`rounded-lg p-3 ${
-                      isAdmin
-                        ? "bg-teal-100 text-gray-900 rounded-tl-none"
-                        : "bg-white text-gray-900 rounded-tr-none border border-gray-200"
-                    }`}
+                    className={`rounded-lg p-3 ${isAdmin
+                      ? "bg-teal-100 text-gray-900 rounded-tl-none"
+                      : "bg-white text-gray-900 rounded-tr-none border border-gray-200"
+                      }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {displayText}
+                      {String(displayText)}
                     </p>
                     <p
-                      className={`text-xs text-gray-500 mt-1 ${
-                        isAdmin ? "text-left" : "text-right"
-                      }`}
+                      className={`text-xs text-gray-500 mt-1 ${isAdmin ? "text-left" : "text-right"
+                        }`}
                     >
-                      {formatDate(it?.created_at)}
+                      {formatDate(String(it?.created_at ?? ""))}
                     </p>
                   </div>
                 )}
@@ -152,11 +164,36 @@ export default function LiveChat({
 
       {/* Chat Input Section */}
       <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg">
+        {imageBase64 && (
+          <div className="mb-2 flex items-center gap-2">
+            <img
+              src={imageBase64}
+              alt="Preview"
+              className="h-12 w-12 rounded object-cover border"
+            />
+            <button
+              type="button"
+              onClick={() => setImageBase64(null)}
+              className="text-xs text-red-600 hover:underline"
+            >
+              Remove
+            </button>
+          </div>
+        )}
         <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleImageSelect}
+          />
           <Button
+            type="button"
             variant="outline"
             size="icon"
             className="rounded-full w-10 h-10 shrink-0 border-gray-300 hover:bg-gray-50"
+            onClick={() => fileInputRef.current?.click()}
           >
             <Plus className="h-5 w-5" />
           </Button>
@@ -174,10 +211,10 @@ export default function LiveChat({
           />
           <Button
             onClick={handleSendMessage}
-            disabled={!message.trim()}
+            disabled={(!message.trim() && !imageBase64) || sending}
             className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-4 py-2 shrink-0"
           >
-            <Send className="h-4 w-4" />
+            {sending ? "Sending..." : <Send className="h-4 w-4" />}
           </Button>
         </div>
       </div>

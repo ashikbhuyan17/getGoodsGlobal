@@ -5,68 +5,62 @@ import TicketInfoBar from "@/components/account/support/TicketInfoBar";
 import TicketDetailsCard from "@/components/account/support/TicketDetailsCard";
 import LiveChat from "@/components/account/support/LiveChat";
 import { Paperclip } from "lucide-react";
+import { fetcher } from "@/lib/fetcher";
+import { notFound } from "next/navigation";
 
-// Demo data matching the image
-const demoTicketData = {
-  ticketId: "ST8861",
-  category: "Wrong Product",
-  status: "Open",
-  manager: "谢鹏 Dora",
-  issueDescription: `Pink need 4 right leg flipflops
-Blue need 6 right leg flipflops
-White need 50 Left leg Flipflops
-Yellow Need 4 left leg flipflops`,
-  chatMessages: [
-    {
-      id: 1,
-      type: "user",
-      image: "/hero-1.jpg", // Demo image - pink items
-      created_at: "2026-01-17T14:06:00.000Z",
-    },
-    {
-      id: 2,
-      type: "user",
-      image: "/hero-2.jpg", // Demo image - blue items
-      created_at: "2026-01-17T14:06:00.000Z",
-    },
-    {
-      id: 3,
-      type: "user",
-      image: "/hero-3.jpg", // Demo image - yellow items
-      created_at: "2026-01-17T14:07:00.000Z",
-    },
-    {
-      id: 4,
-      type: "admin",
-      message: `Dear Team, 🌿 50 pieces - White (Left side) 🌿 6 pieces - Yellow (Left side) 🌿 6 pieces - Blue (Right side) 🌿 4 pieces - Pink (Right side) The above-listed sandals parts are missing. We kindly request you to send the missing items as per the correct list. Please check the list carefully before dispatching. Thank you very much for your support and cooperation.`,
-      created_at: "2026-01-17T14:14:00.000Z",
-    },
-  ],
-};
+function getStatusLabel(status: string) {
+  return status === "1" ? "Open" : status === "0" ? "Closed" : status || "N/A";
+}
 
-export default function TicketDetailPage({
+export default async function TicketDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  // Use demo data instead of API call
-  const ticketData = demoTicketData;
-  const managerName = ticketData.manager;
-  const ticketId = ticketData.ticketId;
-  const category = ticketData.category;
-  const status = ticketData.status;
-  const issueDescription = ticketData.issueDescription;
+  const { slug: ticketId } = await params;
+  if (!ticketId) notFound();
+
+  const [listRes, replayRes] = await Promise.all([
+    fetcher<{ status?: boolean; data?: Record<string, unknown>[] }>("/ticket-list"),
+    fetcher<{ status?: boolean; data?: Record<string, unknown>[] }>(
+      `/ticket-replay-list/${ticketId}`,
+    ),
+  ]);
+
+  const ticketFromList = (listRes?.data || []).find(
+    (t: Record<string, unknown>) => String(t?.ticket_id) === ticketId,
+  ) as Record<string, unknown> | undefined;
+
+  const chatData = replayRes?.data || [];
+  const firstDetail = (ticketFromList?.ticketdetails as Record<string, unknown>[] | undefined)?.[0];
+  const issueDescription = firstDetail?.message
+    ? String(firstDetail.message)
+    : ticketFromList?.message
+      ? String(ticketFromList.message)
+      : "No description";
+
+  const category = ticketFromList?.type
+    ? String(ticketFromList.type)
+    : "General";
+  const status = getStatusLabel(String(ticketFromList?.status ?? ticketFromList?.status ?? "1"));
+  const managerName = String(ticketFromList?.name ?? "Support");
+
+  const chatMessages = chatData.map((item: Record<string, unknown>) => ({
+    id: item?.id,
+    type: item?.replay ? "admin" : "user",
+    message: item?.message ?? "",
+    replay: item?.replay,
+    image: item?.image,
+    created_at: item?.created_at,
+  }));
 
   return (
     <div className="">
-      {/* Ticket Info Bar */}
       <TicketInfoBar ticketId={ticketId} />
 
       <div className="py-3 px-2">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Ticket Details Card */}
             <TicketDetailsCard
               ticketId={ticketId}
               category={category}
@@ -74,7 +68,6 @@ export default function TicketDetailPage({
               manager={managerName}
             />
 
-            {/* Issue Description Section */}
             <Card className="bg-white border border-gray-200 shadow-sm">
               <CardContent className="p-4 md:p-6">
                 <div className="mb-3">
@@ -97,11 +90,10 @@ export default function TicketDetailPage({
             </Card>
           </div>
 
-          {/* Right Column */}
           <div className="space-y-6">
             <LiveChat
               ticketId={ticketId}
-              ticket={ticketData.chatMessages}
+              ticket={chatMessages}
               managerName={managerName}
             />
           </div>
