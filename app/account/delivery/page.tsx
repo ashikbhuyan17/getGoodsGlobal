@@ -52,7 +52,7 @@ export default async function DeliveryPage({
             <table className="w-full text-left text-sm">
               <thead className="border-b">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Order</th>
+                  <th className="py-3 px-4 font-semibold">Invoice ID</th>
                   <th className="py-3 px-4 font-semibold">Date</th>
                   <th className="py-3 px-4 font-semibold">Method</th>
                   <th className="py-3 px-4 font-semibold">Amount</th>

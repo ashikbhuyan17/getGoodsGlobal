@@ -66,7 +66,7 @@ export default async function OrderPage({
             <table className="w-full text-left text-sm">
               <thead className="border-b">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Order ID</th>
+                  <th className="py-3 px-4 font-semibold">Invoice ID</th>
                   <th className="py-3 px-4 font-semibold">Product</th>
                   <th className="py-3 px-4 font-semibold">Total</th>
                   <th className="py-3 px-4 font-semibold">Paid</th>

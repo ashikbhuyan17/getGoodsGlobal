@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
 
 interface OrderDetailsCardProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -7,35 +7,30 @@ interface OrderDetailsCardProps {
 
 export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
   const getStatusBadgeColor = (status: string | number) => {
-    const statusStr = String(status || "").toLowerCase();
+    const statusStr = String(status || '').toLowerCase();
 
-    if (statusStr === "1" || statusStr.includes("pending")) {
-      return "bg-gray-500 text-white";
+    if (statusStr === '1' || statusStr.includes('pending')) {
+      return 'bg-gray-500 text-white';
     }
-    if (statusStr.includes("shipped")) {
-      return "bg-gray-900 text-white";
+    if (statusStr.includes('shipped')) {
+      return 'bg-gray-900 text-white';
     }
-    if (statusStr.includes("completed")) {
-      return "bg-green-600 text-white";
+    if (statusStr.includes('completed')) {
+      return 'bg-green-600 text-white';
     }
-    return "bg-gray-500 text-white";
+    return 'bg-gray-500 text-white';
   };
 
   const getStatusLabel = (status: string | number) => {
-    const statusStr = String(status || "");
-    if (statusStr === "1") return "Pending";
-    if (statusStr === "2") return "Processing";
-    if (statusStr === "3") return "Completed";
-    return statusStr || "N/A";
+    const statusStr = String(status || '').trim();
+    if (!statusStr) return 'N/A';
+    if (statusStr === '1') return 'Pending';
+    if (statusStr === '2') return 'Processing';
+    if (statusStr === '3') return 'Completed';
+    return statusStr;
   };
 
-  const Row = ({
-    label,
-    value,
-  }: {
-    label: string;
-    value: React.ReactNode;
-  }) => (
+  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="grid grid-cols-12 border-b last:border-b-0">
       <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-3 text-sm text-gray-600 font-medium">
         {label}
@@ -49,9 +44,7 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       <div className="px-4 py-3 border-b">
-        <h3 className="text-base font-semibold text-gray-900">
-          Order Details
-        </h3>
+        <h3 className="text-base font-semibold text-gray-900">Order Details</h3>
       </div>
 
       <div className="divide-y">
@@ -60,7 +53,7 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           value={
             <Badge
               className={`text-xs px-3 py-1 rounded-full ${getStatusBadgeColor(
-                data?.order_status
+                data?.order_status,
               )}`}
             >
               {getStatusLabel(data?.order_status)}
@@ -68,15 +61,15 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           }
         />
 
-        <Row label="Name" value={data?.name || "N/A"} />
-        <Row label="Phone" value={data?.phone || "N/A"} />
-        <Row label="Email" value={data?.email || "N/A"} />
+        <Row label="Name" value={data?.name || 'N/A'} />
+        <Row label="Phone" value={data?.phone || 'N/A'} />
+        <Row label="Email" value={data?.email || 'N/A'} />
 
         <Row
           label="Delivery Address"
           value={
             <span className="leading-relaxed">
-              {data?.address || "N/A"}
+              {data?.address || 'N/A'}
               {data?.district && `, ${data.district}`}
               {data?.city && `, ${data.city}`}
               {data?.country && `, ${data.country}`}
@@ -88,7 +81,7 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           label="Delivery Method"
           value={
             <Badge className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full">
-              {data?.delivery_method || data?.order_type || "N/A"}
+              {data?.delivery_method || data?.order_type || 'N/A'}
             </Badge>
           }
         />
@@ -97,27 +90,30 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           label="Shipping Method"
           value={
             <Badge className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full">
-              {data?.shipping_method || data?.order_type || "N/A"}
+              {data?.shipping_method || data?.order_type || 'N/A'}
             </Badge>
           }
         />
 
         <Row
           label="Advance Payment"
-          value={data?.advance_payment ?? data?.advance ?? data?.paid_partial_payment_amount ?? "N/A"}
+          value={
+            data?.advance_payment ??
+            data?.advance ??
+            data?.paid_partial_payment_amount ??
+            'N/A'
+          }
         />
 
         <Row
           label="Shipping Charge"
           value={
-            data?.shipping_charge != null
-              ? `৳${data.shipping_charge}`
-              : "N/A"
+            data?.shipping_charge != null ? `৳${data.shipping_charge}` : 'N/A'
           }
         />
 
-        <Row label="Total Weight" value={data?.total_weight || "-"} />
-        <Row label="Delivered Weight" value={data?.delivered_weight || "-"} />
+        <Row label="Total Weight" value={data?.total_weight || '-'} />
+        <Row label="Delivered Weight" value={data?.delivered_weight || '-'} />
       </div>
     </div>
   );

@@ -13,23 +13,25 @@ function getOrderFromResponse(res: unknown) {
   return Array.isArray(arr) && arr.length > 0 ? arr[0] : null;
 }
 
-/** Normalize order-level fields only, keep products as-is */
+/** Normalize order-level fields; prefer shipping/status when nested objects exist */
 function normalizeOrderData(
   raw: Record<string, unknown>,
 ): Record<string, unknown> {
+  const shipping = raw?.shipping as Record<string, unknown> | undefined;
+  const status = raw?.status as Record<string, unknown> | undefined;
+
   return {
     ...raw,
-    order_status: raw?.order_status ?? raw?.status,
-    name: raw?.name ?? raw?.customer_name,
-    phone: raw?.phone ?? raw?.customer_phone,
-    email: raw?.email ?? raw?.customer_email,
-    address: raw?.address ?? raw?.delivery_address,
-    district: raw?.district ?? raw?.customer_district,
-    city: raw?.city ?? raw?.customer_city,
-    country: raw?.country ?? raw?.customer_country,
-    delivery_method:
-      raw?.delivery_method ?? raw?.order_type ?? 'Cash On Delivery',
-    shipping_method: raw?.shipping_method ?? raw?.order_type ?? 'N/A',
+    order_status: status?.name ?? 'N/A',
+    name: shipping?.name ?? 'N/A',
+    phone: shipping?.phone ?? 'N/A',
+    email: raw?.email ?? 'N/A',
+    address: shipping?.address ?? 'N/A',
+    district: shipping?.district ?? 'N/A',
+    city: shipping?.city ?? 'N/A',
+    country: shipping?.country ?? 'N/A',
+    delivery_method: shipping?.area ?? 'N/A',
+    shipping_method: shipping?.area ?? 'N/A',
     advance_payment: raw?.advance ?? raw?.paid_partial_payment_amount,
     shipping_charge: raw?.shipping_charge ?? raw?.shippingcharge,
     total_weight: raw?.total_weight ?? raw?.delivered_weight,
@@ -48,9 +50,8 @@ export default async function OrderDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const res: any = await fetcher(`/order-track/${id}`);
-
+  const res = await fetcher<unknown>(`/order-track/${id}`);
+  console.log("🚀 ~ OrderDetailsPage ~ res:", res)
   const rawOrder = getOrderFromResponse(res);
   if (!rawOrder) notFound();
 
