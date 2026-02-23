@@ -15,14 +15,14 @@ export default async function AuthPage() {
       <section className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
         <div className="w-full max-w-md mx-auto">
           {/* Welcome Text */}
-          <div className="mb-8">
+          {/* <div className="mb-8">
             <h1 className="font-display text-3xl font-bold text-foreground mb-2">
               Welcome to {settings?.data?.name}
             </h1>
             <p className="text-muted-foreground text-base">
               Your trusted B2B marketplace for wholesale trading
             </p>
-          </div>
+          </div> */}
 
           {/* Auth Card */}
           <Card className="p-4 shadow-elevated border-0 bg-card rounded-2xl">

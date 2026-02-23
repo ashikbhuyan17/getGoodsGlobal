@@ -51,7 +51,6 @@ export default async function OrderDetailsPage({
 }) {
   const { id } = await params;
   const res = await fetcher<unknown>(`/order-track/${id}`);
-  console.log("🚀 ~ OrderDetailsPage ~ res:", res)
   const rawOrder = getOrderFromResponse(res);
   if (!rawOrder) notFound();
 

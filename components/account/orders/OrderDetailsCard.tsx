@@ -112,8 +112,8 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           }
         />
 
-        <Row label="Total Weight" value={data?.total_weight || '-'} />
-        <Row label="Delivered Weight" value={data?.delivered_weight || '-'} />
+        {/* <Row label="Total Weight" value={data?.total_weight || '-'} />
+        <Row label="Delivered Weight" value={data?.delivered_weight || '-'} /> */}
       </div>
     </div>
   );
