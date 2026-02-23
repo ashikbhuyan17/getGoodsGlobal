@@ -25,7 +25,7 @@ export default function ProductDetails({
   const selectedColor = useProductStore((s) => s.selectedColor);
   const setSelectedColor = useProductStore((s) => s.setSelectedColor);
   const colorQty = useProductStore((s) => s.colorQty);
-  // Subscribe to variants so color badge updates immediately when quantity changes
+  const totalQuantity = useProductStore((s) => s.totalQuantity());
   useProductStore((s) => s.variants);
 
   return (
@@ -108,13 +108,22 @@ export default function ProductDetails({
               <div className="bg-gray-100 rounded-t-md overflow-hidden">
                 <div className="grid grid-cols-3 gap-0">
                   {bulkQuantities?.data?.map(
-                    (bulk: any, i: number) =>
-                      i < 3 && (
+                    (bulk: any, i: number) => {
+                      if (i >= 3) return null;
+                      const minQty = Number(bulk?.min_qty ?? 0);
+                      const isActive = i === 0 ? true : totalQuantity >= minQty;
+                      const tierStyles = [
+                        { bg: 'bg-[#E7F2EF]', bar: 'bg-gradient-to-r from-blue-600 to-blue-400' },
+                        { bg: 'bg-[#E8F4FD]', bar: 'bg-gradient-to-r from-sky-600 to-sky-400' },
+                        { bg: 'bg-[#F5F0FF]', bar: 'bg-gradient-to-r from-lime-600 to-lime-400' },
+                      ];
+                      const style = tierStyles[i] ?? { bg: 'bg-gray-100', bar: 'bg-gray-200' };
+                      return (
                         <div
                           key={bulk?.id}
                           className={cn(
-                            'relative px-4 py-6',
-                            i === 0 ? 'bg-[#E7F2EF]' : 'bg-gray-100',
+                            'relative px-4 py-6 transition-colors',
+                            isActive ? style.bg : 'bg-gray-100',
                           )}
                         >
                           <div className="flex flex-col items-center text-center">
@@ -132,13 +141,15 @@ export default function ProductDetails({
                               </p>
                             </div>
                           </div>
-                          {i === 0 ? (
-                            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-400 to-cyan-400" />
-                          ) : (
-                            <div className="absolute bottom-0 left-0 right-0 h-2 bg-gray-200" />
-                          )}
+                          <div
+                            className={cn(
+                              'absolute bottom-0 left-0 right-0 h-2',
+                              isActive ? style.bar : 'bg-gray-200',
+                            )}
+                          />
                         </div>
-                      ),
+                      );
+                    },
                   )}
                 </div>
               </div>
@@ -186,7 +197,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                          'border-2 border-primary',
+                        'border-2 border-primary',
                       )}
                     />
                   </div>
