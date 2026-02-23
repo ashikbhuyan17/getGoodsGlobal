@@ -33,7 +33,6 @@ export default async function FlashSalePage({
   const products = responses.flatMap(
     (r) => (r?.data?.data ?? []) as ProductItem[],
   );
-  console.log('🚀 ~ FlashSalePage ~ products:', products);
   const lastPage = responses[0]?.data?.last_page ?? 1;
   const currentPage = loadedPages;
 
