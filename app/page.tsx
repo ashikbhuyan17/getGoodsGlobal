@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import CategorySection from '@/components/home/CategorySection';
+import FlashSaleSection from '@/components/home/FlashSaleSection';
 import FeatureSection from '@/components/home/FeatureSection';
 import GallerySection from '@/components/home/GallerySection';
 import HeroSlider from '@/components/home/HeroSlider';
@@ -24,6 +25,7 @@ export default async function Home() {
       <div className="px-2">
         <FeatureSection />
         <GallerySection galleryData={galleryData} />
+        <FlashSaleSection />
         <CategorySection />
         <div className="space-y-4">
           {frontCategory?.data?.map((cat: any) => (

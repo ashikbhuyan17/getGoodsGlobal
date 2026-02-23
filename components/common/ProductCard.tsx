@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
+import Image from 'next/image';
+import { Card, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
 export default function ProductCard({
   slug,
@@ -8,19 +8,26 @@ export default function ProductCard({
   title,
   newPrice,
   oldPrice,
+  discountPercent,
 }: {
   slug: string;
   image: string;
   title: string;
   newPrice: number;
   oldPrice?: number;
+  discountPercent?: number;
 }) {
   return (
     <Link href={`/product/${slug}`} prefetch>
-      <Card className="max-w-72 p-0 rounded-xl overflow-hidden shadow-none hover:shadow-md transition-all border border-gray-200">
+      <Card className="max-w-72 p-0 rounded-xl overflow-hidden shadow-none hover:shadow-sm transition-all border border-gray-200">
         <CardContent className="p-0">
           {/* Image Section */}
           <div className="relative aspect-square bg-gray-50 w-full">
+            {discountPercent != null && discountPercent > 0 && (
+              <span className="absolute top-2 right-2 z-10 rounded-md bg-[#ff0050] px-2 py-0.5 text-xs font-semibold text-white">
+                -{discountPercent}%
+              </span>
+            )}
             <Image
               src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
               alt={title}

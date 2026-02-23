@@ -26,6 +26,20 @@ export async function fetcher<T>(
   }
 }
 
+/** Fetch flash sale page (for Load More) */
+export async function fetchFlashSalePage(
+  page: number
+): Promise<{ data?: unknown[]; last_page?: number; current_page?: number }> {
+  try {
+    const result = await fetcher<{
+      data?: { data?: unknown[]; last_page?: number; current_page?: number };
+    }>(`/flash-sale?page=${page}`);
+    return result?.data ?? { data: [], last_page: 1, current_page: 1 };
+  } catch {
+    return { data: [], last_page: 1, current_page: 1 };
+  }
+}
+
 /** Upload profile photo (multipart/form-data). Expects API endpoint e.g. /user-profile-photo */
 export async function uploadProfilePhoto(
   formData: FormData,
