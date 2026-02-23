@@ -62,7 +62,7 @@ export default async function RootLayout({
             initialCategories={menuCategories}
           />
         </div>
-        <BottomNav />
+        <BottomNav menuCategories={menuCategories} />
         <Header />
         <main className="transition-all justify-center md:mx-auto mt-16 md:mt-20 md:ml-56 w-full">
           {children}
