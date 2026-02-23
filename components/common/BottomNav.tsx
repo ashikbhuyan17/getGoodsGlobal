@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Link from "next/link";
+import Link from 'next/link';
 import {
   Home,
   ShoppingBag,
   Grid2x2,
   MessageSquare,
   Headphones,
-} from "lucide-react";
-import { fetcher } from "@/lib/fetcher";
-import Sidebar from "./Sidebar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+} from 'lucide-react';
+import { fetcher } from '@/lib/fetcher';
+import MobileCategorySheet from './MobileCategorySheet';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const Footer = ({ settings, contact }: { settings: any; contact: any }) => (
   <div className="px-3 border-t border-border mt-4">
@@ -53,14 +53,18 @@ const Footer = ({ settings, contact }: { settings: any; contact: any }) => (
   </div>
 );
 
-export default async function BottomNav() {
-  const navItems: any = await fetcher("/categories");
+export default async function BottomNav({
+  menuCategories,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  menuCategories?: any;
+}) {
   const settings: any = await fetcher(`/settings`);
   const contact: any = await fetcher(`/contact`);
 
   let cartProducts: any = null;
   try {
-    cartProducts = await fetcher("/cart-products");
+    cartProducts = await fetcher('/cart-products');
   } catch {
     // Handle error gracefully
   }
@@ -83,12 +87,14 @@ export default async function BottomNav() {
           </Link>
         </li>
 
-        {/* Category */}
-        <Sidebar
-          contact={contact}
-          settings={settings}
-          navItems={navItems?.data}
-        />
+        {/* Category - same category+subcategory as desktop */}
+        <li className="flex flex-col items-center">
+          <MobileCategorySheet
+            menuCategories={menuCategories}
+            settings={settings}
+            contact={contact}
+          />
+        </li>
 
         {/* Cart */}
         <li className="flex flex-col items-center">
@@ -97,7 +103,7 @@ export default async function BottomNav() {
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 flex h-4 w-4 min-w-4 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-white">
-                  {cartCount > 99 ? "99+" : cartCount}
+                  {cartCount > 99 ? '99+' : cartCount}
                 </span>
               )}
             </span>

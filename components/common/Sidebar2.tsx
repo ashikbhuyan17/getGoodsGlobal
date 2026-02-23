@@ -87,6 +87,10 @@ interface Sidebar2Props {
   initialCategories?: any; // Server-fetched categories to avoid loading flash
   onCategoryClick?: (categoryId: string) => void;
   onSubCategoryClick?: (categoryId: string, subCategoryId: string) => void;
+  /** When true, render inline (e.g. inside Sheet) instead of fixed */
+  embedded?: boolean;
+  /** Call when link is clicked (e.g. close mobile sheet) */
+  onClose?: () => void;
 }
 
 export default function Sidebar2({
@@ -95,14 +99,15 @@ export default function Sidebar2({
   initialCategories,
   onCategoryClick,
   onSubCategoryClick,
+  embedded = false,
+  onClose,
 }: Sidebar2Props) {
   const pathname = usePathname();
   // Initialize with server-fetched categories if available
   const getInitialCategories = (): Category[] => {
-    if (initialCategories?.status === "success" && Array.isArray(initialCategories?.data)) {
-      return initialCategories.data.filter(
-        (cat: Category) => cat.status === "1"
-      );
+    const data = initialCategories?.data;
+    if (Array.isArray(data)) {
+      return data.filter((cat: Category) => cat?.status === "1");
     }
     return [];
   };
@@ -161,8 +166,13 @@ export default function Sidebar2({
     onSubCategoryClick?.(categoryId, subCategoryId);
   };
 
+  const Wrapper = embedded ? "div" : "nav";
+  const wrapperClass = embedded
+    ? "h-full w-full bg-white text-foreground flex flex-col overflow-y-auto"
+    : "fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 text-foreground flex flex-col z-50";
+
   return (
-    <nav className="fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 text-foreground flex flex-col z-50">
+    <Wrapper className={wrapperClass}>
       {/* Scrollable Categories Section - Hidden scrollbar but scrollable */}
       <div className="flex-1 overflow-y-auto scrollbar-hide">
         {categories.length === 0 ? (
@@ -186,6 +196,7 @@ export default function Sidebar2({
                       onClick={() => {
                         setOpenCategoryId(String(category.id));
                         setSelectedSubCategoryId(null);
+                        onClose?.();
                       }}
                       className="flex-1 flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
                     >
@@ -241,12 +252,13 @@ export default function Sidebar2({
                               <li key={subCategory.id}>
                                 <Link
                                   href={`/category/${category.slug}/subcategory/${subCategory.slug}`}
-                                  onClick={() =>
+                                  onClick={() => {
                                     handleSubCategoryClick(
                                       String(category.id),
                                       String(subCategory.id)
-                                    )
-                                  }
+                                    );
+                                    onClose?.();
+                                  }}
                                   className={cn(
                                     "w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50 block",
                                     (isSelected || isSubCategoryActive)
@@ -271,6 +283,6 @@ export default function Sidebar2({
 
       {/* Fixed Footer */}
       {settings && contact && <Footer contact={contact} settings={settings} />}
-    </nav>
+    </Wrapper>
   );
 }
