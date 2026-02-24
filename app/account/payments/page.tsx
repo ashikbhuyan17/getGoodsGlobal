@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import ImagePreview from '@/components/common/ImagePreview';
 import { fetcher } from '@/lib/fetcher';
+import { Database } from 'lucide-react';
 
 function formatDateTime(dateString: string) {
   if (!dateString) return 'N/A';
@@ -63,7 +64,9 @@ export default async function PaymentsPage() {
                 <tr>
                   <td colSpan={5} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" />
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                        <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
+                      </div>
                       No payments found
                     </div>
                   </td>

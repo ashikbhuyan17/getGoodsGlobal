@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Plus, Mail } from "lucide-react";
+import { Plus, Mail, Database } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 
 function formatDateTime(dateString: string) {
@@ -76,7 +76,9 @@ export default async function SupportPage() {
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" />
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                        <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
+                      </div>
                       No tickets found
                     </div>
                   </td>
@@ -112,11 +114,10 @@ export default async function SupportPage() {
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            statusLabel === "Closed"
-                              ? "bg-gray-900 text-white"
-                              : "bg-red-600 text-white"
-                          }`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${statusLabel === "Closed"
+                            ? "bg-gray-900 text-white"
+                            : "bg-red-600 text-white"
+                            }`}
                         >
                           {statusLabel}
                         </span>

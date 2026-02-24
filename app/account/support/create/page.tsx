@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { ChevronLeft, Send } from "lucide-react";
+import { ChevronLeft, Send, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -56,7 +58,19 @@ const TicketSchema = z.object({
 
 export default function CreateTicketPage() {
   const [loading, setLoading] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const router = useRouter();
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setUploadedImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const form = useForm({
     resolver: zodResolver(TicketSchema),
@@ -83,6 +97,7 @@ export default function CreateTicketPage() {
         phone: values.phone,
         message: values.message,
         type: values.type,
+        ...(uploadedImage && { image: uploadedImage }),
       });
 
       if (res?.status === true) {
@@ -208,6 +223,50 @@ export default function CreateTicketPage() {
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div>
+                <Label className="text-sm font-medium mb-2 block text-gray-700">
+                  Attach Image (Optional)
+                </Label>
+                {uploadedImage ? (
+                  <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4">
+                    <div className="relative w-full h-48 mb-4">
+                      <Image
+                        src={uploadedImage}
+                        alt="Attached image"
+                        fill
+                        className="object-contain rounded"
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => {
+                        setUploadedImage(null);
+                        setUploadedFile(null);
+                      }}
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Remove Image
+                    </Button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-teal-600 transition-colors min-h-37.5">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <Plus className="h-12 w-12 text-gray-400 mb-2" />
+                    <span className="text-sm text-gray-600">
+                      Upload Image / Screenshot
+                    </span>
+                  </label>
+                )}
               </div>
 
               <FormField

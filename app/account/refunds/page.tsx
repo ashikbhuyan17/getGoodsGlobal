@@ -1,6 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { fetcher } from '@/lib/fetcher';
+import { Database } from 'lucide-react';
 
 function formatDateTime(dateString: string) {
   if (!dateString) return 'N/A';
@@ -45,7 +46,9 @@ export default async function RefundsPage() {
                 <tr>
                   <td colSpan={6} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" />
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                        <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
+                      </div>
                       No refunds found
                     </div>
                   </td>
