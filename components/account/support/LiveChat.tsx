@@ -35,7 +35,6 @@ export default function LiveChat({
   ticket,
   managerName,
 }: LiveChatProps) {
-  console.log("🚀 ~ LiveChat ~ ticket:", ticket)
   const [message, setMessage] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
