@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import DeliveryTopBar from '@/components/account/delivery/DeliveryTopBar';
 import { fetcher } from '@/lib/fetcher';
+import { Database } from 'lucide-react';
 
 function formatDateTime(dateString: string) {
   if (!dateString) return 'N/A';
@@ -67,7 +68,9 @@ export default async function DeliveryPage({
                   <tr>
                     <td colSpan={7} className="text-center py-12 text-gray-400">
                       <div className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" />
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                          <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
+                        </div>
                         No deliveries found
                       </div>
                     </td>

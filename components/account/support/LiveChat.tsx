@@ -39,15 +39,23 @@ export default function LiveChat({
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const router = useRouter();
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setUploadedFile(file);
       const reader = new FileReader();
-      reader.onloadend = () => setImageBase64(reader.result as string);
+      reader.onloadend = () => setUploadedImage(reader.result as string);
       reader.readAsDataURL(file);
     }
+    // if (file) {
+    //   const reader = new FileReader();
+    //   reader.onloadend = () => setImageBase64(reader.result as string);
+    //   reader.readAsDataURL(file);
+    // }
     e.target.value = "";
   };
 
@@ -59,9 +67,10 @@ export default function LiveChat({
       const formData = new FormData();
       formData.append("ticket_id", ticketId);
       formData.append("message", message.trim() || "");
-      if (imageBase64) {
-        formData.append("image", imageBase64);
-        setImageBase64(null);
+      if (uploadedImage && uploadedFile) {
+        formData.append("image", uploadedFile);
+        setUploadedImage(null);
+        setUploadedFile(null);
       }
 
       const res = await submitTicketReply(formData);
@@ -118,7 +127,10 @@ export default function LiveChat({
               >
                 {/* Image Message - Right aligned for user, left for admin */}
                 {hasImage && imageUrl && (
-                  <div className="mb-2">
+                  <div className={`rounded-lg px-2 py-1 ${isAdmin
+                    ? "bg-teal-100 text-gray-900 rounded-tl-none"
+                    : "bg-white text-gray-900 rounded-tr-none border border-gray-200"
+                    }`}>
                     <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200 bg-white">
                       <ImagePreview
                         src={imageUrl}
@@ -128,19 +140,19 @@ export default function LiveChat({
                         className="w-full h-full"
                       />
                     </div>
-                    <p
-                      className={`text-xs text-gray-500 mt-1 ${isAdmin ? "text-left" : "text-right"
-                        }`}
+                    <div
+                      className={`mt-1 text-sm ${isAdmin ? "text-left" : "text-right"} `}
                     >
-                      {formatDate(String(it?.created_at ?? ""))}
-                    </p>
+                      <p> {text}</p>
+                      <p className=" text-xs text-gray-500"> {formatDate(String(it?.created_at ?? ""))}</p>
+                    </div>
                   </div>
                 )}
 
                 {/* Text Message */}
                 {displayText && (
                   <div
-                    className={`rounded-lg p-3 ${isAdmin
+                    className={`rounded-lg px-2 py-1 ${isAdmin
                       ? "bg-teal-100 text-gray-900 rounded-tl-none"
                       : "bg-white text-gray-900 rounded-tr-none border border-gray-200"
                       }`}
@@ -149,7 +161,7 @@ export default function LiveChat({
                       {String(displayText)}
                     </p>
                     <p
-                      className={`text-xs text-gray-500 mt-1 ${isAdmin ? "text-left" : "text-right"
+                      className={`text-xs text-gray-500  ${isAdmin ? "text-left" : "text-right"
                         }`}
                     >
                       {formatDate(String(it?.created_at ?? ""))}
@@ -164,16 +176,16 @@ export default function LiveChat({
 
       {/* Chat Input Section */}
       <div className="border-t border-gray-200 p-4 bg-white rounded-b-lg">
-        {imageBase64 && (
+        {uploadedImage && (
           <div className="mb-2 flex items-center gap-2">
             <img
-              src={imageBase64}
+              src={uploadedImage}
               alt="Preview"
               className="h-12 w-12 rounded object-cover border"
             />
             <button
               type="button"
-              onClick={() => setImageBase64(null)}
+              onClick={() => setUploadedImage(null)}
               className="text-xs text-red-600 hover:underline"
             >
               Remove

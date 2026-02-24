@@ -5,6 +5,7 @@ import { formatDate } from '@/hooks/format-date';
 import { fetcher } from '@/lib/fetcher';
 import Link from 'next/link';
 import OrdersTopBar from '@/components/account/orders/OrdersTopBar';
+import { Database } from 'lucide-react';
 
 function buildOrdersSlug(status?: string, keyword?: string): string {
   const params = new URLSearchParams();
@@ -81,7 +82,9 @@ export default async function OrderPage({
                   <tr>
                     <td colSpan={7} className="text-center py-12 text-gray-400">
                       <div className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" />
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                          <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
+                        </div>
                         No orders found
                       </div>
                     </td>
