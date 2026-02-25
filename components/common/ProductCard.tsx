@@ -18,7 +18,7 @@ export default function ProductCard({
   discountPercent?: number;
 }) {
   return (
-    <Link href={`/product/${slug}`} prefetch>
+    <Link href={`/product/${slug}`} prefetch aria-label={`View product: ${title}`}>
       <Card className="max-w-72 p-0 rounded-xl overflow-hidden shadow-none hover:shadow-sm transition-all border border-gray-200">
         <CardContent className="p-0">
           {/* Image Section */}

@@ -108,7 +108,7 @@ export default function ProductDetails({
           </Dialog>
           <Image
             src={image}
-            alt="main shoe"
+            alt={p?.name ?? "Product"}
             width={180}
             height={180}
             className="rounded-lg shadow-md object-contain lg:object-cover w-full h-full p-1"
@@ -216,7 +216,7 @@ export default function ProductDetails({
                     })()}
                     <Image
                       src={`${process.env.NEXT_PUBLIC_IMG_URL}/${color?.Image}`}
-                      alt="color1"
+                      alt={color?.color?.colorName ?? color?.color?.name ?? "Color option"}
                       width={56}
                       height={56}
                       className={cn(

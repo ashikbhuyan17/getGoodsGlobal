@@ -20,7 +20,7 @@ export default function MobileCategorySheet({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <button type="button" className="flex flex-col items-center">
+        <button type="button" className="flex flex-col items-center" aria-label="Open category menu">
           <Menu className="h-5 w-5" />
           <span>Category</span>
         </button>

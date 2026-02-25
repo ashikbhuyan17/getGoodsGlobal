@@ -16,6 +16,7 @@ export default function OrderInfoBar({ orderId }: { orderId: string }) {
       <div className="flex items-center gap-3">
         <button
           onClick={handleBack}
+          aria-label="Back to orders"
           className="rounded-full w-8 h-8 flex items-center justify-center border border-gray-300 hover:bg-gray-50 transition-colors"
         >
           <svg

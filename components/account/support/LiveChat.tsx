@@ -206,6 +206,7 @@ export default function LiveChat({
             size="icon"
             className="rounded-full w-10 h-10 shrink-0 border-gray-300 hover:bg-gray-50"
             onClick={() => fileInputRef.current?.click()}
+            aria-label="Attach image"
           >
             <Plus className="h-5 w-5" />
           </Button>
@@ -225,6 +226,7 @@ export default function LiveChat({
             onClick={handleSendMessage}
             disabled={(!message.trim() && !imageBase64) || sending}
             className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-4 py-2 shrink-0"
+            aria-label={sending ? "Sending message" : "Send message"}
           >
             {sending ? "Sending..." : <Send className="h-4 w-4" />}
           </Button>

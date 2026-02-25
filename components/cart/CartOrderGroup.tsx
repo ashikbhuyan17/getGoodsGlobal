@@ -145,6 +145,7 @@ export default function CartOrderGroup({
               <button
                 onClick={handleDelete}
                 className="text-red-500 hover:text-red-700"
+                aria-label="Remove from cart"
               >
                 <Trash2 size={20} />
               </button>

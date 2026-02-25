@@ -122,6 +122,7 @@ export default function PaymentPageClient({
                     key={account.id}
                     type="button"
                     onClick={() => setSelectedPayment(account.id)}
+                    aria-label={`Select ${account.name} payment method`}
                     className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
                       ? 'border-teal-600 bg-teal-50'
                       : 'border-gray-200 hover:border-gray-300'

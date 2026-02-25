@@ -58,6 +58,7 @@ function SigninBtn() {
       <button
         className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all"
         disabled
+        aria-label="Loading"
       >
         <User className="h-5 w-5" />
       </button>
@@ -67,6 +68,7 @@ function SigninBtn() {
   return (
     <button
       onClick={handlePush}
+      aria-label={user?.data?.name ? "Account menu" : "Sign in"}
       className={`flex h-10 items-center gap-2 rounded-full "
         }`}
     >

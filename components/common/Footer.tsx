@@ -73,7 +73,7 @@ export default async function Footer() {
               <div className="mb-4">
                 <div className="inline-flex items-center gap-2">
                   <div className="w-36 rounded-full flex items-center justify-center">
-                    <Link href="/" prefetch>
+                    <Link href="/" prefetch aria-label="Go to homepage">
                       <Image
                         alt="Logo"
                         src={`${process.env.NEXT_PUBLIC_IMG_URL}/${settings?.data?.white_logo}`}
@@ -161,7 +161,12 @@ export default async function Footer() {
               <div className="flex gap-4 mb-6">
                 {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 {social?.data?.map((item: any) => (
-                  <Link key={item?.title} target="_blank" href={item?.link}>
+                  <Link
+                    key={item?.title}
+                    target="_blank"
+                    href={item?.link}
+                    aria-label={`Visit our ${item?.title ?? "social"} page`}
+                  >
                     <i
                       className={`${item?.icon} fa-xl`}
                       style={{

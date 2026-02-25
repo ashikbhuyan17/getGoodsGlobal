@@ -223,6 +223,7 @@ export default function Sidebar2({
                       <button
                         onClick={() => handleCategoryClick(String(category.id))}
                         className="px-2 py-3 hover:bg-gray-50 transition-colors"
+                        aria-label={isOpen ? `Collapse ${category.name} subcategories` : `Expand ${category.name} subcategories`}
                       >
                         <ChevronRight
                           className={cn(

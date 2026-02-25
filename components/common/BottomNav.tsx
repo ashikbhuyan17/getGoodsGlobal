@@ -124,7 +124,7 @@ export default async function BottomNav({
         {/* More Drawer */}
         <li className="flex flex-col items-center">
           <Sheet>
-            <SheetTrigger className="flex flex-col items-center">
+            <SheetTrigger className="flex flex-col items-center" aria-label="Open more menu">
               <Grid2x2 className="h-5 w-5" />
               <span className="text-xs">More</span>
             </SheetTrigger>

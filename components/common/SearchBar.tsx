@@ -26,7 +26,9 @@ function SearchBar() {
         className="w-full bg-white py-2 pl-4 pr-10 text-sm text-gray-900 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-0"
       />
       <button
+        type="button"
         onClick={handleSearch}
+        aria-label="Search"
         className="absolute right-3 top-1/2 -translate-y-1/2 text-primary hover:text-gray-900"
       >
         <Search className="h-5 w-5" />

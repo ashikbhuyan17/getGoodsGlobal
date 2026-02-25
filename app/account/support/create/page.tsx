@@ -121,6 +121,7 @@ export default function CreateTicketPage() {
         <div className="px-4 py-4 flex items-center gap-4">
           <Link
             href="/account/support"
+            aria-label="Back to support"
             className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors"
           >
             <ChevronLeft className="h-4 w-4 text-gray-600" />
