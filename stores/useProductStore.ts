@@ -58,13 +58,14 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   shippingOptions: [],
   initFromProduct: (product, shippingOverride?: unknown[]) =>
     set((s) => {
-      const data = (product as { data?: unknown })?.data ?? product;
-      const d = data as {
+      // API format: { product, shippingCharge, productColors } or normalized { data: {...} }
+      const d = (product as { data?: unknown })?.data ?? product;
+      const data = d as {
         shippingCharge?: unknown[];
         shippingcharge?: unknown[];
         productColors?: { color?: unknown }[];
       };
-      const options = (d?.shippingCharge ?? d?.shippingcharge ?? shippingOverride ?? []) as { id?: unknown; name?: string; amount?: number }[];
+      const options = (data?.shippingCharge ?? data?.shippingcharge ?? shippingOverride ?? []) as { id?: unknown; name?: string; amount?: number }[];
       const list = Array.isArray(options)
         ? options.map((o) => ({
             id: (o?.id ?? 0) as string | number,
@@ -76,7 +77,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       return {
         shippingOptions: list,
         shippingArea: first ? { id: first.id, amount: first.amount } : s.shippingArea,
-        selectedColor: s.selectedColor ?? (d?.productColors?.[0]?.color as ProductStore["selectedColor"]) ?? null,
+        selectedColor: s.selectedColor ?? (data?.productColors?.[0]?.color as ProductStore["selectedColor"]) ?? null,
       };
     }),
   reset: () =>

@@ -1,11 +1,16 @@
 import { Star } from 'lucide-react';
 import InfoBarBack from '../common/InfoBarBack';
-import { fetcher } from '@/lib/fetcher';
 import ProductInfoBarShareButtons from './ProductInfoBarShareButtons';
 
-export default async function ProductInfoBar({ slug }: { slug: string }) {
+export default async function ProductInfoBar({
+  product,
+  slug,
+}: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const product: any = await fetcher(`/product-details/${slug}`);
+  product: any;
+  slug: string;
+}) {
+  const p = product?.data?.product;
 
   return (
     <div className="flex items-center justify-between border p-3 bg-white shadow-sm w-full md:mt-[-7px]">
@@ -13,9 +18,7 @@ export default async function ProductInfoBar({ slug }: { slug: string }) {
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <InfoBarBack />
         <div className="min-w-0">
-          <h2 className="text-sm font-medium text-black truncate">
-            {product?.data?.product?.name}
-          </h2>
+          <h2 className="text-sm font-medium text-black truncate">{p?.name}</h2>
 
           <div className="flex items-center gap-3 mt-1">
             <div className="flex items-center text-yellow-400">

@@ -7,7 +7,13 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
 import { Eye } from 'lucide-react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from '../ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from '../ui/dialog';
 import SizeCard from './SizeCard';
 import { useProductStore } from '@/stores/useProductStore';
 
@@ -18,11 +24,21 @@ export default function ProductDetails({
   product: any;
   bulkQuantities?: any;
 }) {
-  const [image, setImage] = useState(
-    `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
+  const p = product?.data?.product;
+  const productColors = product?.data?.productColors ?? [];
+  const selectedColor = useProductStore((s) => s.selectedColor);
+  const selectedProductColor = productColors.find(
+    (pc: any) => pc?.color?.id === selectedColor?.id,
+  );
+  const sizes = selectedProductColor?.sizes ?? productColors?.[0]?.sizes ?? [];
+  const effectiveColorId = String(
+    selectedColor?.id ?? productColors?.[0]?.color?.id ?? '',
   );
 
-  const selectedColor = useProductStore((s) => s.selectedColor);
+  const [image, setImage] = useState(
+    `${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`,
+  );
+
   const setSelectedColor = useProductStore((s) => s.setSelectedColor);
   const colorQty = useProductStore((s) => s.colorQty);
   const totalQuantity = useProductStore((s) => s.totalQuantity());
@@ -34,41 +50,37 @@ export default function ProductDetails({
       <div className="flex xl:flex-col gap-2">
         <div
           onClick={() =>
-            setImage(
-              `${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`,
-            )
+            setImage(`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`)
           }
           className="w-17 h-17 rounded-md overflow-hidden border cursor-pointer"
         >
           <Image
-            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${product?.data?.product?.image?.image}`}
-            alt={product?.data?.product?.name}
+            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`}
+            alt={p?.name}
             width={68}
             height={68}
             className="object-cover w-full h-full"
           />
         </div>
-        {JSON.parse(product?.data?.product?.PostImage ?? '[]')?.map(
-          (img: string) => (
-            <div
-              key={img}
-              onClick={() =>
-                setImage(
-                  `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
-                )
-              }
-              className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
-            >
-              <Image
-                src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
-                alt={product?.data?.product?.name}
-                width={64}
-                height={64}
-                className="object-cover w-full h-full"
-              />
-            </div>
-          ),
-        )}
+        {JSON.parse(p?.PostImage ?? '[]')?.map((img: string) => (
+          <div
+            key={img}
+            onClick={() =>
+              setImage(
+                `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
+              )
+            }
+            className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
+          >
+            <Image
+              src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
+              alt={p?.name}
+              width={64}
+              height={64}
+              className="object-cover w-full h-full"
+            />
+          </div>
+        ))}
       </div>
       <div className="w-full">
         <div className="relative h-[200px] xl:h-[220px]  2xl:h-[400px] w-full ">
@@ -80,11 +92,15 @@ export default function ProductDetails({
             </DialogTrigger>
 
             <DialogContent className="aspect-square  max-2xl:w-[400px]">
-              <DialogTitle className="sr-only">Image preview: {product?.data?.product?.name}</DialogTitle>
-              <DialogDescription className="sr-only">Preview of product image</DialogDescription>
+              <DialogTitle className="sr-only">
+                Image preview: {p?.name}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Preview of product image
+              </DialogDescription>
               <Image
                 src={image}
-                alt={product?.data?.product?.name}
+                alt={p?.name}
                 fill
                 className="rounded-lg object-cover"
               />
@@ -107,50 +123,58 @@ export default function ProductDetails({
             {bulkQuantities && (
               <div className="bg-gray-100 rounded-t-md overflow-hidden">
                 <div className="grid grid-cols-3 gap-0">
-                  {bulkQuantities?.data?.map(
-                    (bulk: any, i: number) => {
-                      if (i >= 3) return null;
-                      const minQty = Number(bulk?.min_qty ?? 0);
-                      const isActive = i === 0 ? true : totalQuantity >= minQty;
-                      const tierStyles = [
-                        { bg: 'bg-[#E7F2EF]', bar: 'bg-gradient-to-r from-blue-600 to-blue-400' },
-                        { bg: 'bg-[#E8F4FD]', bar: 'bg-gradient-to-r from-sky-600 to-sky-400' },
-                        { bg: 'bg-[#F5F0FF]', bar: 'bg-gradient-to-r from-lime-600 to-lime-400' },
-                      ];
-                      const style = tierStyles[i] ?? { bg: 'bg-gray-100', bar: 'bg-gray-200' };
-                      return (
-                        <div
-                          key={bulk?.id}
-                          className={cn(
-                            'relative px-4 py-6 transition-colors',
-                            isActive ? style.bg : 'bg-gray-100',
-                          )}
-                        >
-                          <div className="flex flex-col items-center text-center">
-                            <div className="flex flex-col items-center gap-1 space-y-2">
-                              <p className="text-xl font-semibold text-gray-800">
-                                ৳{bulk?.price}
+                  {bulkQuantities?.data?.map((bulk: any, i: number) => {
+                    if (i >= 3) return null;
+                    const minQty = Number(bulk?.min_qty ?? 0);
+                    const isActive = i === 0 ? true : totalQuantity >= minQty;
+                    const tierStyles = [
+                      {
+                        bg: 'bg-[#E7F2EF]',
+                        bar: 'bg-gradient-to-r from-blue-600 to-blue-400',
+                      },
+                      {
+                        bg: 'bg-[#E8F4FD]',
+                        bar: 'bg-gradient-to-r from-sky-600 to-sky-400',
+                      },
+                      {
+                        bg: 'bg-[#F5F0FF]',
+                        bar: 'bg-gradient-to-r from-lime-600 to-lime-400',
+                      },
+                    ];
+                    const style = tierStyles[i] ?? {
+                      bg: 'bg-gray-100',
+                      bar: 'bg-gray-200',
+                    };
+                    return (
+                      <div
+                        key={bulk?.id}
+                        className={cn(
+                          'relative px-4 py-6 transition-colors',
+                          isActive ? style.bg : 'bg-gray-100',
+                        )}
+                      >
+                        <div className="flex flex-col items-center text-center">
+                          <div className="flex flex-col items-center gap-1 space-y-2">
+                            <p className="text-xl font-semibold text-gray-800">
+                              ৳{bulk?.price}
+                            </p>
+                            {bulk?.old_price && (
+                              <p className="text-sm text-gray-400 line-through">
+                                ৳{bulk?.old_price}
                               </p>
-                              {bulk?.old_price && (
-                                <p className="text-sm text-gray-400 line-through">
-                                  ৳{bulk?.old_price}
-                                </p>
-                              )}
-                              <p className="text-sm text-[#777]">
-                                {bulk?.title}
-                              </p>
-                            </div>
-                          </div>
-                          <div
-                            className={cn(
-                              'absolute bottom-0 left-0 right-0 h-2',
-                              isActive ? style.bar : 'bg-gray-200',
                             )}
-                          />
+                            <p className="text-sm text-[#777]">{bulk?.title}</p>
+                          </div>
                         </div>
-                      );
-                    },
-                  )}
+                        <div
+                          className={cn(
+                            'absolute bottom-0 left-0 right-0 h-2',
+                            isActive ? style.bar : 'bg-gray-200',
+                          )}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -159,11 +183,12 @@ export default function ProductDetails({
               <p className="font-medium text-gray-700 mb-2">
                 Color :{' '}
                 <span className="text-primary cursor-pointer">
-                  {selectedColor?.colorName}
+                  {selectedColor?.colorName ??
+                    productColors?.[0]?.color?.colorName}
                 </span>
               </p>
               <div className="flex relative flex-wrap gap-3">
-                {product?.data?.productColors?.map((color: any) => (
+                {productColors?.map((color: any) => (
                   <div
                     key={color?.color?.id}
                     onClick={() => {
@@ -197,7 +222,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                        'border-2 border-primary',
+                          'border-2 border-primary',
                       )}
                     />
                   </div>
@@ -224,10 +249,10 @@ export default function ProductDetails({
                   </div>
                 </div>
 
-                {product?.data?.productSizes?.map((size: any) => (
+                {sizes?.map((size: any) => (
                   <SizeCard
                     key={size?.id}
-                    colorId={String(selectedColor?.id ?? '')}
+                    colorId={effectiveColorId}
                     size={size?.size?.sizeName}
                     price={size?.SalePrice}
                     max={Number(size?.stock)}
