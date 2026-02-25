@@ -168,8 +168,8 @@ export default function Sidebar2({
 
   const Wrapper = embedded ? "div" : "nav";
   const wrapperClass = embedded
-    ? "h-full w-full bg-white text-foreground flex flex-col overflow-y-auto"
-    : "fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-200 text-foreground flex flex-col z-50";
+    ? "h-full w-full bg-[#FFFFFF] text-foreground flex flex-col overflow-y-auto"
+    : "fixed top-0 left-0 h-full w-56 bg-[#FFFFFF] border-r border-gray-200 text-foreground flex flex-col z-50";
 
   return (
     <Wrapper className={wrapperClass}>

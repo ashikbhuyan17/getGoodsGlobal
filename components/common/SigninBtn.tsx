@@ -83,11 +83,11 @@ function SigninBtn() {
       )}
 
       {user?.data?.name && (
-        <div className="flex flex-col justify-start items-start">
-          <p className="text-sm font-semibold text-gray-600 max-w-[120px] truncate">
+        <div className="flex flex-col justify-start items-start text-gray-100">
+          <p className="text-sm font-semibold max-w-[120px] truncate">
             {user.data.name}
           </p>
-          <p className="text-xs font-semibold text-gray-600 max-w-[120px]">
+          <p className="text-xs font-semibold  max-w-[120px]">
             {user.data.email}
           </p>
         </div>

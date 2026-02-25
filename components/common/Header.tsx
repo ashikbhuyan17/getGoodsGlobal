@@ -26,11 +26,11 @@ export default async function Header() {
   const cartCount = cartProducts?.data?.length ?? 0;
 
   return (
-    <header className="bg-[#edd7c4] text-primary-foreground z-40 px-4 py-1 md:px-6 fixed top-0 w-full md:w-[calc(100%-14rem)] md:ml-56">
+    <header className="bg-[#219F9B] text-primary-foreground z-40 px-4 py-1 md:px-6 fixed top-0 w-full md:w-[calc(100%-14rem)] md:ml-56">
       <div className="mx-auto flex items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex  items-center gap-2 whitespace-nowrap md:w-2/12">
-          \
+
           <Link href="/" prefetch>
             <Image
               alt="Logo"

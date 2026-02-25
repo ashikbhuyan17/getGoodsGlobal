@@ -79,12 +79,12 @@ export default function Header() {
                   {user?.data?.email || 'user@example.com'}
                 </p>
                 {/* Points Badge */}
-                <div className="mt-2 inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
+                {/* <div className="mt-2 inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
                   <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
                   <span className="text-xs font-medium text-gray-900">
                     {user?.data?.points || 0} Points
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
 

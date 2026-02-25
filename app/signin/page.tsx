@@ -12,7 +12,7 @@ export default async function AuthPage() {
   return (
     <main className="min-h-screen bg-background flex px-2">
       {/* Left Section - Auth Forms */}
-      <section className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-12 xl:px-20">
+      <section className="flex-1 flex flex-col justify-center px-6 py-12 ">
         <div className="w-full max-w-md mx-auto">
           {/* Welcome Text */}
           {/* <div className="mb-8">
@@ -64,7 +64,7 @@ export default async function AuthPage() {
       </section>
 
       {/* Right Section - Illustration */}
-      <section className="hidden lg:flex flex-1 bg-accent items-center justify-center p-12 relative overflow-hidden">
+      {/* <section className="hidden lg:flex flex-1 bg-accent items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-primary/5 to-primary/10" />
         <div className="relative z-10 text-center max-w-lg">
           <Image
@@ -83,7 +83,7 @@ export default async function AuthPage() {
             manufacturers and suppliers.
           </p>
         </div>
-      </section>
+      </section> */}
     </main>
   );
 }
