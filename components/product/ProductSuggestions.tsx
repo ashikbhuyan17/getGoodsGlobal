@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 async function ProductSuggestions({ slug }: { slug: string }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const products: any = await fetcher(`/related-products/${slug}`);
+  const products: any = await fetcher(`/related-products/${slug}`, {}, 60);
   return (
     <div className="p-4 rounded-sm border bg-white flex flex-col justify-center text-center mx-auto">
       <h1 className="w-full text-xl font-semibold">Suggestions</h1>

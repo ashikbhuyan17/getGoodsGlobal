@@ -40,7 +40,7 @@ interface GalleryApiResponse {
   data: GalleryCategory[];
 }
 
-interface GallerySectionProps {
+export interface GallerySectionProps {
   galleryData: GalleryApiResponse | null;
 }
 

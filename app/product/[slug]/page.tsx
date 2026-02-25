@@ -25,17 +25,21 @@ async function ProductPage({ params }: { params: { slug: string } }) {
 
   if (!isProductResponseSuccess(rawProduct) || !product) notFound();
 
-  // bulkQuantities depends on product
+  // bulkQuantities depends on product (cache 60s)
   const bulkQuantities =
     p?.order_by == 1
-      ? await fetcher(`/product-bulkquantities/${p?.id}`)
+      ? await fetcher(`/product-bulkquantities/${p?.id}`, {}, 60)
       : undefined;
 
-  const isInWishlist = (wishlist as { data?: { product?: { id?: number } }[] })
-    ?.data?.find((item: { product?: { id?: number } }) => item?.product?.id === p?.id);
+  const isInWishlist = (
+    wishlist as { data?: { product?: { id?: number } }[] }
+  )?.data?.find(
+    (item: { product?: { id?: number } }) => item?.product?.id === p?.id,
+  );
 
   const shippingOptions =
-    product?.data?.shippingCharge ?? (shippingArea as { data?: unknown[] })?.data;
+    product?.data?.shippingCharge ??
+    (shippingArea as { data?: unknown[] })?.data;
 
   return (
     <main>

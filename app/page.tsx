@@ -1,34 +1,41 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { Suspense } from 'react';
 import CategorySection from '@/components/home/CategorySection';
+import CategorySectionSkeleton from '@/components/home/CategorySectionSkeleton';
 import FlashSaleSection from '@/components/home/FlashSaleSection';
 import FeatureSection from '@/components/home/FeatureSection';
-import GallerySection from '@/components/home/GallerySection';
+import GallerySection, {
+  type GallerySectionProps,
+} from '@/components/home/GallerySection';
 import HeroSlider from '@/components/home/HeroSlider';
 import ProductsSlider from '@/components/home/ProductsSlider';
 import Footer from '@/components/common/Footer';
 import { fetcher } from '@/lib/fetcher';
 
+// Home page cache - 3 min, no API hit on back navigation
+const HOME_CACHE = 180;
+
 export default async function Home() {
-  const slides: any = await fetcher('/mainslider');
-  const frontCategory: any = await fetcher('/front-category-products');
-  // Fetch gallery slider data
-  let galleryData: any = null;
-  try {
-    galleryData = await fetcher('/galleryslider');
-  } catch (error) {
-    console.error('Error fetching gallery slider:', error);
-  }
+  const [slides, frontCategory, galleryData] = await Promise.all([
+    fetcher('/mainslider', {}, HOME_CACHE),
+    fetcher('/front-category-products', { cache: 'no-store' }),
+    fetcher('/galleryslider', {}, HOME_CACHE).catch(() => null),
+  ]);
 
   return (
     <div>
       <HeroSlider slides={slides} />
       <div className="px-2">
         <FeatureSection />
-        <GallerySection galleryData={galleryData} />
+        <GallerySection
+          galleryData={galleryData as GallerySectionProps['galleryData']}
+        />
         <FlashSaleSection />
-        <CategorySection />
+        <Suspense fallback={<CategorySectionSkeleton />}>
+          <CategorySection />
+        </Suspense>
         <div className="space-y-4">
-          {frontCategory?.data?.map((cat: any) => (
+          {(frontCategory as { data?: unknown[] })?.data?.map((cat: any) => (
             <ProductsSlider
               title={cat?.name}
               image={cat?.image}

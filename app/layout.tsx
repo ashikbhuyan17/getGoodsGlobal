@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { Metadata } from 'next';
 import { Jost } from 'next/font/google';
 import './globals.css';
@@ -20,6 +19,9 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
+// Cache layout data for 60s - reduces re-fetch on every navigation
+const REVALIDATE_LAYOUT = 60;
+
 export default async function RootLayout({
   children,
   modal,
@@ -27,14 +29,12 @@ export default async function RootLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }>) {
-  const settings: any = await fetcher(`/settings`);
-  const contact: any = await fetcher(`/contact`);
-  let menuCategories: any = null;
-  try {
-    menuCategories = await fetcher('/menu-categories');
-  } catch (error) {
-    console.error('Error fetching menu categories:', error);
-  }
+  const [settings, contact, menuCategoriesRes] = await Promise.all([
+    fetcher(`/settings`, {}, REVALIDATE_LAYOUT),
+    fetcher(`/contact`, {}, REVALIDATE_LAYOUT),
+    fetcher('/menu-categories', {}, REVALIDATE_LAYOUT).catch(() => null),
+  ]);
+  const menuCategories = menuCategoriesRes ?? null;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -63,7 +63,7 @@ export default async function RootLayout({
           />
         </div>
         <BottomNav menuCategories={menuCategories} />
-        <Header />
+        <Header settings={settings} />
         <main className="transition-all justify-center md:mx-auto mt-16 md:mt-20 md:ml-56 w-full">
           {children}
           {modal}

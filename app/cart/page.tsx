@@ -1,12 +1,11 @@
-import CartEmptyState from "@/components/cart/CartEmptyState";
-import CartInfoBar from "@/components/cart/CartInfoBar";
-import CartPageClient from "@/components/cart/CartPageClient";
-import { fetcher } from "@/lib/fetcher";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import CartEmptyState from '@/components/cart/CartEmptyState';
+import CartInfoBar from '@/components/cart/CartInfoBar';
+import CartPageClient from '@/components/cart/CartPageClient';
+import { fetcher } from '@/lib/fetcher';
 
 export default async function CartPage() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const cartProducts: any = await fetcher("/cart-products", { cache: 'no-store' });
-
+  const cartProducts: any = await fetcher('/cart-products');
 
   if (cartProducts?.data?.length === 0) {
     return (

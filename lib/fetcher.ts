@@ -2,21 +2,52 @@
 
 import { cookies } from 'next/headers';
 
+// export async function fetcher<T>(
+//   slug: string,
+//   options: RequestInit = {},
+//   revalidate: number | false = 0,
+// ): Promise<T> {
+//   try {
+//     const cookiesStore = await cookies();
+//     const token = await cookiesStore.get('token')?.value;
+//     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${slug}`, {
+//       ...options,
+//       next: revalidate ? { revalidate } : undefined,
+//       headers: {
+//         ...(token && { Authorization: `Bearer ${token}` }),
+//         'Content-Type': 'application/json',
+//       },
+//     });
+
+//     return res.json() as Promise<T>;
+//   } catch (error) {
+//     console.log('Fetcher Error:', error);
+//     throw error;
+//   }
+// }
+
 export async function fetcher<T>(
   slug: string,
   options: RequestInit = {},
   revalidate: number | false = 0,
+  auth = true, // NEW: whether to use cookies & token
 ): Promise<T> {
   try {
-    const cookiesStore = await cookies();
-    const token = await cookiesStore.get('token')?.value;
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    };
+    if (auth) {
+      const cookiesStore = await cookies();
+      const token = await cookiesStore.get('token')?.value;
+      if (token) headers['Authorization'] = `Bearer ${token}`; // ✅ property modify allowed with const
+    }
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${slug}`, {
       ...options,
-      next: revalidate ? { revalidate } : undefined,
-      headers: {
-        ...(token && { Authorization: `Bearer ${token}` }),
-        'Content-Type': 'application/json',
-      },
+      headers,
+      ...(revalidate ? { next: { revalidate } } : {}),
+      ...(options.cache === 'no-store' ? { cache: 'no-store' } : {}),
     });
 
     return res.json() as Promise<T>;
@@ -28,7 +59,7 @@ export async function fetcher<T>(
 
 /** Fetch flash sale page (for Load More) */
 export async function fetchFlashSalePage(
-  page: number
+  page: number,
 ): Promise<{ data?: unknown[]; last_page?: number; current_page?: number }> {
   try {
     const result = await fetcher<{
@@ -100,17 +131,14 @@ export async function createTicket(body: {
   try {
     const cookiesStore = await cookies();
     const token = cookiesStore.get('token')?.value;
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/ticket-store`,
-      {
-        method: 'POST',
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ticket-store`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify(body),
+    });
     return res.json();
   } catch (error) {
     console.log('Create ticket error:', error);

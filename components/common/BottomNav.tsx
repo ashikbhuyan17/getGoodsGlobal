@@ -81,7 +81,7 @@ export default async function BottomNav({
       <ul className="flex justify-between items-center px-4 py-2 text-xs">
         {/* Home */}
         <li className="flex flex-col items-center">
-          <Link href="/" className="flex flex-col items-center">
+          <Link href="/" prefetch className="flex flex-col items-center">
             <Home className="h-5 w-5" />
             <span>Home</span>
           </Link>

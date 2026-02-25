@@ -1,28 +1,31 @@
-import { ShoppingBag, Heart } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { fetcher } from "@/lib/fetcher";
-import SearchBar from "./SearchBar";
-import SigninBtn from "./SigninBtn";
+import { ShoppingBag, Heart } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { fetcher } from '@/lib/fetcher';
+import SearchBar from './SearchBar';
+import SigninBtn from './SigninBtn';
 
-export default async function Header() {
+export default async function Header({
+  settings,
+}: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const data: any = await fetcher(`/settings`);
+  settings: any;
+}) {
+  const data = settings;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let wishlist: any = null;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let cartProducts: any = null;
   try {
-    wishlist = await fetcher("/wishlists");
+    [wishlist, cartProducts] = await Promise.all([
+      fetcher('/wishlists'),
+      fetcher('/cart-products'),
+    ]);
   } catch {
     // Handle error gracefully
   }
-  try {
-    cartProducts = await fetcher("/cart-products");
-  } catch {
-    // Handle error gracefully
-  }
-  const wishlistCount = wishlist?.status === "error" || !wishlist?.data ? 0 : wishlist.data.length;
+  const wishlistCount =
+    wishlist?.status === 'error' || !wishlist?.data ? 0 : wishlist.data.length;
   const cartCount = cartProducts?.data?.length ?? 0;
 
   return (
@@ -30,7 +33,6 @@ export default async function Header() {
       <div className="mx-auto flex items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex  items-center gap-2 whitespace-nowrap md:w-2/12">
-
           <Link href="/" prefetch>
             <Image
               alt="Logo"
@@ -69,9 +71,6 @@ export default async function Header() {
               )}
             </button>
           </Link>
-
-
-
           <SigninBtn />
         </div>
       </div>
