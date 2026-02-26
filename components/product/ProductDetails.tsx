@@ -34,6 +34,9 @@ export default function ProductDetails({
   const effectiveColorId = String(
     selectedColor?.id ?? productColors?.[0]?.color?.id ?? '',
   );
+  const specification =
+    selectedProductColor?.specification ?? productColors?.[0]?.specification;
+  const hasSpecification = specification != null && specification !== '';
 
   const [image, setImage] = useState(
     `${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`,
@@ -108,7 +111,7 @@ export default function ProductDetails({
           </Dialog>
           <Image
             src={image}
-            alt={p?.name ?? "Product"}
+            alt={p?.name ?? 'Product'}
             width={180}
             height={180}
             className="rounded-lg shadow-md object-contain lg:object-cover w-full h-full p-1"
@@ -181,10 +184,12 @@ export default function ProductDetails({
 
             <div>
               <p className="font-medium text-gray-700 mb-2">
-                Color :{' '}
+                {hasSpecification ? 'Specification' : 'Color'} :{' '}
                 <span className="text-primary cursor-pointer">
-                  {selectedColor?.colorName ??
-                    productColors?.[0]?.color?.colorName}
+                  {hasSpecification
+                    ? String(specification)
+                    : (selectedColor?.colorName ??
+                      productColors?.[0]?.color?.colorName)}
                 </span>
               </p>
               <div className="flex relative flex-wrap gap-3">
@@ -216,7 +221,11 @@ export default function ProductDetails({
                     })()}
                     <Image
                       src={`${process.env.NEXT_PUBLIC_IMG_URL}/${color?.Image}`}
-                      alt={color?.color?.colorName ?? color?.color?.name ?? "Color option"}
+                      alt={
+                        color?.color?.colorName ??
+                        color?.color?.name ??
+                        'Color option'
+                      }
                       width={56}
                       height={56}
                       className={cn(
@@ -234,7 +243,7 @@ export default function ProductDetails({
                 <div className="grid grid-cols-3 gap-3 p-1 py-2 border-gray-200">
                   <div className="text-start">
                     <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-start">
-                      Size
+                      {hasSpecification ? 'Specification' : 'Size'}
                     </span>
                   </div>
                   <div className="text-center">
@@ -253,7 +262,11 @@ export default function ProductDetails({
                   <SizeCard
                     key={size?.id}
                     colorId={effectiveColorId}
-                    size={size?.size?.sizeName}
+                    size={
+                      hasSpecification
+                        ? String(specification)
+                        : size?.size?.sizeName
+                    }
                     price={size?.SalePrice}
                     max={Number(size?.stock)}
                   />
