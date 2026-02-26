@@ -231,7 +231,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                          'border-2 border-primary',
+                        'border-2 border-primary',
                       )}
                     />
                   </div>
@@ -262,11 +262,8 @@ export default function ProductDetails({
                   <SizeCard
                     key={size?.id}
                     colorId={effectiveColorId}
-                    size={
-                      hasSpecification
-                        ? String(specification)
-                        : size?.size?.sizeName
-                    }
+                    size={size?.size?.sizeName}
+                    displayLabel={hasSpecification ? String(specification) : undefined}
                     price={size?.SalePrice}
                     max={Number(size?.stock)}
                   />

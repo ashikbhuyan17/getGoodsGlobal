@@ -9,11 +9,14 @@ function SizeCard({
   colorId,
   price,
   max = 999999999,
+  displayLabel,
 }: {
   size: string | number;
   price: string | number;
   colorId: string;
   max?: number;
+  /** Optional: show in UI instead of size (e.g. specification). API always receives size. */
+  displayLabel?: string;
 }) {
   const setVariant = useProductStore((s) => s.setVariant);
   const variants = useProductStore((s) => {
@@ -34,8 +37,8 @@ function SizeCard({
 
   return (
     <div className="grid grid-cols-3 gap-0 items-center py-3 px-1">
-      {/* Size Column */}
-      <p className="text-left text-gray-800">{size}</p>
+      {/* Size Column - displayLabel for UI, size used for variant/API */}
+      <p className="text-left text-gray-800">{displayLabel ?? size}</p>
 
       {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
