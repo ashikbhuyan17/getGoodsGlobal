@@ -77,6 +77,7 @@ export default function ActionButtons({
           cart_details: cartDetails,
         }),
       });
+      console.log("🚀 ~ handleAddToCart ~ res:", res)
       const isSuccess =
         res?.status === true ||
         res?.status === "success" ||
