@@ -55,10 +55,8 @@ export default function ImagePreview({
                     bg-transparent 
                     w-[350px] 
                     max-w-[350px]
-                    lg:w-[400px] 
+                    lg:w-[350px] 
                     lg:max-w-[400px]
-                    xl:w-[540px] 
-                    xl:max-w-[540px]
                   "
         >
           <DialogTitle className="sr-only">Image preview: {alt}</DialogTitle>
