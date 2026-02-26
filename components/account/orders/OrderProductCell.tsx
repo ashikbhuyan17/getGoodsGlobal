@@ -39,8 +39,6 @@ export default function OrderProductCell({
                     max-w-[350px]
                     lg:w-[350px] 
                     lg:max-w-[350px]
-                    xl:w-[540px] 
-                    xl:max-w-[540px]
                   "
           >
             <DialogTitle className="sr-only">
