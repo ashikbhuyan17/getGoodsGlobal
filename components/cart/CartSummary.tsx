@@ -165,7 +165,7 @@ export default function CartSummary({
       const orderPayload = {
         ...formData,
         total_price: finalPrice,
-        shipping_amount: shippingCharge,
+        shippingfee: shippingCharge,
         coupon_code: discount ? coupon : null,
         ...(!isBuyNow && cartIds?.length ? { cart_ids: cartIds } : {}),
       };
