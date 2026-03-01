@@ -11,6 +11,7 @@ import {
 import VideoCard from "./VideoCard";
 import { Button } from "@/components/ui/button";
 import { Images, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
@@ -118,12 +119,15 @@ function GallerySection({ galleryData }: GallerySectionProps) {
         })}
         {/* View Sky Gallery Button */}
         <Button
+          asChild
           variant="outline"
           className="ml-auto whitespace-nowrap flex items-center gap-2 rounded-lg px-4 py-2 h-auto bg-white text-gray-700 hover:bg-gray-50 border-gray-200"
         >
-          <Images className="w-4 h-4 text-blue-600" />
-          <span className="text-sm font-medium">View Sky Gallery</span>
-          <ArrowRight className="w-4 h-4" />
+          <Link href="/gallery" prefetch className="flex items-center gap-2">
+            <Images className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium">View Sky Gallery</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </Button>
       </div>
 

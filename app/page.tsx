@@ -26,7 +26,7 @@ export default async function Home() {
     <div>
       <HeroSlider slides={slides} />
       <div className="px-2">
-        <FeatureSection />
+        {/* <FeatureSection /> */}
         <GallerySection
           galleryData={galleryData as GallerySectionProps['galleryData']}
         />
