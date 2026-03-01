@@ -23,7 +23,12 @@ async function CheckoutPage({
     cartProducts = { data: [], status: "success" };
   }
 
-  const user = await fetcher("/user-profile");
+  const [user, shippingArea] = await Promise.all([
+    fetcher("/user-profile"),
+    fetcher("/shipping-area").catch(() => ({ status: false, data: [] })),
+  ]);
+
+  const shippingOptions = (shippingArea as { data?: { id: number; name: string; amount: string; to_amount: string }[] })?.data ?? [];
 
   return (
     <div className="min-h-screen py-8 px-2">
@@ -31,6 +36,7 @@ async function CheckoutPage({
         user={user}
         cartProducts={cartProducts}
         isBuyNow={isBuyNow}
+        shippingOptions={shippingOptions}
       />
     </div>
   );

@@ -1,9 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { fetcher } from '@/lib/fetcher';
 import { notFound } from 'next/navigation';
 import PaymentPageClient from './_components/PaymentPageClient';
+
+export const PAYMENT_CACHE = 60;
+
+type PaymentItem = {
+  amount?: number;
+  advanced?: number;
+  payable?: number;
+  invoice_id?: string;
+};
+
+type PaymentResponse = {
+  status?: string;
+  data?: PaymentItem | PaymentItem[];
+};
+
+type BankItem = {
+  id?: number;
+  status?: string;
+  account_name?: string;
+  account_number?: string;
+  branch?: string;
+  routing_number?: string;
+  image?: string;
+  description?: string;
+};
+
+type BankListResponse = {
+  status?: string;
+  data?: BankItem[];
+};
 
 export default async function PaymentPage({
   params,
@@ -12,41 +41,26 @@ export default async function PaymentPage({
 }) {
   const { invoiceId } = await params;
 
-  // Fetch payment data (array of payments)
-  const payment: any = await fetcher(`/payment/${invoiceId}`);
-  // Fetch bank list
-  let bankList: any = null;
-  try {
-    bankList = await fetcher(`/bank-lists`);
-    // Handle error response
-    if (bankList?.status === 'error' || !bankList?.data) {
-      bankList = { data: [] };
-    }
-  } catch {
-    bankList = { data: [] };
-  }
+  const [payment, bankList] = await Promise.all([
+    fetcher<PaymentResponse>(`/payment/${invoiceId}`),
+    fetcher<BankListResponse>(`/bank-lists`, {}, PAYMENT_CACHE).catch(() => ({
+      data: [],
+    })),
+  ]);
 
-  // Handle error response
   if (payment?.status === 'error' || !payment?.data) {
     notFound();
   }
 
-  // Get first payment to extract invoice_id
-  const firstPayment = payment.data;
-  // const invoiceId = firstPayment?.invoice_id ?? invoiceId;
+  const rawData = payment.data;
+  const firstPayment = Array.isArray(rawData) ? rawData[0] : rawData;
+  if (!firstPayment) notFound();
+
   const orderLabel = invoiceId ? `SKY${invoiceId}` : '—';
-
-  // Calculate total amount: first payment is 50% advance, so total = first payment * 2
-  const total = firstPayment?.amount > 0 ? firstPayment?.amount : 0;
-
+  const total = Number(firstPayment?.amount) || 0;
   const paid = 0;
-
-  // Advance is a percentage (e.g., 50 means 50%)
-  const advance = firstPayment?.advanced ?? 0;
-
-  // Payable Amount = 20% of total amount
-  const payable = firstPayment?.payable ?? 0;
-  const initialPayable = payable;
+  const advance = Number(firstPayment?.advanced) || 0;
+  const payable = Number(firstPayment?.payable) || 0;
 
   return (
     <div className="min-h-screen space-y-4">
@@ -99,7 +113,7 @@ export default async function PaymentPage({
 
           {/* Right Section – client (interactive) */}
           <PaymentPageClient
-            initialPayable={initialPayable}
+            initialPayable={payable}
             bankList={bankList}
             invoiceId={invoiceId}
           />

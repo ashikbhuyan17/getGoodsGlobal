@@ -3,17 +3,20 @@ import CartOrderGroup from "@/components/cart/CartOrderGroup";
 import CartItemRow from "@/components/cart/CartItemRow";
 import CartSummary from "@/components/cart/CartSummary";
 import OrderForm from "@/components/checkout/OrderForm";
+import ShippingMethodSection, { type ShippingOption } from "@/components/checkout/ShippingMethodSection";
 import { useState, useMemo } from "react";
 function CheckoutClient({
   cartProducts,
   user,
   isBuyNow = false,
+  shippingOptions = [],
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cartProducts: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   user: any;
   isBuyNow?: boolean;
+  shippingOptions?: ShippingOption[];
 }) {
   const [formData, setFormData] = useState({
     name: user?.data?.name,
@@ -24,11 +27,16 @@ function CheckoutClient({
     customer_id: user?.data?.id,
     payment_method: "Cash On Delivery",
   });
+  const [selectedShipping, setSelectedShipping] = useState<{
+    id: number;
+    name: string;
+    amount: number;
+  } | null>(null);
 
   // cart-products: cartdetails; buy-products: buydetails (API returns buydetails)
   const normalizedProducts = useMemo(() => {
     const list = cartProducts?.data ?? [];
-    return list.map((p: any) => ({
+    return list.map((p: Record<string, unknown>) => ({
       ...p,
       cartdetails: p?.cartdetails ?? p?.buydetails ?? p?.buy_details ?? [],
     }));
@@ -62,6 +70,21 @@ function CheckoutClient({
     <div className="mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 space-y-6">
         <OrderForm formData={formData} setFormData={setFormData} />
+        <ShippingMethodSection
+          options={shippingOptions}
+          selectedId={selectedShipping?.id ?? null}
+          onSelect={(opt) =>
+            setSelectedShipping(
+              opt
+                ? {
+                    id: opt.id,
+                    name: opt.name,
+                    amount: Number(opt.amount) || 0,
+                  }
+                : null
+            )
+          }
+        />
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {productsWithTotals?.map((product: any) => (
           <CartOrderGroup
@@ -90,7 +113,15 @@ function CheckoutClient({
       </div>
 
       {/* Cart Summary */}
-      <CartSummary formData={formData} total={grandTotal} page="checkout" cartIds={cartIds} isBuyNow={isBuyNow} />
+      <CartSummary
+        formData={formData}
+        total={grandTotal}
+        shippingCharge={selectedShipping?.amount ?? 0}
+        requiresShippingSelection={shippingOptions.length > 0}
+        page="checkout"
+        cartIds={cartIds}
+        isBuyNow={isBuyNow}
+      />
     </div>
   );
 }

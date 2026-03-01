@@ -29,7 +29,7 @@ export default function ProductSummary({
 
   return (
     <Card className="px-4 rounded-sm border">
-      <div className="grid grid-cols-2 gap-3">
+      {/* <div className="grid grid-cols-2 gap-3">
         {shippingOptions?.map((item) => (
           <ShippingOptionCard
             key={item?.id}
@@ -41,10 +41,11 @@ export default function ProductSummary({
             }
           />
         ))}
-      </div>
+      </div> */}
 
       <PriceDetails
-        shipping={shippingArea?.amount ?? 0}
+        // shipping={shippingArea?.amount ?? 0}
+        shipping={0}
         price={price}
         bulkQuantities={bulkQuantities}
         quantity={quantity}

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Heart, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { fetcher } from "@/lib/fetcher";
-import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { toast } from "sonner";
-import MinOrderModal from "./MinOrderModal";
-import AddToCartModal from "./AddToCartModal";
-import { useProductStore } from "@/stores/useProductStore";
+import { Heart, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { fetcher } from '@/lib/fetcher';
+import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import MinOrderModal from './MinOrderModal';
+import AddToCartModal from './AddToCartModal';
+import { useProductStore } from '@/stores/useProductStore';
 
 export default function ActionButtons({
   isInWishlist,
@@ -40,9 +40,9 @@ export default function ActionButtons({
       }));
 
   const checkAuthAndValidate = async () => {
-    const user: any = await fetcher("/user-profile");
+    const user: any = await fetcher('/user-profile');
     if (!user?.data?.id) {
-      router.push("/signin");
+      router.push('/signin');
       return false;
     }
     if (totalQuantity < 1) {
@@ -68,28 +68,29 @@ export default function ActionButtons({
     const { cartDetails } = validated;
     setIsAddToCartLoading(true);
     try {
-      const res: any = await fetcher("/product-add-to-cart", {
-        method: "POST",
+      const res: any = await fetcher('/product-add-to-cart', {
+        method: 'POST',
         body: JSON.stringify({
           product_id: String(productId),
           shippingcharge_id: String(shippingArea?.id),
+          shippingfee: Number(shippingArea?.amount ?? 0),
           total_quantity: String(totalQuantity),
           cart_details: cartDetails,
         }),
       });
       const isSuccess =
         res?.status === true ||
-        res?.status === "success" ||
+        res?.status === 'success' ||
         res?.success === true ||
-        (res?.message && String(res.message).toLowerCase().includes("success"));
+        (res?.message && String(res.message).toLowerCase().includes('success'));
 
       if (isSuccess) {
         setShowAddToCartModal(true);
       } else {
-        toast.error(res?.message || "Failed to add to cart.");
+        toast.error(res?.message || 'Failed to add to cart.');
       }
     } catch {
-      toast.error("Failed to add to cart.");
+      toast.error('Failed to add to cart.');
     } finally {
       setIsAddToCartLoading(false);
     }
@@ -102,49 +103,53 @@ export default function ActionButtons({
     const { cartDetails } = validated;
     setIsBuyNowLoading(true);
     try {
-      const addRes: any = await fetcher("/product-add-to-cart", {
-        method: "POST",
+      const addRes: any = await fetcher('/product-add-to-cart', {
+        method: 'POST',
         body: JSON.stringify({
           product_id: String(productId),
           shippingcharge_id: String(shippingArea?.id),
+          shippingfee: Number(shippingArea?.amount ?? 0),
           total_quantity: String(totalQuantity),
           cart_details: cartDetails,
         }),
       });
       const addSuccess =
         addRes?.status === true ||
-        addRes?.status === "success" ||
+        addRes?.status === 'success' ||
         addRes?.success === true ||
-        (addRes?.message && String(addRes.message).toLowerCase().includes("success"));
+        (addRes?.message &&
+          String(addRes.message).toLowerCase().includes('success'));
 
       if (!addSuccess) {
-        toast.error(addRes?.message || "Failed to add to cart.");
+        toast.error(addRes?.message || 'Failed to add to cart.');
         return;
       }
 
-      const buyRes: any = await fetcher("/product-buy-now", {
-        method: "POST",
+      const buyRes: any = await fetcher('/product-buy-now', {
+        method: 'POST',
         body: JSON.stringify({
           product_id: String(productId),
           shippingcharge_id: String(shippingArea?.id),
+          shippingfee: Number(shippingArea?.amount ?? 0),
           total_quantity: String(totalQuantity),
           buy_details: cartDetails,
         }),
       });
       const buySuccess =
         buyRes?.status === true ||
-        buyRes?.status === "success" ||
+        buyRes?.status === 'success' ||
         buyRes?.success === true ||
-        (buyRes?.message && String(buyRes.message).toLowerCase().includes("success"));
+        (buyRes?.message &&
+          String(buyRes.message).toLowerCase().includes('success'));
 
       if (buySuccess) {
-        toast.success(buyRes?.message || "Proceeding to checkout");
-        window.location.href = "/checkout?buyNow=1";
+        toast.success(buyRes?.message || 'Proceeding to checkout');
+        window.location.href = '/checkout?buyNow=1';
       } else {
-        toast.error(buyRes?.message || "Buy now failed. Try again.");
+        toast.error(buyRes?.message || 'Buy now failed. Try again.');
       }
     } catch {
-      toast.error("Buy now failed. Try again.");
+      toast.error('Buy now failed. Try again.');
     } finally {
       setIsBuyNowLoading(false);
     }
@@ -153,15 +158,15 @@ export default function ActionButtons({
   const handleWishlist = async () => {
     setIsWishlistLoading(true);
     try {
-      const user: any = await fetcher("/user-profile");
+      const user: any = await fetcher('/user-profile');
       if (!user?.data?.id) {
-        router.push("/signin");
+        router.push('/signin');
         return;
       }
 
-      const endpoint = isInWishlist ? "/remove-wishlist" : "/add-to-wishlist";
+      const endpoint = isInWishlist ? '/remove-wishlist' : '/add-to-wishlist';
       const res: any = await fetcher(endpoint, {
-        method: "POST",
+        method: 'POST',
         body: JSON.stringify({
           product_id: productId,
           user_id: user?.data?.id,
@@ -171,7 +176,7 @@ export default function ActionButtons({
       if (res?.status === true) {
         router.refresh();
       } else {
-        toast.error("Failed to update wishlist.");
+        toast.error('Failed to update wishlist.');
       }
     } finally {
       setIsWishlistLoading(false);
@@ -192,8 +197,8 @@ export default function ActionButtons({
         ) : (
           <Heart
             size={22}
-            className={cn(isInWishlist ? "text-red-600" : "text-gray-500")}
-            fill={isInWishlist ? "#e7000b" : "none"}
+            className={cn(isInWishlist ? 'text-red-600' : 'text-gray-500')}
+            fill={isInWishlist ? '#e7000b' : 'none'}
           />
         )}
       </Button>
@@ -207,7 +212,7 @@ export default function ActionButtons({
         {isAddToCartLoading ? (
           <Loader2 className="animate-spin size-5" />
         ) : (
-          "Add to Cart"
+          'Add to Cart'
         )}
       </Button>
 
@@ -220,7 +225,7 @@ export default function ActionButtons({
         {isBuyNowLoading ? (
           <Loader2 className="animate-spin size-5" />
         ) : (
-          "Buy Now"
+          'Buy Now'
         )}
       </Button>
 

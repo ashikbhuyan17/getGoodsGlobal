@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import PriceRow from './PriceRow';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
@@ -20,6 +20,8 @@ export default function CartSummary({
   isCheckoutLoading = false,
   cartIds,
   isBuyNow = false,
+  shippingCharge = 0,
+  requiresShippingSelection = false,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -31,6 +33,9 @@ export default function CartSummary({
     city: string;
     customer_id: number;
     payment_method: string;
+    shipping_method_id?: number;
+    shipping_method_name?: string;
+    shipping_amount?: number;
   };
   allDeselected?: boolean;
   onCheckoutClick?: () => void;
@@ -39,6 +44,10 @@ export default function CartSummary({
   cartIds?: number[];
   /** When true, call buy-order-place instead of order-place. */
   isBuyNow?: boolean;
+  /** Shipping charge from selected method (checkout page only). */
+  shippingCharge?: number;
+  /** When true, user must select a shipping method (checkout with shipping options). */
+  requiresShippingSelection?: boolean;
 }) {
   const router = useRouter();
 
@@ -48,23 +57,17 @@ export default function CartSummary({
     type: string;
   }>(null);
   const [loading, setLoading] = useState(false);
-  const [finalPrice, setFinalPrice] = useState(total);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
-  useEffect(() => {
-    if (!discount) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFinalPrice(total);
-      return;
-    }
-
-    if (discount.type === 'Solid') {
-      setFinalPrice(discount.discount);
-    } else if (discount.type === 'Percentage') {
-      const discountAmount = (total * discount.discount) / 100;
-      setFinalPrice(total - discountAmount);
-    }
-  }, [discount, total]);
+  const discountAmount = (() => {
+    if (!discount) return 0;
+    const val = Number(discount.discount) || 0;
+    if (discount.type === 'Solid') return Math.min(val, total);
+    if (discount.type === 'Percentage') return (total * val) / 100;
+    return 0;
+  })();
+  const subtotalAfterDiscount = total - discountAmount;
+  const finalPrice = subtotalAfterDiscount + shippingCharge;
 
   const validateForm = () => {
     if (page !== 'checkout') return true;
@@ -106,6 +109,11 @@ export default function CartSummary({
 
     if (!formData?.payment_method) {
       toast.error('Please select a payment method');
+      return false;
+    }
+
+    if (requiresShippingSelection && (!shippingCharge || shippingCharge <= 0)) {
+      toast.error('Please select a shipping method');
       return false;
     }
 
@@ -157,6 +165,7 @@ export default function CartSummary({
       const orderPayload = {
         ...formData,
         total_price: finalPrice,
+        shipping_amount: shippingCharge,
         coupon_code: discount ? coupon : null,
         ...(!isBuyNow && cartIds?.length ? { cart_ids: cartIds } : {}),
       };
@@ -193,10 +202,17 @@ export default function CartSummary({
       <div className="p-2 lg:p-6 space-y-2">
         <div className="space-y-4">
           <PriceRow label="Product price" value={`৳${total}`} />
+          {page === 'checkout' && (
+            <PriceRow label="Shipping" value={`৳${shippingCharge}`} />
+          )}
+          <PriceRow
+            label="Total"
+            value={`৳${page === 'checkout' ? total + shippingCharge : total}`}
+          />
           {/* <PriceRow label="Pay now" value={`৳${total / 2}`} discount={50} /> */}
 
           {discount && page === 'checkout' && (
-            <PriceRow label="Discount" value={`-৳${total - finalPrice}`} />
+            <PriceRow label="Discount" value={`-৳${discountAmount}`} />
           )}
 
           {discount && page === 'checkout' && (
@@ -230,13 +246,13 @@ export default function CartSummary({
 
             {discount && page === 'checkout' && (
               <p className="text-green-600 text-sm">
-                Coupon applied! Discount: ৳{total - finalPrice}
+                Coupon applied! Discount: ৳{discountAmount}
               </p>
             )}
           </div>
         )}
 
-        <div className="border border-dashed text-center border-primary bg-[#E3F5F9] rounded-lg p-4">
+        {/* <div className="border border-dashed text-center border-primary bg-[#E3F5F9] rounded-lg p-4">
           <p className="font-medium">Pay on delivery</p>
 
           <div className="flex items-center font-medium justify-center gap-2">
@@ -246,7 +262,7 @@ export default function CartSummary({
 
             <InfoIcon size={16} />
           </div>
-        </div>
+        </div> */}
 
         {
           page === 'checkout' ? (

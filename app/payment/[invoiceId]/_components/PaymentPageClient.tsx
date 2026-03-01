@@ -40,6 +40,7 @@ export default function PaymentPageClient({
           accountNumber: bank.account_number,
           branch: bank.branch || 'N/A',
           routingNo: bank.routing_number || 'N/A',
+          description: bank.description || '',
         }))
       : [];
 
@@ -100,8 +101,7 @@ export default function PaymentPageClient({
       } else {
         toast.error(data?.message || 'Failed to submit payment');
       }
-    } catch (error) {
-      console.log('🚀 ~ handlePaymentSubmit ~ error:', error);
+    } catch {
       toast.dismiss();
       toast.error('Something went wrong. Please try again.');
     } finally {
@@ -186,7 +186,7 @@ export default function PaymentPageClient({
                         {selectedAccount.branch}
                       </div>
                     </div>
-                    <div className="grid grid-cols-12 border-b last:border-b-0">
+                    <div className="grid grid-cols-12 border-b">
                       <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
                         Routing No
                       </div>
@@ -195,6 +195,17 @@ export default function PaymentPageClient({
                       </div>
                     </div>
                   </>
+                )}
+                {selectedAccount.description && (
+                  <div className="border-b last:border-b-0">
+                    <div className="bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium border-b">
+                      Description
+                    </div>
+                    <div
+                      className="px-4 py-3 text-sm text-gray-900 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_li]:my-1 [&_ul]:space-y-1"
+                      dangerouslySetInnerHTML={{ __html: selectedAccount.description }}
+                    />
+                  </div>
                 )}
               </div>
             </div>
