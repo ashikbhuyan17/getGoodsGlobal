@@ -63,7 +63,7 @@ export default async function PaymentPage({
   const payable = Number(firstPayment?.payable) || 0;
 
   return (
-    <div className="min-h-screen space-y-4">
+    <div className="min-h-screen space-y-4 max-md:mb-20 mb-10">
       <div className="bg-white p-3 -mt-1 flex items-center">
         <h1 className="text-lg font-bold text-gray-900">Payment</h1>
       </div>
