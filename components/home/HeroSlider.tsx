@@ -16,7 +16,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
   );
 
   return (
-    <section className="relative w-full overflow-hidden max-md:mt-3 md:-mt-[7px]">
+    <section className="relative w-full overflow-hidden max-md:mt-2 md:-mt-[7px]">
       <Carousel
         plugins={[plugin.current]}
         className="w-full"

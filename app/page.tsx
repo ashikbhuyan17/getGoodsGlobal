@@ -25,7 +25,7 @@ export default async function Home() {
   return (
     <div>
       <HeroSlider slides={slides} />
-      <div className="px-2 space-y-2 lg:space-y-4 pt-4">
+      <div className="px-2 space-y-2 lg:space-y-4 pt-2 lg:pt-4">
         {/* <FeatureSection /> */}
         <GallerySection
           galleryData={galleryData as GallerySectionProps['galleryData']}
