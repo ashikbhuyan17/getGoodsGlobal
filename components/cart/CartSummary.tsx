@@ -21,6 +21,7 @@ export default function CartSummary({
   cartIds,
   isBuyNow = false,
   shippingCharge = 0,
+  shippingChargeID,
   requiresShippingSelection = false,
 }: {
   page?: 'cart' | 'checkout';
@@ -46,6 +47,7 @@ export default function CartSummary({
   isBuyNow?: boolean;
   /** Shipping charge from selected method (checkout page only). */
   shippingCharge?: number;
+  shippingChargeID?: number;
   /** When true, user must select a shipping method (checkout with shipping options). */
   requiresShippingSelection?: boolean;
 }) {
@@ -166,6 +168,7 @@ export default function CartSummary({
         ...formData,
         total_price: finalPrice,
         shippingfee: shippingCharge,
+        shippingcharge_id: shippingChargeID,
         coupon_code: discount ? coupon : null,
         ...(!isBuyNow && cartIds?.length ? { cart_ids: cartIds } : {}),
       };

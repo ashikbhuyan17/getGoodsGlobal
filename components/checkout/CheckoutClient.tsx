@@ -32,6 +32,7 @@ function CheckoutClient({
     name: string;
     amount: number;
   } | null>(null);
+  console.log("🚀 ~ CheckoutClient ~ selectedShipping:", selectedShipping)
 
   // cart-products: cartdetails; buy-products: buydetails (API returns buydetails)
   const normalizedProducts = useMemo(() => {
@@ -77,10 +78,10 @@ function CheckoutClient({
             setSelectedShipping(
               opt
                 ? {
-                    id: opt.id,
-                    name: opt.name,
-                    amount: Number(opt.amount) || 0,
-                  }
+                  id: opt.id,
+                  name: opt.name,
+                  amount: Number(opt.amount) || 0,
+                }
                 : null
             )
           }
@@ -117,6 +118,7 @@ function CheckoutClient({
         formData={formData}
         total={grandTotal}
         shippingCharge={selectedShipping?.amount ?? 0}
+        shippingChargeID={selectedShipping?.id}
         requiresShippingSelection={shippingOptions.length > 0}
         page="checkout"
         cartIds={cartIds}
