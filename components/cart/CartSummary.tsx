@@ -196,7 +196,7 @@ export default function CartSummary({
   };
 
   return (
-    <div className="bg-white rounded-lg">
+    <div className="bg-white rounded-lg max-md:mb-12">
       <h2 className="text-base font-bold text-center p-2 lg:p-4">
         Cart Summary
       </h2>

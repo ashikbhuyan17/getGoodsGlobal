@@ -63,15 +63,15 @@ export default function Header() {
     <header className="px-2 pt-2">
       <div className="bg-white border-b border-gray-200 rounded mb-4">
         <div className="px-6 py-4">
-          <div className="flex items-center max-lg:flex-col  ">
+          <div className="flex items-center max-lg:flex-col gap-5 ">
             {/* User Profile Section */}
-            <div className="flex items-center gap-4 shrink-0 lg:w-1/4">
+            <div className="flex items-center justify-center max-xl:flex-col gap-2 md:gap-4 shrink-0 lg:w-1/4">
               <Avatar className="h-14 w-14 bg-gray-300 shrink-0">
                 <AvatarFallback className="text-lg font-semibold text-gray-700">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
-              <div>
+              <div className="max-xl:text-center">
                 <p className="font-semibold  text-base">
                   {user?.data?.name || 'User'}
                 </p>
@@ -89,7 +89,7 @@ export default function Header() {
             </div>
 
             {/* Navigation Links Section */}
-            <nav className="flex gap-2 overflow-x-auto pb-2  justify-between ml-4 w-full 2xl:w-1/2 ">
+            <nav className="grid grid-cols-4 lg:grid-cols-8 gap-2 md:overflow-x-auto sm:gap-3 ml-4 w-full 2xl:w-1/2">
               {navItems.map((item) => {
                 const active = isActive(item.url);
                 return (
@@ -97,16 +97,19 @@ export default function Header() {
                     prefetch
                     href={item.url}
                     key={item.label}
-                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded transition-colors whitespace-nowrap ${active ? 'bg-gray-100' : 'hover:bg-gray-50'
-                      }`}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded transition-colors whitespace-nowrap ${
+                      active ? 'bg-gray-100' : 'hover:bg-gray-50'
+                    }`}
                   >
                     <item.icon
-                      className={`h-6 w-6 ${active ? 'text-teal-600' : 'text-gray-700'
-                        }`}
+                      className={`h-6 w-6 ${
+                        active ? 'text-teal-600' : 'text-gray-700'
+                      }`}
                     />
                     <span
-                      className={`text-xs font-medium ${active ? 'text-teal-600' : 'text-gray-700'
-                        }`}
+                      className={`text-xs font-medium ${
+                        active ? 'text-teal-600' : 'text-gray-700'
+                      }`}
                     >
                       {item.label}
                     </span>

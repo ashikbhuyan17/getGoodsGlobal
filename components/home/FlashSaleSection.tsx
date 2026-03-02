@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { fetcher } from "@/lib/fetcher";
-import ProductCard from "@/components/common/ProductCard";
+import Link from 'next/link';
+import { fetcher } from '@/lib/fetcher';
+import ProductCard from '@/components/common/ProductCard';
 
 function getProductImage(product: {
   image?: { image?: string };
@@ -8,11 +8,13 @@ function getProductImage(product: {
 }): string {
   if (product?.image?.image) return product.image.image;
   try {
-    const arr = JSON.parse(product?.PostImage ?? "[]");
+    const arr = JSON.parse(product?.PostImage ?? '[]');
     const first = arr?.[0];
-    return first ? `public/images/product/slider/${first}` : "/placeholder-product.png";
+    return first
+      ? `public/images/product/slider/${first}`
+      : '/placeholder-product.png';
   } catch {
-    return "/placeholder-product.png";
+    return '/placeholder-product.png';
   }
 }
 
@@ -25,7 +27,7 @@ export default async function FlashSaleSection() {
   const res = await fetcher<{
     status?: string;
     data?: { data?: unknown[] };
-  }>("/flash-sale?page=1");
+  }>('/flash-sale?page=1');
 
   const products = (res?.data?.data ?? []) as {
     id: number;
@@ -41,7 +43,7 @@ export default async function FlashSaleSection() {
   if (displayProducts.length === 0) return null;
 
   return (
-    <section className="py-6">
+    <section className="">
       <div className="bg-white rounded-sm border border-gray-200 p-4">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">

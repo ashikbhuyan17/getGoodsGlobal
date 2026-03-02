@@ -12,33 +12,34 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function HeroSlider({ slides }: { slides: any }) {
   const plugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: false })
+    Autoplay({ delay: 4000, stopOnInteraction: false }),
   );
 
   return (
-    <section className="relative -mt-2 md:-mr-4 max-h-[60vh] h-auto w-full overflow-hidden">
+    <section className="relative w-full overflow-hidden max-md:mt-3 md:-mt-[7px]">
       <Carousel
         plugins={[plugin.current]}
-        className="w-full md:rounded-2xl"
+        className="w-full"
         onMouseEnter={() => plugin.current.stop()}
         opts={{ loop: true }}
         onMouseLeave={() => plugin.current.play()}
       >
-        <CarouselContent>
+        <CarouselContent className="-ml-0">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {slides?.data?.map((slide: any, i: number) => (
             <CarouselItem
               onClick={() => window.open(slide?.link, '_blank')}
               key={i}
+              className="pl-0"
             >
-              <div className="relative w-full cursor-pointer">
+              <div className="relative w-full aspect-[16/7] md:aspect-[16/6] lg:aspect-[16/5]">
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
                   alt={`Slide ${slide?.id}`}
-                  width={1200}
-                  height={1200}
+                  fill
                   priority={i === 0}
-                  className="object-cover object-center w-full"
+                  className="object-cover object-center cursor-pointer"
+                  sizes="100vw"
                 />
               </div>
             </CarouselItem>

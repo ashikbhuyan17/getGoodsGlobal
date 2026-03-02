@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
+import { useState, useMemo } from 'react';
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-} from "@/components/ui/carousel";
-import VideoCard from "./VideoCard";
-import { Button } from "@/components/ui/button";
-import { Images, ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+} from '@/components/ui/carousel';
+import VideoCard from './VideoCard';
+import { Button } from '@/components/ui/button';
+import { Images, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 // API Response Types
 interface Banner {
@@ -61,11 +61,16 @@ function GallerySection({ galleryData }: GallerySectionProps) {
 
   // Get default selected category (first category)
   const defaultCategory = categories.length > 0 ? categories[0].id : null;
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(defaultCategory);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    defaultCategory,
+  );
 
   // Ensure selectedCategory is valid, fallback to first category
   const activeCategory = useMemo(() => {
-    if (!selectedCategory || !categories.some((cat) => cat.id === selectedCategory)) {
+    if (
+      !selectedCategory ||
+      !categories.some((cat) => cat.id === selectedCategory)
+    ) {
       return defaultCategory;
     }
     return selectedCategory;
@@ -78,7 +83,7 @@ function GallerySection({ galleryData }: GallerySectionProps) {
     }
 
     const category = galleryData.data.find(
-      (cat) => String(cat.id) === activeCategory
+      (cat) => String(cat.id) === activeCategory,
     );
 
     if (!category) return [];
@@ -98,12 +103,12 @@ function GallerySection({ galleryData }: GallerySectionProps) {
             <Button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
-              variant={isActive ? "default" : "outline"}
+              variant={isActive ? 'default' : 'outline'}
               className={cn(
-                "whitespace-nowrap flex items-center gap-2 rounded px-3 py-2 h-auto",
+                'whitespace-nowrap flex items-center gap-2 rounded px-3 py-2 h-auto',
                 isActive
-                  ? "bg-teal-600 text-white hover:bg-teal-700"
-                  : "bg-white text-gray-700 hover:bg-gray-50 border-gray-200"
+                  ? 'bg-teal-600 text-white hover:bg-teal-700'
+                  : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200',
               )}
             >
               <Image
@@ -135,7 +140,7 @@ function GallerySection({ galleryData }: GallerySectionProps) {
       <div className="relative">
         <Carousel
           opts={{
-            align: "start",
+            align: 'start',
             loop: false,
           }}
           className="w-full"

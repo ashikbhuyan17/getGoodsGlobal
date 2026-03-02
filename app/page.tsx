@@ -25,7 +25,7 @@ export default async function Home() {
   return (
     <div>
       <HeroSlider slides={slides} />
-      <div className="px-2">
+      <div className="px-2 space-y-2 lg:space-y-4 pt-4">
         {/* <FeatureSection /> */}
         <GallerySection
           galleryData={galleryData as GallerySectionProps['galleryData']}
@@ -34,7 +34,7 @@ export default async function Home() {
         <Suspense fallback={<CategorySectionSkeleton />}>
           <CategorySection />
         </Suspense>
-        <div className="space-y-4">
+        <div className="space-y-2 lg:space-y-4">
           {(frontCategory as { data?: unknown[] })?.data?.map((cat: any) => (
             <ProductsSlider
               title={cat?.name}
