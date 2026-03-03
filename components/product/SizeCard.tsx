@@ -10,6 +10,7 @@ function SizeCard({
   price,
   max = 999999999,
   displayLabel,
+  flashSalePercentage,
 }: {
   size: string | number;
   price: string | number;
@@ -17,6 +18,8 @@ function SizeCard({
   max?: number;
   /** Optional: show in UI instead of size (e.g. specification). API always receives size. */
   displayLabel?: string;
+  /** Flash sale percentage (e.g. "5"). When set, apply discount and show both prices. */
+  flashSalePercentage?: string;
 }) {
   const setVariant = useProductStore((s) => s.setVariant);
   const variants = useProductStore((s) => {
@@ -30,9 +33,14 @@ function SizeCard({
         String(v.size) === String(size),
     )?.quantity ?? 0;
 
-  const priceNum = Number(price);
+  const originalPrice = Number(price);
+  const pct = Number(flashSalePercentage) || 0;
+  const discountedPrice =
+    pct > 0 ? Math.round(originalPrice * (1 - pct / 100)) : originalPrice;
+  const priceToUse = pct > 0 ? discountedPrice : originalPrice;
+
   const handleQuantityChange = (newQty: number) => {
-    setVariant(String(colorId), String(size), newQty, priceNum);
+    setVariant(String(colorId), String(size), newQty, priceToUse);
   };
 
   return (
@@ -42,7 +50,14 @@ function SizeCard({
 
       {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
-        <p className=" font-semibold text-gray-800">৳{price}</p>
+        {pct > 0 ? (
+          <>
+            <p className="font-semibold text-gray-800">৳{discountedPrice}</p>
+            <p className="text-sm text-gray-400 line-through">৳{originalPrice}</p>
+          </>
+        ) : (
+          <p className="font-semibold text-gray-800">৳{originalPrice}</p>
+        )}
       </div>
 
       {/* Quantity Column */}

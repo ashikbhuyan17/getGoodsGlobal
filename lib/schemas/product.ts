@@ -106,10 +106,22 @@ export const shippingChargeSchema = z.object({
   updated_at: z.string().optional(),
 });
 
+const flashSaleSchema = z
+  .object({
+    id: z.number().optional(),
+    flash_sale_title: z.string().optional(),
+    flash_sale_percentage: z.string().optional(),
+    flash_sale_start_date: z.string().optional(),
+    flash_sale_end_date: z.string().optional(),
+  })
+  .nullable()
+  .optional();
+
 export const productApiResponseSchema = z.object({
   product: productSchema,
   shippingCharge: z.array(shippingChargeSchema),
   productColors: z.array(productColorSchema),
+  flashSale: flashSaleSchema,
 });
 
 export type ProductApiResponse = z.infer<typeof productApiResponseSchema>;

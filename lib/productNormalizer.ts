@@ -3,11 +3,20 @@ import {
   type ProductApiResponse,
 } from './schemas/product';
 
+export type FlashSaleData = {
+  id?: number;
+  flash_sale_title?: string;
+  flash_sale_percentage?: string;
+  flash_sale_start_date?: string;
+  flash_sale_end_date?: string;
+} | null;
+
 export type NormalizedProductData = {
   data: {
     product: ProductApiResponse['product'];
     productColors: ProductApiResponse['productColors'];
     shippingCharge: ProductApiResponse['shippingCharge'];
+    flashSale: FlashSaleData;
   };
 };
 
@@ -28,6 +37,7 @@ export function normalizeProductResponse(
   const product = data.product ?? data.Product;
   const productColors = data.productColors ?? data.productcolors ?? [];
   const shippingCharge = data.shippingCharge ?? data.shippingcharge ?? [];
+  const flashSale = data.flashSale ?? data.flash_sale ?? null;
 
   if (!product) return null;
 
@@ -35,6 +45,7 @@ export function normalizeProductResponse(
     product,
     productColors: Array.isArray(productColors) ? productColors : [],
     shippingCharge: Array.isArray(shippingCharge) ? shippingCharge : [],
+    flashSale: flashSale && typeof flashSale === 'object' ? flashSale : null,
   };
 
   const parsed = productApiResponseSchema.safeParse(normalized);
@@ -44,6 +55,7 @@ export function normalizeProductResponse(
         product: parsed.data.product,
         productColors: parsed.data.productColors,
         shippingCharge: parsed.data.shippingCharge,
+        flashSale: (parsed.data.flashSale ?? null) as FlashSaleData,
       },
     };
   }
@@ -55,6 +67,7 @@ export function normalizeProductResponse(
         normalized.productColors as ProductApiResponse['productColors'],
       shippingCharge:
         normalized.shippingCharge as ProductApiResponse['shippingCharge'],
+      flashSale: normalized.flashSale,
     },
   };
 }

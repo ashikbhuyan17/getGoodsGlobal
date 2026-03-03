@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from '../ui/dialog';
 import SizeCard from './SizeCard';
+import FlashSaleBanner from './FlashSaleBanner';
 import { useProductStore } from '@/stores/useProductStore';
 
 export default function ProductDetails({
@@ -37,6 +38,14 @@ export default function ProductDetails({
   const specification =
     selectedProductColor?.specification ?? productColors?.[0]?.specification;
   const hasSpecification = specification != null && specification !== '';
+  const rawFlashSale = product?.data?.flashSale ?? null;
+  const flashSale = !rawFlashSale
+    ? null
+    : Array.isArray(rawFlashSale)
+      ? rawFlashSale.length > 0
+        ? rawFlashSale[0]
+        : null
+      : rawFlashSale;
 
   const [image, setImage] = useState(
     `${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`,
@@ -182,6 +191,8 @@ export default function ProductDetails({
               </div>
             )}
 
+            {flashSale && <FlashSaleBanner flashSale={flashSale} />}
+
             <div>
               <p className="font-medium text-gray-700 mb-2">
                 {hasSpecification ? 'Specification' : 'Color'} :{' '}
@@ -231,7 +242,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                        'border-2 border-primary',
+                          'border-2 border-primary',
                       )}
                     />
                   </div>
@@ -263,9 +274,12 @@ export default function ProductDetails({
                     key={size?.id}
                     colorId={effectiveColorId}
                     size={size?.size?.sizeName}
-                    displayLabel={hasSpecification ? String(specification) : undefined}
+                    displayLabel={
+                      hasSpecification ? String(specification) : undefined
+                    }
                     price={size?.SalePrice}
                     max={Number(size?.stock)}
+                    flashSalePercentage={flashSale?.flash_sale_percentage}
                   />
                 ))}
               </div>
