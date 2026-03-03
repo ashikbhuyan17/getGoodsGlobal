@@ -4,7 +4,7 @@
 import { Heart, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -20,6 +20,7 @@ export default function ActionButtons({
   productId: any;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
   const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
@@ -44,7 +45,7 @@ export default function ActionButtons({
   const checkAuthAndValidate = async () => {
     const user: any = await fetcher('/user-profile');
     if (!user?.data?.id) {
-      router.push('/signin');
+      router.push(`/signin?redirect=${encodeURIComponent(pathname || '/')}`);
       return false;
     }
     const cartDetails = buildCartDetails();
@@ -171,7 +172,7 @@ export default function ActionButtons({
     try {
       const user: any = await fetcher('/user-profile');
       if (!user?.data?.id) {
-        router.push('/signin');
+        router.push(`/signin?redirect=${encodeURIComponent(pathname || '/')}`);
         return;
       }
 

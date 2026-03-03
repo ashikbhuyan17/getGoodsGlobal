@@ -18,7 +18,7 @@ import {
 import { fetcher } from "@/lib/fetcher";
 import { setToken } from "@/action/token";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // -------------------- SCHEMA --------------------
 const loginSchema = z.object({
@@ -36,8 +36,15 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 // -------------------- COMPONENT --------------------
+function isValidRedirect(path: string | null): boolean {
+  if (!path || typeof path !== "string") return false;
+  return path.startsWith("/") && !path.startsWith("//");
+}
+
 export default function LoginForm({ method }: { method: "page" | "modal" }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -69,16 +76,8 @@ export default function LoginForm({ method }: { method: "page" | "modal" }) {
       // Refresh the page to update auth state
       router.refresh();
 
-      if (method === "modal") {
-        router.back();
-      } else {
-        router.push("/account");
-      }
-      
-      // Reload after a short delay to ensure state is updated
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
+      const returnUrl: string = isValidRedirect(redirectTo) ? (redirectTo as string) : "/account";
+      router.push(returnUrl);
     } else {
       toast.error(logUser?.message || "Login failed");
     }

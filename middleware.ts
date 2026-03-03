@@ -13,7 +13,12 @@ export async function middleware(request: NextRequest) {
 
     if (status === true) {
       if (pathname === "/signin") {
-        return NextResponse.redirect(new URL("/account", request.url));
+        const redirect = request.nextUrl.searchParams.get("redirect");
+        const returnUrl =
+          redirect && redirect.startsWith("/") && !redirect.startsWith("//")
+            ? redirect
+            : "/account";
+        return NextResponse.redirect(new URL(returnUrl, request.url));
       }
     }
 
@@ -24,7 +29,9 @@ export async function middleware(request: NextRequest) {
         pathname === "/cart" ||
         pathname === "/checkout"
       ) {
-        return NextResponse.redirect(new URL("/signin", request.url));
+        const signinUrl = new URL("/signin", request.url);
+        signinUrl.searchParams.set("redirect", pathname);
+        return NextResponse.redirect(signinUrl);
       }
     }
 

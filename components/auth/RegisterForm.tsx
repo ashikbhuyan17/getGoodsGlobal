@@ -18,7 +18,7 @@ import {
 import { fetcher } from "@/lib/fetcher";
 import { toast } from "sonner";
 import { setToken } from "@/action/token";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const registerSchema = z.object({
   fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -34,8 +34,15 @@ const registerSchema = z.object({
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
+function isValidRedirect(path: string | null): boolean {
+  if (!path || typeof path !== "string") return false;
+  return path.startsWith("/") && !path.startsWith("//");
+}
+
 export default function RegisterForm({ method }: { method: "page" | "modal" }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -65,11 +72,8 @@ export default function RegisterForm({ method }: { method: "page" | "modal" }) {
     if (regUserData?.status) {
       await setToken(regUserData?.token);
       toast.success("Your account has been created successfully.");
-      if (method === "modal") {
-        router.back();
-      } else {
-        router.push("/account");
-      }
+      const returnUrl: string = isValidRedirect(redirectTo) ? (redirectTo as string) : "/account";
+      router.push(returnUrl);
     } else {
       toast.error(regUserData?.message[0]);
     }

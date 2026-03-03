@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -32,6 +32,7 @@ export default function WishlistProductCard({
   oldPrice,
 }: WishlistProductCardProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isRemoving, setIsRemoving] = useState(false);
   const [isRemoved, setIsRemoved] = useState(false);
 
@@ -44,7 +45,7 @@ export default function WishlistProductCard({
     try {
       const user: any = await fetcher('/user-profile');
       if (!user?.data?.id) {
-        router.push('/signin');
+        router.push(`/signin?redirect=${encodeURIComponent(pathname || '/wishlist')}`);
         return;
       }
 

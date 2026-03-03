@@ -48,7 +48,8 @@ function SigninBtn() {
       if (pathname === '/signin') {
         return;
       } else {
-        router.push('/signin');
+        const signinUrl = `/signin?redirect=${encodeURIComponent(pathname || '/')}`;
+        router.push(signinUrl);
       }
     }
   };
