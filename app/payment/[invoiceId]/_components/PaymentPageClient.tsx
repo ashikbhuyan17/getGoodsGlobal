@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,19 +13,23 @@ import { toast } from 'sonner';
 import { submitPayment } from '@/lib/fetcher';
 
 export default function PaymentPageClient({
+  invoiceId,
+  orderLabel,
+  total,
+  advance,
+  paid,
   initialPayable,
   bankList,
-  invoiceId,
 }: {
-  initialPayable: number;
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  bankList?: any;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
   invoiceId: string;
+  orderLabel: string;
+  total: number;
+  advance: number;
+  paid: number;
+  initialPayable: number;
+  bankList?: any;
 }) {
-  const router = useRouter();
-
-  // Transform API bank list data to component format
+  // Transform API bank list data to component format (include cod for COD method)
   const paymentAccounts =
     bankList?.data && Array.isArray(bankList.data) && bankList.data.length > 0
       ? bankList.data
@@ -41,6 +45,7 @@ export default function PaymentPageClient({
           branch: bank.branch || 'N/A',
           routingNo: bank.routing_number || 'N/A',
           description: bank.description || '',
+          cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
         }))
       : [];
 
@@ -54,10 +59,26 @@ export default function PaymentPageClient({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const selectedAccount = paymentAccounts.find(
     (acc: any) => acc.id === selectedPayment,
   );
+
+  const isCodSelected =
+    selectedAccount?.cod != null && selectedAccount?.cod !== '';
+  const advanceLabel = isCodSelected ? 'COD' : 'Advance';
+  const codPercentNumber = isCodSelected
+    ? Number(selectedAccount?.cod ?? 0) || 0
+    : 0;
+  const advanceValue = isCodSelected
+    ? `${codPercentNumber}%`
+    : `${advance}%`;
+  const currentPayable = isCodSelected
+    ? Math.round(total * (Number(selectedAccount?.cod ?? 0) / 100))
+    : initialPayable;
+
+  useEffect(() => {
+    setPaymentAmount(String(currentPayable));
+  }, [currentPayable]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,6 +108,7 @@ export default function PaymentPageClient({
       const formData = new FormData();
       formData.append('pay_slip_image', uploadedFile);
       formData.append('payment_method', selectedAccount.accountName);
+      formData.append('payment_method_id', selectedAccount.id);
       formData.append('invoice_id', invoiceId);
 
       const data = await submitPayment(invoiceId, formData);
@@ -110,8 +132,45 @@ export default function PaymentPageClient({
   };
 
   return (
-    <div className="lg:col-span-2 space-y-6">
-      <Card className="bg-white rounded-lg">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      {/* Left – Order summary (Advance → COD when COD method selected) */}
+      <div className="lg:col-span-3">
+        <Card className="rounded shadow">
+          <CardContent className="p-0 overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b">
+                <tr>
+                  <th className="py-3 px-4 font-semibold">Order</th>
+                  <th className="py-3 px-4 font-semibold">Total</th>
+                  <th className="py-3 px-4 font-semibold">{advanceLabel}</th>
+                  <th className="py-3 px-4 font-semibold">Paid</th>
+                  <th className="py-3 px-4 font-semibold">Payable</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="hover:bg-gray-50 transition font-semibold">
+                  <td className="py-3 px-4">
+                    <Link
+                      href={`/account/orders/${invoiceId}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                    >
+                      {orderLabel}
+                    </Link>
+                  </td>
+                  <td className="py-3 px-4">৳{total}</td>
+                  <td className="py-3 px-4">{advanceValue}</td>
+                  <td className="py-3 px-4">৳{paid}</td>
+                  <td className="py-3 px-4">৳{currentPayable}</td>
+                </tr>
+              </tbody>
+            </table>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Right – Payment method and form */}
+      <div className="lg:col-span-2 space-y-6">
+        <Card className="bg-white rounded-lg">
         <CardContent className="space-y-3">
           {paymentAccounts.length > 0 ? (
             <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
@@ -287,6 +346,7 @@ export default function PaymentPageClient({
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
