@@ -12,9 +12,12 @@ import { Button } from "@/components/ui/button";
 interface MinOrderModalProps {
   open: boolean;
   onClose: () => void;
+  /** Specific error message. Default: সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে */
+  message?: string;
 }
 
-export default function MinOrderModal({ open, onClose }: MinOrderModalProps) {
+export default function MinOrderModal({ open, onClose, message }: MinOrderModalProps) {
+  const defaultMessage = "সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে";
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent className="max-w-sm sm:max-w-md p-6">
@@ -23,7 +26,7 @@ export default function MinOrderModal({ open, onClose }: MinOrderModalProps) {
             Minimum Order Quantity 1
           </DialogTitle>
           <DialogDescription className="text-gray-600 text-center py-2">
-            সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে
+            {message ?? defaultMessage}
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-center pt-2">

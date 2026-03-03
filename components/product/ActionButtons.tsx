@@ -24,11 +24,13 @@ export default function ActionButtons({
   const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
   const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
   const [showMinOrderModal, setShowMinOrderModal] = useState(false);
+  const [minOrderMessage, setMinOrderMessage] = useState<string>("");
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
 
   const variants = useProductStore((s) => s.variants);
   const totalQuantity = useProductStore((s) => s.totalQuantity());
   const shippingArea = useProductStore((s) => s.shippingArea);
+  const shippingOptions = useProductStore((s) => s.shippingOptions);
 
   const buildCartDetails = () =>
     variants
@@ -45,16 +47,15 @@ export default function ActionButtons({
       router.push('/signin');
       return false;
     }
-    if (totalQuantity < 1) {
-      setShowMinOrderModal(true);
-      return false;
-    }
-    if (!shippingArea?.id) {
-      setShowMinOrderModal(true);
-      return false;
-    }
     const cartDetails = buildCartDetails();
-    if (cartDetails.length === 0) {
+    if (totalQuantity < 1 || cartDetails.length === 0) {
+      setMinOrderMessage('সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে');
+      setShowMinOrderModal(true);
+      return false;
+    }
+    const hasShippingOptions = shippingOptions?.length > 0;
+    if (hasShippingOptions && !shippingArea?.id) {
+      setMinOrderMessage('দয়া করে শিপিং মেথড সিলেক্ট করুন');
       setShowMinOrderModal(true);
       return false;
     }
@@ -67,17 +68,25 @@ export default function ActionButtons({
 
     const { cartDetails } = validated;
     setIsAddToCartLoading(true);
+    console.log({
+      product_id: String(productId),
+      shippingcharge_id: shippingArea?.id,
+      shippingfee: Number(shippingArea?.amount ?? 0),
+      total_quantity: String(totalQuantity),
+      cart_details: cartDetails,
+    });
     try {
       const res: any = await fetcher('/product-add-to-cart', {
         method: 'POST',
         body: JSON.stringify({
           product_id: String(productId),
-          shippingcharge_id: String(shippingArea?.id),
-          shippingfee: Number(shippingArea?.amount ?? 0),
+          shippingcharge_id: 1,
+          // shippingfee: Number(shippingArea?.amount ?? 0),
           total_quantity: String(totalQuantity),
           cart_details: cartDetails,
         }),
       });
+      console.log("🚀 ~ handleAddToCart ~ res:", res)
       const isSuccess =
         res?.status === true ||
         res?.status === 'success' ||
@@ -107,12 +116,14 @@ export default function ActionButtons({
         method: 'POST',
         body: JSON.stringify({
           product_id: String(productId),
-          shippingcharge_id: String(shippingArea?.id),
-          shippingfee: Number(shippingArea?.amount ?? 0),
+          shippingcharge_id: 1,
+          // shippingcharge_id: shippingArea?.id,
+          // shippingfee: Number(shippingArea?.amount ?? 0),
           total_quantity: String(totalQuantity),
           cart_details: cartDetails,
         }),
       });
+      console.log("🚀 ~ handleBuyNow ~ addRes:", addRes)
       const addSuccess =
         addRes?.status === true ||
         addRes?.status === 'success' ||
@@ -232,6 +243,7 @@ export default function ActionButtons({
       <MinOrderModal
         open={showMinOrderModal}
         onClose={() => setShowMinOrderModal(false)}
+        message={minOrderMessage}
       />
 
       <AddToCartModal
