@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 import { useProductStore } from '@/stores/useProductStore';
 
 interface AddToCartModalProps {
@@ -16,18 +17,18 @@ interface AddToCartModalProps {
 }
 
 export default function AddToCartModal({ open, onClose }: AddToCartModalProps) {
+  const router = useRouter();
   const reset = useProductStore((s) => s.reset);
 
   const handleContinueShopping = () => {
     reset();
     onClose();
-    window.location.reload();
   };
 
   const handleGoToCart = () => {
     reset();
     onClose();
-    window.location.href = '/cart';
+    router.push('/cart');
   };
 
   return (

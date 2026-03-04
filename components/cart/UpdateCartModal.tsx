@@ -22,6 +22,7 @@ function UpdateCartModal({
   qty,
   id,
   price,
+  onRemoveLoading,
 }: {
   children: React.ReactNode;
   color?: string;
@@ -29,23 +30,29 @@ function UpdateCartModal({
   qty: number;
   id: number | string;
   price: number;
+  onRemoveLoading?: (loading: boolean) => void;
 }) {
   const [quantity, setQuantity] = useState(qty);
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   const handleDelete = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res: any = await fetcher(`/cart-details-delete/${id}`, {
-      method: "POST",
-    });
+    onRemoveLoading?.(true);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res: any = await fetcher(`/cart-details-delete/${id}`, {
+        method: "POST",
+      });
 
-    if (res?.status === "success") {
-      router.refresh();
-      setOpen(false);
-      toast.success(res?.message || "Item removed from cart");
-    } else {
-      toast.error(res?.message || "Failed to remove item from cart");
+      if (res?.status === "success") {
+        router.refresh();
+        setOpen(false);
+        toast.success(res?.message || "Item removed from cart");
+      } else {
+        toast.error(res?.message || "Failed to remove item from cart");
+      }
+    } finally {
+      onRemoveLoading?.(false);
     }
   };
 

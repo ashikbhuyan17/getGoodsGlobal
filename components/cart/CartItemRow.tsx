@@ -13,8 +13,8 @@ interface CartItemRowProps {
   id: number | string;
   price: number;
   page?: 'cart' | 'checkout';
-
   onEdit?: () => void;
+  onRemoveLoading?: (loading: boolean) => void;
 }
 
 export default function CartItemRow({
@@ -26,6 +26,7 @@ export default function CartItemRow({
   id,
   onEdit,
   colorImage,
+  onRemoveLoading,
 }: CartItemRowProps) {
   const imageSrc = colorImage || '/placeholder-product.png';
 
@@ -79,6 +80,7 @@ export default function CartItemRow({
             color={color}
             qty={qty}
             price={price}
+            onRemoveLoading={onRemoveLoading}
           >
             <button
               // size="sm"

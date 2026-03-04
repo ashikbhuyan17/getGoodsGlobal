@@ -19,6 +19,7 @@ interface CartOrderGroupProps {
   product: any;
   isSelected?: boolean;
   onSelectChange?: (selected: boolean) => void;
+  onRemoveLoading?: (loading: boolean) => void;
 }
 
 export default function CartOrderGroup({
@@ -30,6 +31,7 @@ export default function CartOrderGroup({
   page = "cart",
   isSelected = true,
   onSelectChange,
+  onRemoveLoading,
 }: CartOrderGroupProps) {
   const totalItems = product?.cartdetails?.reduce(
     (total: number, prev: { quantity: number }) =>
@@ -46,15 +48,20 @@ export default function CartOrderGroup({
   );
 
   const handleDelete = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res: any = await fetcher(`/cart-remove/${product?.id}`, {
-      method: "POST",
-    });
-    if (res?.status === true) {
-      router.refresh();
-      toast.success(res?.message || "Product removed from cart");
-    } else {
-      toast.error(res?.message || "Failed to remove product from cart!");
+    onRemoveLoading?.(true);
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res: any = await fetcher(`/cart-remove/${product?.id}`, {
+        method: "POST",
+      });
+      if (res?.status === true) {
+        router.refresh();
+        toast.success(res?.message || "Product removed from cart");
+      } else {
+        toast.error(res?.message || "Failed to remove product from cart!");
+      }
+    } finally {
+      onRemoveLoading?.(false);
     }
   };
 

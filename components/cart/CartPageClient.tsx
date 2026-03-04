@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import CartOrderGroup from '@/components/cart/CartOrderGroup';
 import CartItemRow from '@/components/cart/CartItemRow';
 import CartSummary from '@/components/cart/CartSummary';
@@ -66,6 +67,7 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
   }, [selectedItems, cartProducts?.data?.length]);
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [removeLoading, setRemoveLoading] = useState(false);
   const router = useRouter();
 
   const handleCheckoutClick = async () => {
@@ -103,6 +105,14 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
 
   return (
     <>
+      {removeLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="flex flex-col items-center gap-3 rounded-lg bg-white px-6 py-4 shadow-lg">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <span className="text-sm font-medium text-gray-700">Removing from cart...</span>
+          </div>
+        </div>
+      )}
       <div className="lg:col-span-2 space-y-6">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {cartProducts?.data?.map((product: any) => (
@@ -116,6 +126,7 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
             onSelectChange={(selected) =>
               handleSelectChange(product.id, selected)
             }
+            onRemoveLoading={setRemoveLoading}
           >
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {product?.cartdetails?.map((cart: any) => (
@@ -127,6 +138,7 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
                 price={Number(cart?.price)}
                 size={cart?.size}
                 colorImage={`${process.env.NEXT_PUBLIC_IMG_URL}/${cart?.color_image}`}
+                onRemoveLoading={setRemoveLoading}
               />
             ))}
           </CartOrderGroup>

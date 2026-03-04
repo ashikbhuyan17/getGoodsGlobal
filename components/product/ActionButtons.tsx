@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
 import { useProductStore } from '@/stores/useProductStore';
+import { revalidateClient } from '@/action/revalidateClient';
 
 export default function ActionButtons({
   isInWishlist,
@@ -25,7 +26,7 @@ export default function ActionButtons({
   const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
   const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
   const [showMinOrderModal, setShowMinOrderModal] = useState(false);
-  const [minOrderMessage, setMinOrderMessage] = useState<string>("");
+  const [minOrderMessage, setMinOrderMessage] = useState<string>('');
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
 
   const variants = useProductStore((s) => s.variants);
@@ -87,7 +88,7 @@ export default function ActionButtons({
           cart_details: cartDetails,
         }),
       });
-      console.log("🚀 ~ handleAddToCart ~ res:", res)
+      console.log('🚀 ~ handleAddToCart ~ res:', res);
       const isSuccess =
         res?.status === true ||
         res?.status === 'success' ||
@@ -95,6 +96,7 @@ export default function ActionButtons({
         (res?.message && String(res.message).toLowerCase().includes('success'));
 
       if (isSuccess) {
+        await revalidateClient('/cart');
         setShowAddToCartModal(true);
       } else {
         toast.error(res?.message || 'Failed to add to cart.');
@@ -124,7 +126,7 @@ export default function ActionButtons({
           cart_details: cartDetails,
         }),
       });
-      console.log("🚀 ~ handleBuyNow ~ addRes:", addRes)
+      console.log('🚀 ~ handleBuyNow ~ addRes:', addRes);
       const addSuccess =
         addRes?.status === true ||
         addRes?.status === 'success' ||
