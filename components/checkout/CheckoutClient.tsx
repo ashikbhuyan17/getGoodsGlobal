@@ -32,7 +32,6 @@ function CheckoutClient({
     name: string;
     amount: number;
   } | null>(null);
-  console.log("🚀 ~ CheckoutClient ~ selectedShipping:", selectedShipping)
 
   // cart-products: cartdetails; buy-products: buydetails (API returns buydetails)
   const normalizedProducts = useMemo(() => {
@@ -61,17 +60,6 @@ function CheckoutClient({
   const grandTotal = productsWithTotals.reduce(
     (sum: number, product: { totalPrice: number }) => {
       return sum + product.totalPrice;
-    },
-    0
-  );
-
-  const totalItemCount = productsWithTotals.reduce(
-    (sum: number, product: { cartdetails?: { quantity?: number }[] }) => {
-      const qty = product?.cartdetails?.reduce(
-        (s: number, c: { quantity?: number }) => s + Number(c?.quantity ?? 0),
-        0
-      ) ?? 0;
-      return sum + qty;
     },
     0
   );
@@ -128,7 +116,7 @@ function CheckoutClient({
       <CartSummary
         formData={formData}
         total={grandTotal}
-        totalItemCount={totalItemCount}
+        flashSale={cartProducts?.flashSale}
         shippingCharge={selectedShipping?.amount ?? 0}
         shippingChargeID={selectedShipping?.id}
         requiresShippingSelection={shippingOptions.length > 0}

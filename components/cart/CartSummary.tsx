@@ -23,7 +23,7 @@ export default function CartSummary({
   shippingCharge = 0,
   shippingChargeID,
   requiresShippingSelection = false,
-  totalItemCount,
+  flashSale,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -51,8 +51,12 @@ export default function CartSummary({
   shippingChargeID?: number;
   /** When true, user must select a shipping method (checkout with shipping options). */
   requiresShippingSelection?: boolean;
-  /** Total item count (checkout page). */
-  totalItemCount?: number;
+  /** From checkout API: { flash_sale_title?, regular_price?, flash_sale_discount_price? }. Used for Product Price and Eid Furti row. */
+  flashSale?: {
+    flash_sale_title?: string;
+    regular_price?: number;
+    flash_sale_discount_price?: number;
+  } | null;
 }) {
   const router = useRouter();
 
@@ -64,18 +68,24 @@ export default function CartSummary({
   const [loading, setLoading] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
-  const itemCount = totalItemCount ?? 1;
-  const eidFurtiPercent = 5;
+  const productSubtotal =
+    flashSale?.regular_price != null ? Number(flashSale.regular_price) : total;
+  const flashSaleDiscount =
+    flashSale?.flash_sale_discount_price != null
+      ? Number(flashSale.flash_sale_discount_price)
+      : 0;
 
   const couponDiscountAmount = (() => {
     if (!discount) return 0;
+    const base = productSubtotal - flashSaleDiscount;
     const val = Number(discount.discount) || 0;
-    if (discount.type === 'Solid') return Math.min(val, total);
-    if (discount.type === 'Percentage') return (total * val) / 100;
+    if (discount.type === 'Solid') return Math.min(val, base);
+    if (discount.type === 'Percentage') return (base * val) / 100;
     return 0;
   })();
 
-  const finalPrice = total - couponDiscountAmount + shippingCharge;
+  const finalPrice =
+    productSubtotal - flashSaleDiscount - couponDiscountAmount + shippingCharge;
 
   const validateForm = () => {
     if (page !== 'checkout') return true;
@@ -211,36 +221,42 @@ export default function CartSummary({
       <div className="p-2 lg:p-6 space-y-2">
         {page === 'checkout' ? (
           <div className="space-y-3">
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm font-semibold text-gray-600 border-b pb-2">
+            {/* <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm font-semibold text-gray-600 border-b pb-2">
               <span>Item</span>
               <span>Qty</span>
               <span>Price</span>
-            </div>
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+            </div> */}
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
-              <span className="font-semibold">{itemCount}</span>
-              <span className="font-semibold">৳{total}</span>
+              <span className="font-semibold">৳{productSubtotal}</span>
             </div>
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center text-gray-500">
-              <span className="font-semibold">Eid Furti Offer {eidFurtiPercent}%</span>
-              <span></span>
-              <span className="font-semibold">৳0</span>
-            </div>
-            {discount && (
-              <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center text-green-600">
-                <span className="font-semibold">Coupon Code discount {discount.type === 'Percentage' ? `${discount.discount}%` : ''}</span>
-                <span></span>
-                <span className="font-semibold">-৳{couponDiscountAmount.toFixed(2)}</span>
+            {flashSale && (
+              <div className="grid grid-cols-[1fr_auto] gap-2 items-center ">
+                <span className="font-semibold">
+                  {flashSale.flash_sale_title ?? 'Flash Sale'}
+                </span>
+                <span className="font-semibold">-৳{flashSaleDiscount}</span>
               </div>
             )}
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+            {discount && (
+              <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+                <span className="font-semibold">
+                  Coupon Code Discount{' '}
+                  {discount.type === 'Percentage'
+                    ? `${discount.discount}%`
+                    : ''}
+                </span>
+                <span className="font-semibold">
+                  -৳{couponDiscountAmount.toFixed(2)}
+                </span>
+              </div>
+            )}
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Shipping fee</span>
-              <span></span>
               <span className="font-semibold">৳{shippingCharge}</span>
             </div>
-            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Final price</span>
-              <span></span>
               <span className="font-semibold">৳{finalPrice.toFixed(2)}</span>
             </div>
           </div>
