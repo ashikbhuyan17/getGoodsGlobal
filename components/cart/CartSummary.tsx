@@ -23,6 +23,7 @@ export default function CartSummary({
   shippingCharge = 0,
   shippingChargeID,
   requiresShippingSelection = false,
+  totalItemCount,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -50,6 +51,8 @@ export default function CartSummary({
   shippingChargeID?: number;
   /** When true, user must select a shipping method (checkout with shipping options). */
   requiresShippingSelection?: boolean;
+  /** Total item count (checkout page). */
+  totalItemCount?: number;
 }) {
   const router = useRouter();
 
@@ -61,15 +64,18 @@ export default function CartSummary({
   const [loading, setLoading] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
-  const discountAmount = (() => {
+  const itemCount = totalItemCount ?? 1;
+  const eidFurtiPercent = 5;
+
+  const couponDiscountAmount = (() => {
     if (!discount) return 0;
     const val = Number(discount.discount) || 0;
     if (discount.type === 'Solid') return Math.min(val, total);
     if (discount.type === 'Percentage') return (total * val) / 100;
     return 0;
   })();
-  const subtotalAfterDiscount = total - discountAmount;
-  const finalPrice = subtotalAfterDiscount + shippingCharge;
+
+  const finalPrice = total - couponDiscountAmount + shippingCharge;
 
   const validateForm = () => {
     if (page !== 'checkout') return true;
@@ -203,27 +209,47 @@ export default function CartSummary({
       <p className="border-t border-gray-200"></p>
 
       <div className="p-2 lg:p-6 space-y-2">
-        <div className="space-y-4">
-          <PriceRow label="Product price" value={`৳${total}`} />
-          {page === 'checkout' && (
-            <PriceRow label="Shipping" value={`৳${shippingCharge}`} />
-          )}
-          <PriceRow
-            label="Total"
-            value={`৳${page === 'checkout' ? total + shippingCharge : total}`}
-          />
-          {/* <PriceRow label="Pay now" value={`৳${total / 2}`} discount={50} /> */}
-
-          {discount && page === 'checkout' && (
-            <PriceRow label="Discount" value={`-৳${discountAmount}`} />
-          )}
-
-          {discount && page === 'checkout' && (
-            <div className="border-t pt-4">
-              <PriceRow label="Final price" value={`৳${finalPrice}`} />
+        {page === 'checkout' ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm font-semibold text-gray-600 border-b pb-2">
+              <span>Item</span>
+              <span>Qty</span>
+              <span>Price</span>
             </div>
-          )}
-        </div>
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+              <span className="font-semibold">Product Price</span>
+              <span className="font-semibold">{itemCount}</span>
+              <span className="font-semibold">৳{total}</span>
+            </div>
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center text-gray-500">
+              <span className="font-semibold">Eid Furti Offer {eidFurtiPercent}%</span>
+              <span></span>
+              <span className="font-semibold">৳0</span>
+            </div>
+            {discount && (
+              <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center text-green-600">
+                <span className="font-semibold">Coupon Code discount {discount.type === 'Percentage' ? `${discount.discount}%` : ''}</span>
+                <span></span>
+                <span className="font-semibold">-৳{couponDiscountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
+              <span className="font-semibold">Shipping fee</span>
+              <span></span>
+              <span className="font-semibold">৳{shippingCharge}</span>
+            </div>
+            <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
+              <span className="font-semibold">Final price</span>
+              <span></span>
+              <span className="font-semibold">৳{finalPrice.toFixed(2)}</span>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <PriceRow label="Product price" value={`৳${total}`} />
+            <PriceRow label="Total" value={`৳${total}`} />
+          </div>
+        )}
         {/* Coupon Section */}
         {page === 'checkout' && (
           <div className="space-y-2">
@@ -249,7 +275,7 @@ export default function CartSummary({
 
             {discount && page === 'checkout' && (
               <p className="text-green-600 text-sm">
-                Coupon applied! Discount: ৳{discountAmount}
+                Coupon applied! Discount: ৳{couponDiscountAmount.toFixed(2)}
               </p>
             )}
           </div>
