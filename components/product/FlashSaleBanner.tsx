@@ -51,7 +51,7 @@ export default function FlashSaleBanner({ flashSale }: FlashSaleBannerProps) {
   if (expired) return null;
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-gradient-to-r from-[#8B2B7A] via-[#9B3A8A] to-[#219F9B] px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+    <div className="rounded-2xl overflow-hidden bg-gradient-to-r from-[#8B2B7A] via-[#9B3A8A] to-[#219F9B] px-4 py-2 2xl:py-3 flex flex-wrap items-center justify-between gap-1">
       <p className="text-white font-bold text-base sm:text-lg">
         {percentage}% {title.replace(/^\d+%\s*/i, '').trim() || 'Sale'}
       </p>
@@ -64,7 +64,7 @@ export default function FlashSaleBanner({ flashSale }: FlashSaleBannerProps) {
         ].map(({ value, label }) => (
           <div
             key={label}
-            className="flex flex-col items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-white"
+            className="flex flex-col items-center justify-center w-12 h-12 sm:w-12 sm:h-12 rounded-full border-2 border-white"
           >
             <span className="text-white font-bold text-sm sm:text-base leading-tight">
               {String(value).padStart(2, '0')}
