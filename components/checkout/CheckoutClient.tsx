@@ -65,6 +65,17 @@ function CheckoutClient({
     0
   );
 
+  const totalItemCount = productsWithTotals.reduce(
+    (sum: number, product: { cartdetails?: { quantity?: number }[] }) => {
+      const qty = product?.cartdetails?.reduce(
+        (s: number, c: { quantity?: number }) => s + Number(c?.quantity ?? 0),
+        0
+      ) ?? 0;
+      return sum + qty;
+    },
+    0
+  );
+
   const cartIds = isBuyNow ? undefined : productsWithTotals.map((p: { id: string | number }) => Number(p.id));
 
   return (
@@ -117,6 +128,7 @@ function CheckoutClient({
       <CartSummary
         formData={formData}
         total={grandTotal}
+        totalItemCount={totalItemCount}
         shippingCharge={selectedShipping?.amount ?? 0}
         shippingChargeID={selectedShipping?.id}
         requiresShippingSelection={shippingOptions.length > 0}
