@@ -32,7 +32,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
               key={i}
               className="pl-0"
             >
-              <div className="relative w-full aspect-[16/7] md:aspect-[16/6] lg:aspect-[16/5]">
+              <div className="relative w-full aspect-[16/9] md:aspect-[16/6] lg:aspect-[16/5]">
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
                   alt={`Slide ${slide?.id}`}
