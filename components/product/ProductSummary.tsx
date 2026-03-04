@@ -11,10 +11,12 @@ export default function ProductSummary({
   productId,
   isInWishlist,
   bulkQuantities,
+  flashSalePercentage,
 }: {
   productId: any;
   isInWishlist: any;
   bulkQuantities?: any;
+  flashSalePercentage?: string;
 }) {
   const shippingOptions = useProductStore((s) => s.shippingOptions);
   const shippingArea = useProductStore((s) => s.shippingArea);
@@ -49,6 +51,7 @@ export default function ProductSummary({
         price={price}
         bulkQuantities={bulkQuantities}
         quantity={quantity}
+        flashSalePercentage={flashSalePercentage}
       />
       <ActionButtons isInWishlist={isInWishlist} productId={productId} />
     </Card>

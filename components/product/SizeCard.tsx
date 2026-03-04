@@ -3,6 +3,7 @@
 import { Button } from '../ui/button';
 import QuantityUpdateBtn from '../common/QuantityUpdateBtn';
 import { useProductStore } from '@/stores/useProductStore';
+import { getActiveBulkTier } from '@/lib/utils';
 
 function SizeCard({
   size,
@@ -11,6 +12,8 @@ function SizeCard({
   max = 999999999,
   displayLabel,
   flashSalePercentage,
+  bulkQuantities,
+  totalQuantity,
 }: {
   size: string | number;
   price: string | number;
@@ -20,11 +23,12 @@ function SizeCard({
   displayLabel?: string;
   /** Flash sale percentage (e.g. "5"). When set, apply discount and show both prices. */
   flashSalePercentage?: string;
+  /** When set, use bulk tier price instead of variant price. */
+  bulkQuantities?: { data?: { min_qty?: string | number; max_qty?: string | number; price?: string | number }[] };
+  totalQuantity?: number;
 }) {
   const setVariant = useProductStore((s) => s.setVariant);
-  const variants = useProductStore((s) => {
-    return s.variants;
-  });
+  const variants = useProductStore((s) => s.variants);
 
   const quantity =
     variants.find(
@@ -33,14 +37,21 @@ function SizeCard({
         String(v.size) === String(size),
     )?.quantity ?? 0;
 
-  const originalPrice = Number(price);
+  const useBulk = bulkQuantities && totalQuantity !== undefined;
+  const bulkTier = useBulk ? getActiveBulkTier(bulkQuantities, totalQuantity) : null;
+  const basePrice = bulkTier ? bulkTier.price : Number(price);
+
   const pct = Number(flashSalePercentage) || 0;
   const discountedPrice =
-    pct > 0 ? Math.round(originalPrice * (1 - pct / 100)) : originalPrice;
-  const priceToUse = pct > 0 ? discountedPrice : originalPrice;
+    pct > 0 ? basePrice * (1 - pct / 100) : basePrice;
+  const priceToUse = pct > 0 ? discountedPrice : basePrice;
 
   const handleQuantityChange = (newQty: number) => {
-    setVariant(String(colorId), String(size), newQty, priceToUse);
+    const newTotal = (totalQuantity ?? 0) - quantity + newQty;
+    const tierForNewTotal = useBulk ? getActiveBulkTier(bulkQuantities, newTotal) : null;
+    const priceForVariant = tierForNewTotal ? tierForNewTotal.price : basePrice;
+    const finalPrice = pct > 0 ? priceForVariant * (1 - pct / 100) : priceForVariant;
+    setVariant(String(colorId), String(size), newQty, finalPrice);
   };
 
   return (
@@ -53,10 +64,10 @@ function SizeCard({
         {pct > 0 ? (
           <>
             <p className="font-semibold text-gray-800">৳{discountedPrice}</p>
-            <p className="text-sm text-gray-400 line-through">৳{originalPrice}</p>
+            <p className="text-sm text-gray-400 line-through">৳{basePrice}</p>
           </>
         ) : (
-          <p className="font-semibold text-gray-800">৳{originalPrice}</p>
+          <p className="font-semibold text-gray-800">৳{basePrice}</p>
         )}
       </div>
 

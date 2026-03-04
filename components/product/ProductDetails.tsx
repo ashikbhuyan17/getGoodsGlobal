@@ -17,6 +17,7 @@ import {
 import SizeCard from './SizeCard';
 import FlashSaleBanner from './FlashSaleBanner';
 import { useProductStore } from '@/stores/useProductStore';
+import { getActiveBulkTier } from '@/lib/utils';
 
 export default function ProductDetails({
   product,
@@ -137,8 +138,9 @@ export default function ProductDetails({
                 <div className="grid grid-cols-3 gap-0">
                   {bulkQuantities?.data?.map((bulk: any, i: number) => {
                     if (i >= 3) return null;
-                    const minQty = Number(bulk?.min_qty ?? 0);
-                    const isActive = i === 0 ? true : totalQuantity >= minQty;
+                    const activeTier = getActiveBulkTier(bulkQuantities, totalQuantity);
+                    const isActive =
+                      activeTier && Number(activeTier.min_qty) === Number(bulk?.min_qty ?? 0);
                     const tierStyles = [
                       {
                         bg: 'bg-[#E7F2EF]',
@@ -280,6 +282,8 @@ export default function ProductDetails({
                     price={size?.SalePrice}
                     max={Number(size?.stock)}
                     flashSalePercentage={flashSale?.flash_sale_percentage}
+                    bulkQuantities={bulkQuantities}
+                    totalQuantity={bulkQuantities ? totalQuantity : undefined}
                   />
                 ))}
               </div>

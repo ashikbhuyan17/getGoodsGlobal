@@ -42,6 +42,12 @@ function ProductPageClient({
           isInWishlist={isInWishlist}
           bulkQuantities={bulkQuantities}
           productId={product?.data?.product?.id}
+          flashSalePercentage={
+            (Array.isArray(product?.data?.flashSale)
+              ? product?.data?.flashSale?.[0]
+              : product?.data?.flashSale
+            )?.flash_sale_percentage
+          }
         />
       </div>
     </div>
