@@ -187,7 +187,7 @@ export default function CartSummary({
         shippingcharge_id: shippingChargeID,
         coupon_code: discount ? coupon : null,
         ...(!isBuyNow && cartIds?.length ? { cart_ids: cartIds } : {}),
-        ...(flashSaleDiscount > 0 || flashSaleDiscount != null
+        ...(flashSaleDiscount > 0
           ? { flash_sale_discount_price: flashSaleDiscount }
           : {}),
       };
