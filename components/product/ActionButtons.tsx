@@ -88,7 +88,6 @@ export default function ActionButtons({
           cart_details: cartDetails,
         }),
       });
-      console.log('🚀 ~ handleAddToCart ~ res:', res);
       const isSuccess =
         res?.status === true ||
         res?.status === 'success' ||
@@ -126,7 +125,6 @@ export default function ActionButtons({
           cart_details: cartDetails,
         }),
       });
-      console.log('🚀 ~ handleBuyNow ~ addRes:', addRes);
       const addSuccess =
         addRes?.status === true ||
         addRes?.status === 'success' ||

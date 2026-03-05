@@ -105,7 +105,6 @@ export async function cartOrderProducts(
       .map((id) => `cart_ids[]=${encodeURIComponent(id)}`)
       .join('&');
     const slug = `/cart-order-products?${query}`;
-    console.log('🚀 ~ cartOrderProducts ~ slug:', slug);
     const result = await fetcher<{
       status?: boolean | string;
       message?: string;
