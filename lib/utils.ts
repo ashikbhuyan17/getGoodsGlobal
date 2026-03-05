@@ -5,6 +5,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Discount percentage from old and new price. Returns 0 if no valid discount. */
+export function getDiscountPercent(newPrice: number, oldPrice: number): number {
+  const newP = Number(newPrice);
+  const oldP = Number(oldPrice);
+  if (oldP <= 0 || newP >= oldP) return 0;
+  return Math.round(((oldP - newP) / oldP) * 100);
+}
+
 /** Get active bulk tier based on totalQuantity (min_qty <= qty <= max_qty). Returns best tier for display/calculation. */
 export function getActiveBulkTier(
   bulkQuantities: { data?: { min_qty?: string | number; max_qty?: string | number; price?: string | number }[] } | null | undefined,

@@ -18,11 +18,6 @@ function getProductImage(product: {
   }
 }
 
-function getDiscountPercent(newPrice: number, oldPrice: number): number {
-  if (oldPrice <= 0 || newPrice >= oldPrice) return 0;
-  return Math.round(((oldPrice - newPrice) / oldPrice) * 100);
-}
-
 export default async function FlashSaleSection() {
   const res = await fetcher<{
     status?: string;
@@ -61,22 +56,18 @@ export default async function FlashSaleSection() {
 
         {/* Product Grid - 6 products */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          {displayProducts.map((product) => {
-            const newPrice = Number(product.new_price ?? 0);
-            const oldPrice = Number(product.old_price ?? 0);
-            const discount = getDiscountPercent(newPrice, oldPrice);
-            return (
-              <ProductCard
-                key={product.id}
-                slug={product.slug}
-                image={getProductImage(product)}
-                title={product.name}
-                newPrice={newPrice}
-                oldPrice={oldPrice > 0 ? oldPrice : undefined}
-                discountPercent={discount}
-              />
-            );
-          })}
+          {displayProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              slug={product.slug}
+              image={getProductImage(product)}
+              title={product.name}
+              newPrice={Number(product.new_price ?? 0)}
+              oldPrice={
+                product.old_price ? Number(product.old_price) : undefined
+              }
+            />
+          ))}
         </div>
       </div>
     </section>

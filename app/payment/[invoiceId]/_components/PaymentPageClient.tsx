@@ -171,181 +171,181 @@ export default function PaymentPageClient({
       {/* Right – Payment method and form */}
       <div className="lg:col-span-2 space-y-6">
         <Card className="bg-white rounded-lg">
-        <CardContent className="space-y-3">
-          {paymentAccounts.length > 0 ? (
-            <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
-              {paymentAccounts.map((account: any) => {
-                const isSelected = selectedPayment === account.id;
-                return (
-                  <button
-                    key={account.id}
-                    type="button"
-                    onClick={() => setSelectedPayment(account.id)}
-                    aria-label={`Select ${account.name} payment method`}
-                    className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
-                      ? 'border-teal-600 bg-teal-50'
-                      : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                  >
-                    {isSelected && (
-                      <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
-                        <Check className="h-3 w-3 text-white" />
+          <CardContent className="space-y-3">
+            {paymentAccounts.length > 0 ? (
+              <div className="grid grid-cols-3 md:grid-cols-3 gap-4">
+                {paymentAccounts.map((account: any) => {
+                  const isSelected = selectedPayment === account.id;
+                  return (
+                    <button
+                      key={account.id}
+                      type="button"
+                      onClick={() => setSelectedPayment(account.id)}
+                      aria-label={`Select ${account.name} payment method`}
+                      className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
+                        ? 'border-teal-600 bg-teal-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
+                          <Check className="h-3 w-3 text-white" />
+                        </div>
+                      )}
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="relative w-full lg:w-14 xl:w-full h-12">
+                          <Image
+                            src={account.icon}
+                            alt={account.name}
+                            fill
+                            className="object-contain rounded"
+                          />
+                        </div>
                       </div>
-                    )}
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="relative w-full lg:w-14 xl:w-full h-12">
-                        <Image
-                          src={account.icon}
-                          alt={account.name}
-                          fill
-                          className="object-contain rounded"
-                        />
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-8 text-gray-500">
-              No payment methods available
-            </div>
-          )}
-          {selectedAccount && (
-            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-              <div className="px-4 py-3 border-b">
-                <h3 className="text-base font-semibold text-gray-900">
-                  {selectedAccount.accountName} Details
-                </h3>
-              </div>
-              <div className="divide-y">
-                <div className="grid grid-cols-12 border-b">
-                  <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                    Account Name
-                  </div>
-                  <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                    {selectedAccount.accountName}
-                  </div>
-                </div>
-                <div className="grid grid-cols-12 border-b">
-                  <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                    Account Number
-                  </div>
-                  <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                    {selectedAccount.accountNumber}
-                  </div>
-                </div>
-                {selectedAccount.accountName != 'BKash' && (
-                  <>
-                    <div className="grid grid-cols-12 border-b">
-                      <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                        Branch
-                      </div>
-                      <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                        {selectedAccount.branch}
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-12 border-b">
-                      <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                        Routing No
-                      </div>
-                      <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                        {selectedAccount.routingNo}
-                      </div>
-                    </div>
-                  </>
-                )}
-                {selectedAccount.description && (
-                  <div className="border-b last:border-b-0">
-                    <div className="bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium border-b">
-                      Description
-                    </div>
-                    <div
-                      className="px-4 py-3 text-sm text-gray-900 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_li]:my-1 [&_ul]:space-y-1"
-                      dangerouslySetInnerHTML={{ __html: selectedAccount.description }}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-          <div>
-            <Label className="text-sm font-medium mb-2 block text-gray-900">
-              Upload Slip / Screenshot
-            </Label>
-            {uploadedImage ? (
-              <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4">
-                <div className="relative w-full h-48 mb-4">
-                  <Image
-                    src={uploadedImage}
-                    alt="Payment slip"
-                    fill
-                    className="object-contain rounded"
-                  />
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => {
-                    setUploadedImage(null);
-                    setUploadedFile(null);
-                  }}
-                >
-                  <X className="h-4 w-4 mr-2" />
-                  Remove Image
-                </Button>
+                    </button>
+                  );
+                })}
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-teal-600 transition-colors min-h-37.5">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                <Plus className="h-12 w-12 text-gray-400 mb-2" />
-                <span className="text-sm text-gray-600">
-                  Upload Slip / Screenshot
-                </span>
-              </label>
+              <div className="text-center py-8 text-gray-500">
+                No payment methods available
+              </div>
             )}
-          </div>
-          <div>
-            <Label
-              htmlFor="paymentAmount"
-              className="text-sm font-medium mb-2 block text-gray-900"
-            >
-              Payable Amount
-            </Label>
-            <Input
-              id="paymentAmount"
-              type="number"
-              value={paymentAmount}
-              disabled
-              onChange={(e) => setPaymentAmount(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <Button
-              type="button"
-              onClick={handlePaymentSubmit}
-              disabled={isSubmitting || !uploadedFile || !selectedAccount}
-              className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  Submitting...
-                </>
+            {selectedAccount && (
+              <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                <div className="px-4 py-3 border-b">
+                  <h3 className="text-base font-semibold text-gray-900">
+                    {selectedAccount.accountName} Details
+                  </h3>
+                </div>
+                <div className="divide-y">
+                  <div className="grid grid-cols-12 border-b">
+                    <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                      Account Name
+                    </div>
+                    <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                      {selectedAccount.accountName}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-12 border-b">
+                    <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                      Account Number
+                    </div>
+                    <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                      {selectedAccount.accountNumber}
+                    </div>
+                  </div>
+                  {selectedAccount.accountName != 'BKash' && (
+                    <>
+                      <div className="grid grid-cols-12 border-b">
+                        <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                          Branch
+                        </div>
+                        <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                          {selectedAccount.branch}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-12 border-b">
+                        <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                          Routing No
+                        </div>
+                        <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                          {selectedAccount.routingNo}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {selectedAccount.description && (
+                    <div className="border-b last:border-b-0">
+                      <div className="bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium border-b">
+                        Payment Guidelines
+                      </div>
+                      <div
+                        className="px-4 py-3 text-sm text-gray-900 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_li]:my-1 [&_ul]:space-y-1"
+                        dangerouslySetInnerHTML={{ __html: selectedAccount.description }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            <div>
+              <Label className="text-sm font-medium mb-2 block text-gray-900">
+                Upload Slip / Screenshot
+              </Label>
+              {uploadedImage ? (
+                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4">
+                  <div className="relative w-full h-48 mb-4">
+                    <Image
+                      src={uploadedImage}
+                      alt="Payment slip"
+                      fill
+                      className="object-contain rounded"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => {
+                      setUploadedImage(null);
+                      setUploadedFile(null);
+                    }}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remove Image
+                  </Button>
+                </div>
               ) : (
-                `Pay ৳${paymentAmount}`
+                <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-teal-600 transition-colors min-h-37.5">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Plus className="h-12 w-12 text-gray-400 mb-2" />
+                  <span className="text-sm text-gray-600">
+                    Upload Slip / Screenshot
+                  </span>
+                </label>
               )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            </div>
+            <div>
+              <Label
+                htmlFor="paymentAmount"
+                className="text-sm font-medium mb-2 block text-gray-900"
+              >
+                Payable Amount
+              </Label>
+              <Input
+                id="paymentAmount"
+                type="number"
+                value={paymentAmount}
+                disabled
+                onChange={(e) => setPaymentAmount(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <Button
+                type="button"
+                onClick={handlePaymentSubmit}
+                disabled={isSubmitting || !uploadedFile || !selectedAccount}
+                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  `Pay ৳${paymentAmount}`
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
