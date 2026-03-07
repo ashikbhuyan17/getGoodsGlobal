@@ -46,6 +46,8 @@ export default async function PaymentPage({
       data: [],
     })),
   ]);
+  console.log('🚀 ~ PaymentPage ~ payment:', payment);
+  console.log('🚀 ~ PaymentPage ~ bankList:', bankList);
 
   if (payment?.status === 'error' || !payment?.data) {
     notFound();
@@ -56,10 +58,7 @@ export default async function PaymentPage({
   if (!firstPayment) notFound();
 
   const orderLabel = invoiceId ? `SKY${invoiceId}` : '—';
-  const total = Number(firstPayment?.amount) || 0;
-  const paid = 0;
-  const advance = Number(firstPayment?.advanced) || 0;
-  const payable = Number(firstPayment?.payable) || 0;
+  const subTotal = Number(firstPayment?.amount) || 0;
 
   return (
     <div className="min-h-screen space-y-4 max-md:mb-20 mb-10">
@@ -70,10 +69,7 @@ export default async function PaymentPage({
         <PaymentPageClient
           invoiceId={invoiceId}
           orderLabel={orderLabel}
-          total={total}
-          advance={advance}
-          paid={paid}
-          initialPayable={payable}
+          subTotal={subTotal}
           bankList={bankList}
         />
       </div>

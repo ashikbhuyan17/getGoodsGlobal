@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,38 +15,33 @@ import { submitPayment } from '@/lib/fetcher';
 export default function PaymentPageClient({
   invoiceId,
   orderLabel,
-  total,
-  advance,
-  paid,
-  initialPayable,
+  subTotal,
   bankList,
 }: {
   invoiceId: string;
   orderLabel: string;
-  total: number;
-  advance: number;
-  paid: number;
-  initialPayable: number;
+  /** Sub-Total = item price + shipping fee (from API amount). */
+  subTotal: number;
   bankList?: any;
 }) {
   // Transform API bank list data to component format (include cod for COD method)
   const paymentAccounts =
     bankList?.data && Array.isArray(bankList.data) && bankList.data.length > 0
       ? bankList.data
-        .filter((bank: any) => bank.status === '1')
-        .map((bank: any) => ({
-          id: String(bank.id),
-          name: bank.account_name,
-          icon: bank.image
-            ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
-            : '/bank-placeholder.png',
-          accountName: bank.account_name,
-          accountNumber: bank.account_number,
-          branch: bank.branch || 'N/A',
-          routingNo: bank.routing_number || 'N/A',
-          description: bank.description || '',
-          cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
-        }))
+          .filter((bank: any) => bank.status === '1')
+          .map((bank: any) => ({
+            id: String(bank.id),
+            name: bank.account_name,
+            icon: bank.image
+              ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
+              : '/bank-placeholder.png',
+            accountName: bank.account_name,
+            accountNumber: bank.account_number,
+            branch: bank.branch || 'N/A',
+            routingNo: bank.routing_number || 'N/A',
+            description: bank.description || '',
+            cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
+          }))
       : [];
 
   const [selectedPayment, setSelectedPayment] = useState<string>(
@@ -54,31 +49,29 @@ export default function PaymentPageClient({
   );
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [paymentAmount, setPaymentAmount] = useState<string>(
-    String(initialPayable),
-  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedAccount = paymentAccounts.find(
     (acc: any) => acc.id === selectedPayment,
   );
 
-  const isCodSelected =
-    selectedAccount?.cod != null && selectedAccount?.cod !== '';
-  const advanceLabel = isCodSelected ? 'COD' : 'Advance';
-  const codPercentNumber = isCodSelected
-    ? Number(selectedAccount?.cod ?? 0) || 0
-    : 0;
-  const advanceValue = isCodSelected
-    ? `${codPercentNumber}%`
-    : `${advance}%`;
-  const currentPayable = isCodSelected
-    ? Math.round(total * (Number(selectedAccount?.cod ?? 0) / 100))
-    : initialPayable;
-
-  useEffect(() => {
-    setPaymentAmount(String(currentPayable));
-  }, [currentPayable]);
+  // Cash Payment Fee/Charge = percentage fee (from bank cod %)
+  const codPercent =
+    selectedAccount?.cod != null && selectedAccount?.cod !== ''
+      ? Number(selectedAccount.cod) || 0
+      : 0;
+  const cashPaymentFeeNum = subTotal * (codPercent / 100);
+  const totalAmount = subTotal + cashPaymentFeeNum;
+  const isCodSelected = selectedAccount?.accountName
+    ?.toLowerCase()
+    .includes('cash on delivery');
+  // BKash/Bank: Payable = Total. COD: Payable = Cash Payment Fee only. Display as whole number (e.g. 9733.40 → 9734).
+  const payableAmount = isCodSelected ? cashPaymentFeeNum : totalAmount;
+  const payableDisplay = String(Math.ceil(payableAmount));
+  // Due only for COD: Due = Total - Payable (= SubTotal when COD)
+  const dueAmount = isCodSelected ? totalAmount - payableAmount : 0;
+  // All amounts shown as round figure (e.g. 4159.05 → 4160)
+  const round = (n: number) => String(Math.ceil(n));
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -133,7 +126,7 @@ export default function PaymentPageClient({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      {/* Left – Order summary (Advance → COD when COD method selected) */}
+      {/* Left – Order summary: Order > Sub-Total > Cash Payment Fee > Total > Payable > Due (only for COD). Advance removed. */}
       <div className="lg:col-span-3">
         <Card className="rounded shadow">
           <CardContent className="p-0 overflow-x-auto">
@@ -141,10 +134,18 @@ export default function PaymentPageClient({
               <thead className="border-b">
                 <tr>
                   <th className="py-3 px-4 font-semibold">Order</th>
+                  <th className="py-3 px-4 font-semibold">Sub-Total</th>
+                  <th className="py-3 px-4 font-semibold">Cash Fee</th>
                   <th className="py-3 px-4 font-semibold">Total</th>
-                  <th className="py-3 px-4 font-semibold">{advanceLabel}</th>
-                  <th className="py-3 px-4 font-semibold">Paid</th>
+                  {isCodSelected && (
+                    <th className="py-3 px-4 font-semibold">Advance</th>
+                  )}
                   <th className="py-3 px-4 font-semibold">Payable</th>
+                  {isCodSelected && (
+                    <th className="py-3 px-4 font-semibold min-w-[120px]">
+                      Due (COD)
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
@@ -157,10 +158,16 @@ export default function PaymentPageClient({
                       {orderLabel}
                     </Link>
                   </td>
-                  <td className="py-3 px-4">৳{total}</td>
-                  <td className="py-3 px-4">{advanceValue}</td>
-                  <td className="py-3 px-4">৳{paid}</td>
-                  <td className="py-3 px-4">৳{currentPayable}</td>
+                  <td className="py-3 px-4">৳{round(subTotal)}</td>
+                  <td className="py-3 px-4">৳{round(cashPaymentFeeNum)}</td>
+                  <td className="py-3 px-4">৳{round(totalAmount)}</td>
+                  {isCodSelected && (
+                    <td className="py-3 px-4">{codPercent}%</td>
+                  )}
+                  <td className="py-3 px-4">৳{payableDisplay}</td>
+                  {isCodSelected && (
+                    <td className="py-3 px-4">৳{round(dueAmount)}</td>
+                  )}
                 </tr>
               </tbody>
             </table>
@@ -182,10 +189,11 @@ export default function PaymentPageClient({
                       type="button"
                       onClick={() => setSelectedPayment(account.id)}
                       aria-label={`Select ${account.name} payment method`}
-                      className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
-                        ? 'border-teal-600 bg-teal-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                      className={`relative p-4 border-2 rounded-lg transition-all ${
+                        isSelected
+                          ? 'border-teal-600 bg-teal-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
                     >
                       {isSelected && (
                         <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
@@ -262,7 +270,9 @@ export default function PaymentPageClient({
                       </div>
                       <div
                         className="px-4 py-3 text-sm text-gray-900 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-2 [&_li]:my-1 [&_ul]:space-y-1"
-                        dangerouslySetInnerHTML={{ __html: selectedAccount.description }}
+                        dangerouslySetInnerHTML={{
+                          __html: selectedAccount.description,
+                        }}
                       />
                     </div>
                   )}
@@ -320,10 +330,9 @@ export default function PaymentPageClient({
               </Label>
               <Input
                 id="paymentAmount"
-                type="number"
-                value={paymentAmount}
-                disabled
-                onChange={(e) => setPaymentAmount(e.target.value)}
+                type="text"
+                value={payableDisplay}
+                readOnly
                 className="w-full"
               />
             </div>
@@ -340,7 +349,7 @@ export default function PaymentPageClient({
                     Submitting...
                   </>
                 ) : (
-                  `Pay ৳${paymentAmount}`
+                  `Pay ৳${payableDisplay}`
                 )}
               </Button>
             </div>
