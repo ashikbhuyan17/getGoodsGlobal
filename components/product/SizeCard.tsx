@@ -3,7 +3,7 @@
 import { Button } from '../ui/button';
 import QuantityUpdateBtn from '../common/QuantityUpdateBtn';
 import { useProductStore } from '@/stores/useProductStore';
-import { getActiveBulkTier } from '@/lib/utils';
+import { getActiveBulkTier, formatPrice } from '@/lib/utils';
 
 function SizeCard({
   size,
@@ -63,11 +63,11 @@ function SizeCard({
       <div className="flex flex-col items-center gap-1">
         {pct > 0 ? (
           <>
-            <p className="font-semibold text-gray-800">৳{discountedPrice}</p>
-            <p className="text-sm text-gray-400 line-through">৳{basePrice}</p>
+            <p className="font-semibold text-gray-800">৳{formatPrice(discountedPrice)}</p>
+            <p className="text-sm text-gray-400 line-through">৳{formatPrice(basePrice)}</p>
           </>
         ) : (
-          <p className="font-semibold text-gray-800">৳{basePrice}</p>
+          <p className="font-semibold text-gray-800">৳{formatPrice(basePrice)}</p>
         )}
       </div>
 

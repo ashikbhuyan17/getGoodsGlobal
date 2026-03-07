@@ -5,6 +5,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+/** Format number as price string with 2 decimal places, truncated not rounded (e.g. 976.4999… → 976.49). */
+export function formatPrice(value: number | string): string {
+  const n = Number(value);
+  const truncated = Math.floor(n * 100) / 100;
+  return truncated.toFixed(2);
+}
+
 /** Discount percentage from old and new price. Returns 0 if no valid discount. */
 export function getDiscountPercent(newPrice: number, oldPrice: number): number {
   const newP = Number(newPrice);

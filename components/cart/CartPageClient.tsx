@@ -109,7 +109,9 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="flex flex-col items-center gap-3 rounded-lg bg-white px-6 py-4 shadow-lg">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
-            <span className="text-sm font-medium text-gray-700">Removing from cart...</span>
+            <span className="text-sm font-medium text-gray-700">
+              Removing from cart...
+            </span>
           </div>
         </div>
       )}
@@ -147,10 +149,12 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
 
       {/* Cart Summary */}
       <CartSummary
+        page="cart"
         total={selectedTotal}
         allDeselected={allDeselected}
         onCheckoutClick={handleCheckoutClick}
         isCheckoutLoading={checkoutLoading}
+        flashSale={cartProducts?.flashSale}
       />
     </>
   );

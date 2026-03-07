@@ -2,7 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-import PriceRow from './PriceRow';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
 import { InfoIcon, Loader2 } from 'lucide-react';
@@ -264,9 +263,23 @@ export default function CartSummary({
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <PriceRow label="Product price" value={`৳${total}`} />
-            <PriceRow label="Total" value={`৳${total}`} />
+          <div className="space-y-3">
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+              <span className="font-semibold">Product Price</span>
+              <span className="font-semibold">৳{productSubtotal}</span>
+            </div>
+            {flashSale && (
+              <div className="grid grid-cols-[1fr_auto] gap-2 items-center ">
+                <span className="font-semibold">
+                  {flashSale.flash_sale_title ?? 'Flash Sale'}
+                </span>
+                <span className="font-semibold">-৳{flashSaleDiscount}</span>
+              </div>
+            )}
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
+              <span className="font-semibold">Final price</span>
+              <span className="font-semibold">৳{finalPrice.toFixed(2)}</span>
+            </div>
           </div>
         )}
         {/* Coupon Section */}
