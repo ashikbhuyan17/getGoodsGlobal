@@ -52,27 +52,29 @@ function VideoCard({
         </div>
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-[65vw] max-w-[70vw] w-full h-[80vh] py-10 px-14 overflow-hidden">
+      <DialogContent className="w-full max-w-[95vw] sm:max-w-[75vw] lg:max-w-[60vw] max-h-[85vh] p-3 sm:p-5 md:p-6 overflow-hidden flex items-center justify-center">
         <DialogTitle className="sr-only">Video: {title || "Video"}</DialogTitle>
         <DialogDescription className="sr-only">Watch video content</DialogDescription>
-        {video ? (
-          <iframe
-            className="w-full h-full rounded-sm"
-            src={`https://www.youtube.com/embed/${video}?autoplay=1&controls=0`}
-            title="Guangzhou Shipment Loading From SkyBuy China Warehouse (10/11/2025)"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-          ></iframe>
-        ) : (
-          <Image
-            alt=""
-            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
-            width={1200}
-            height={1200}
-            className="w-full h-full rounded-sm"
-          />
-        )}
+        <div className="relative w-full max-w-full aspect-video">
+          {video ? (
+            <iframe
+              className="absolute inset-0 w-full h-full rounded-sm"
+              src={`https://www.youtube.com/embed/${video}?autoplay=1&controls=0`}
+              title={title || "Gallery video"}
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+            ></iframe>
+          ) : (
+            <Image
+              alt={title || "Gallery image"}
+              src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
+              width={1200}
+              height={675}
+              className="absolute inset-0 w-full h-full rounded-sm object-contain bg-black"
+            />
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );
