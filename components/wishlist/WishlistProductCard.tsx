@@ -10,7 +10,7 @@ import { fetcher } from '@/lib/fetcher';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
+import { cn, formatPriceInt } from '@/lib/utils';
 
 interface WishlistProductCardProps {
   id: number;
@@ -96,11 +96,11 @@ export default function WishlistProductCard({
           {/* Price */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[#ff0050] font-bold text-base">
-              ৳{newPrice}
+              ৳{formatPriceInt(newPrice)}
             </span>
             {oldPrice && oldPrice > newPrice && (
               <span className="text-gray-400 font-medium text-sm line-through">
-                ৳{oldPrice}
+                ৳{formatPriceInt(oldPrice)}
               </span>
             )}
           </div>

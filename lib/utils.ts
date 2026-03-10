@@ -12,6 +12,13 @@ export function formatPrice(value: number | string): string {
   return truncated.toFixed(2);
 }
 
+/** Format number as integer price string (nearest integer). Example: 4.56 → 5, 4.49 → 4. */
+export function formatPriceInt(value: number | string): string {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "0";
+  return String(Math.round(n));
+}
+
 /** Discount percentage from old and new price. Returns 0 if no valid discount. */
 export function getDiscountPercent(newPrice: number, oldPrice: number): number {
   const newP = Number(newPrice);

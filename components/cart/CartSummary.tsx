@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import TermsModal from '@/components/checkout/TermsModal';
+import { formatPriceInt } from '@/lib/utils';
 
 export default function CartSummary({
   page = 'cart',
@@ -23,6 +24,7 @@ export default function CartSummary({
   shippingChargeID,
   requiresShippingSelection = false,
   flashSale,
+  orderConditionHtml,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -56,6 +58,8 @@ export default function CartSummary({
     regular_price?: number;
     flash_sale_discount_price?: number;
   } | null;
+  /** HTML string from checkout API: order_condition. Rendered inside Terms & Conditions modal. */
+  orderConditionHtml?: string;
 }) {
   const router = useRouter();
 
@@ -259,7 +263,7 @@ export default function CartSummary({
             </div>
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Final price</span>
-              <span className="font-semibold">৳{finalPrice.toFixed(2)}</span>
+              <span className="font-semibold">৳{formatPriceInt(finalPrice)}</span>
             </div>
           </div>
         ) : (
@@ -278,7 +282,7 @@ export default function CartSummary({
             )}
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Final price</span>
-              <span className="font-semibold">৳{finalPrice.toFixed(2)}</span>
+              <span className="font-semibold">৳{formatPriceInt(finalPrice)}</span>
             </div>
           </div>
         )}
@@ -338,6 +342,7 @@ export default function CartSummary({
                 open={showTermsModal}
                 onClose={() => setShowTermsModal(false)}
                 onAccept={handleAcceptTerms}
+                orderConditionHtml={orderConditionHtml}
               />
             </>
           ) : (

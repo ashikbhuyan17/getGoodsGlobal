@@ -77,14 +77,14 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
           }
         />
 
-        <Row
+        {/* <Row
           label="Delivery Method"
           value={
             <Badge className="bg-gray-900 text-white text-xs px-3 py-1 rounded-full">
               {data?.delivery_method || data?.order_type || 'N/A'}
             </Badge>
           }
-        />
+        /> */}
 
         <Row
           label="Shipping Method"

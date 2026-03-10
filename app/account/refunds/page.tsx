@@ -36,8 +36,8 @@ export default async function RefundsPage() {
                 <th className="py-3 px-4 font-semibold">Date</th>
                 <th className="py-3 px-4 font-semibold">Amount</th>
                 <th className="py-3 px-4 font-semibold">Paid</th>
-                <th className="py-3 px-4 font-semibold">Due</th>
-                <th className="py-3 px-4 font-semibold">Info</th>
+                {/* <th className="py-3 px-4 font-semibold">Due</th> */}
+                <th className="py-3 px-4 font-semibold">Admin Note</th>
               </tr>
             </thead>
 
@@ -46,7 +46,7 @@ export default async function RefundsPage() {
                 <tr>
                   <td colSpan={6} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2">
                         <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
                       </div>
                       No refunds found
@@ -83,9 +83,9 @@ export default async function RefundsPage() {
                       <td className="py-3 px-4">
                         ৳{String(refund?.paid_partial_payment_amount ?? 'N/A')}
                       </td>
-                      <td className="py-3 px-4">
+                      {/* <td className="py-3 px-4">
                         ৳{String(refund?.payment_due_amount ?? 'N/A')}
-                      </td>
+                      </td> */}
                       <td className="py-3 px-4 text-gray-500">
                         {refund?.admin_note ? (
                           <span className="text-gray-700">

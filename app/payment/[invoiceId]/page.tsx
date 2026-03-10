@@ -6,14 +6,14 @@ export const PAYMENT_CACHE = 60;
 
 type PaymentItem = {
   amount?: number;
-  advanced?: number;
-  payable?: number;
   invoice_id?: string;
 };
 
 type PaymentResponse = {
   status?: string;
   data?: PaymentItem | PaymentItem[];
+  banks?: BankItem[];
+  advanced?: number | string;
 };
 
 type BankItem = {
@@ -28,11 +28,6 @@ type BankItem = {
   cod?: string | null;
 };
 
-type BankListResponse = {
-  status?: string;
-  data?: BankItem[];
-};
-
 export default async function PaymentPage({
   params,
 }: {
@@ -40,14 +35,7 @@ export default async function PaymentPage({
 }) {
   const { invoiceId } = await params;
 
-  const [payment, bankList] = await Promise.all([
-    fetcher<PaymentResponse>(`/payment/${invoiceId}`),
-    fetcher<BankListResponse>(`/bank-lists`, {}, PAYMENT_CACHE).catch(() => ({
-      data: [],
-    })),
-  ]);
-  console.log('🚀 ~ PaymentPage ~ payment:', payment);
-  console.log('🚀 ~ PaymentPage ~ bankList:', bankList);
+  const payment = await fetcher<PaymentResponse>(`/payment/${invoiceId}`);
 
   if (payment?.status === 'error' || !payment?.data) {
     notFound();
@@ -59,6 +47,8 @@ export default async function PaymentPage({
 
   const orderLabel = invoiceId ? `SKY${invoiceId}` : '—';
   const subTotal = Number(firstPayment?.amount) || 0;
+  const banks = Array.isArray(payment?.banks) ? payment.banks : [];
+  const advancedPercent = Number(payment?.advanced) || 0;
 
   return (
     <div className="min-h-screen space-y-4 max-md:mb-20 mb-10">
@@ -70,7 +60,8 @@ export default async function PaymentPage({
           invoiceId={invoiceId}
           orderLabel={orderLabel}
           subTotal={subTotal}
-          bankList={bankList}
+          banks={banks}
+          advanced={advancedPercent}
         />
       </div>
     </div>

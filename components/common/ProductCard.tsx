@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import { getDiscountPercent } from '@/lib/utils';
+import { formatPriceInt, getDiscountPercent } from '@/lib/utils';
 
 export default function ProductCard({
   slug,
@@ -50,10 +50,10 @@ export default function ProductCard({
           {/* Info Section */}
           <div className="mt-1 p-3 space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-[#ff0050] font-bold text-lg">৳{newP}</span>
+              <span className="text-[#ff0050] font-bold text-lg">৳{formatPriceInt(newP)}</span>
               {oldP > 0 && oldP > newP && (
                 <span className="text-[#80807B] font-bold text-sm line-through">
-                  ৳{oldP}
+                  ৳{formatPriceInt(oldP)}
                 </span>
               )}
             </div>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function GalleryTopBar() {
   return (
-    <div className="bg-white border-b shadow-sm px-4 py-3 mt-[-5px] flex items-center gap-3">
+    <div className="bg-white border-b shadow-sm px-4 py-3 md:mt-[-5px] flex items-center gap-3">
       <Button
         asChild
         variant="outline"
