@@ -46,12 +46,12 @@ export default async function SupportPage() {
                 Manage and track your support tickets
               </p>
             </div>
-            <Link href="/account/support/create">
+            {/* <Link href="/account/support/create">
               <Button className="rounded px-6 py-2">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Ticket
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

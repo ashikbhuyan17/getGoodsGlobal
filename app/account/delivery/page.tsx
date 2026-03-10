@@ -99,7 +99,7 @@ export default async function DeliveryPage({
                               href={`/account/orders/${invoiceId}`}
                               className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
                             >
-                              ORD-{String(invoiceId)}
+                              {String(invoiceId)}
                             </Link>
                           ) : (
                             <span className="text-gray-500">—</span>

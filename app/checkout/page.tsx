@@ -22,6 +22,7 @@ async function CheckoutPage({
   } else {
     cartProducts = { data: [], status: "success" };
   }
+  console.log("🚀 ~ CheckoutPage ~ cartProducts:", cartProducts)
 
   const [user, shippingArea] = await Promise.all([
     fetcher("/user-profile"),

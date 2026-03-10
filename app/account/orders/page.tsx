@@ -6,6 +6,7 @@ import { fetcher } from '@/lib/fetcher';
 import Link from 'next/link';
 import OrdersTopBar from '@/components/account/orders/OrdersTopBar';
 import { Database } from 'lucide-react';
+import OrderChatButton from '@/components/account/orders/OrderChatButton';
 
 function buildOrdersSlug(status?: string, keyword?: string): string {
   const params = new URLSearchParams();
@@ -82,7 +83,7 @@ export default async function OrderPage({
                   <tr>
                     <td colSpan={7} className="text-center py-12 text-gray-400">
                       <div className="flex flex-col items-center">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2">
                           <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
                         </div>
                         No orders found
@@ -103,6 +104,9 @@ export default async function OrderPage({
 
                     const firstItem = order?.order_details?.[0];
                     const status = formatStatus(order?.order_status ?? '');
+                    const isPartiallyPaid = status.label
+                      ?.toLowerCase()
+                      .includes('partially');
 
                     return (
                       <tr
@@ -111,7 +115,7 @@ export default async function OrderPage({
                       >
                         <td className="py-3 px-4">
                           <span className="font-medium">
-                            ORD-{order?.invoice_id}
+                            {order?.invoice_id}
                           </span>
                           <span className="block text-xs font-medium mt-0.5 text-gray-500">
                             {formatDate(order?.created_at)}
@@ -154,6 +158,7 @@ export default async function OrderPage({
                                 </Button>
                               </Link>
                             )}
+
                             <Link
                               prefetch
                               href={`/account/orders/${order?.invoice_id}`}
@@ -162,6 +167,9 @@ export default async function OrderPage({
                                 Details
                               </Button>
                             </Link>
+                            {isPartiallyPaid && (
+                              <OrderChatButton invoiceId={order?.invoice_id} />
+                            )}
                           </div>
                         </td>
                       </tr>
