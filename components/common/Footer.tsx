@@ -76,7 +76,7 @@ export default async function Footer() {
                     <Link href="/" prefetch aria-label="Go to homepage">
                       <Image
                         alt="Logo"
-                        src={`${process.env.NEXT_PUBLIC_IMG_URL}/${settings?.data?.white_logo}`}
+                        src={`${process.env.NEXT_PUBLIC_IMG_URL}/${settings?.data?.dark_logo}`}
                         width={1200}
                         height={1200}
                         className="w-full"
