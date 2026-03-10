@@ -11,23 +11,28 @@ import { Check, Plus, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { submitPayment } from '@/lib/fetcher';
+import { formatPriceInt } from '@/lib/utils';
 
 export default function PaymentPageClient({
   invoiceId,
   orderLabel,
   subTotal,
-  bankList,
+  banks,
+  advanced = 0,
 }: {
   invoiceId: string;
   orderLabel: string;
   /** Sub-Total = item price + shipping fee (from API amount). */
   subTotal: number;
-  bankList?: any;
+  /** Banks list from payment API response. */
+  banks?: any[];
+  /** Advance percentage from payment API (used only for COD). */
+  advanced?: number;
 }) {
   // Transform API bank list data to component format (include cod for COD method)
   const paymentAccounts =
-    bankList?.data && Array.isArray(bankList.data) && bankList.data.length > 0
-      ? bankList.data
+    Array.isArray(banks) && banks.length > 0
+      ? banks
           .filter((bank: any) => bank.status === '1')
           .map((bank: any) => ({
             id: String(bank.id),
@@ -65,13 +70,23 @@ export default function PaymentPageClient({
   const isCodSelected = selectedAccount?.accountName
     ?.toLowerCase()
     .includes('cash on delivery');
-  // BKash/Bank: Payable = Total. COD: Payable = Cash Payment Fee only. Display as whole number (e.g. 9733.40 → 9734).
-  const payableAmount = isCodSelected ? cashPaymentFeeNum : totalAmount;
-  const payableDisplay = String(Math.ceil(payableAmount));
-  // Due only for COD: Due = Total - Payable (= SubTotal when COD)
-  const dueAmount = isCodSelected ? totalAmount - payableAmount : 0;
-  // All amounts shown as round figure (e.g. 4159.05 → 4160)
-  const round = (n: number) => String(Math.ceil(n));
+  // Advance percentage (from payment API). Used only when COD method is selected.
+  const advancePercent = isCodSelected ? Math.max(0, Number(advanced) || 0) : 0;
+  // BKash/Bank: Payable = Total. COD: Payable = Total * advance%.
+  const payableAmount = isCodSelected
+    ? totalAmount * (advancePercent / 100)
+    : totalAmount;
+  // Helper: rounded integer as number
+  const roundInt = (n: number) => Number(formatPriceInt(n));
+  // Display values (keep arithmetic consistent: Due = TotalDisplay - PayableDisplay)
+  const subTotalDisplay = roundInt(subTotal);
+  const cashFeeDisplay = roundInt(cashPaymentFeeNum);
+  const totalDisplay = roundInt(totalAmount);
+  const payableDisplayNum = roundInt(payableAmount);
+  const payableDisplay = String(payableDisplayNum);
+  const dueDisplay = isCodSelected
+    ? String(totalDisplay - payableDisplayNum)
+    : '0';
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -142,9 +157,7 @@ export default function PaymentPageClient({
                   )}
                   <th className="py-3 px-4 font-semibold">Payable</th>
                   {isCodSelected && (
-                    <th className="py-3 px-4 font-semibold min-w-[120px]">
-                      Due (COD)
-                    </th>
+                    <th className="py-3 px-4 font-semibold min-w-30">Due</th>
                   )}
                 </tr>
               </thead>
@@ -158,15 +171,15 @@ export default function PaymentPageClient({
                       {orderLabel}
                     </Link>
                   </td>
-                  <td className="py-3 px-4">৳{round(subTotal)}</td>
-                  <td className="py-3 px-4">৳{round(cashPaymentFeeNum)}</td>
-                  <td className="py-3 px-4">৳{round(totalAmount)}</td>
+                  <td className="py-3 px-4">৳{subTotalDisplay}</td>
+                  <td className="py-3 px-4">৳{cashFeeDisplay}</td>
+                  <td className="py-3 px-4">৳{totalDisplay}</td>
                   {isCodSelected && (
-                    <td className="py-3 px-4">{codPercent}%</td>
+                    <td className="py-3 px-4">{advancePercent}%</td>
                   )}
                   <td className="py-3 px-4">৳{payableDisplay}</td>
                   {isCodSelected && (
-                    <td className="py-3 px-4">৳{round(dueAmount)}</td>
+                    <td className="py-3 px-4">৳{dueDisplay}</td>
                   )}
                 </tr>
               </tbody>
