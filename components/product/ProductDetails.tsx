@@ -17,7 +17,7 @@ import {
 import SizeCard from './SizeCard';
 import FlashSaleBanner from './FlashSaleBanner';
 import { useProductStore } from '@/stores/useProductStore';
-import { getActiveBulkTier, formatPrice } from '@/lib/utils';
+import { getActiveBulkTier, formatPriceInt } from '@/lib/utils';
 
 export default function ProductDetails({
   product,
@@ -170,11 +170,11 @@ export default function ProductDetails({
                         <div className="flex flex-col items-center text-center">
                           <div className="flex flex-col items-center gap-1 space-y-2">
                             <p className="text-xl font-semibold text-gray-800">
-                              ৳{formatPrice(bulk?.price ?? 0)}
+                              ৳{formatPriceInt(bulk?.price ?? 0)}
                             </p>
                             {bulk?.old_price && (
                               <p className="text-sm text-gray-400 line-through">
-                                ৳{formatPrice(bulk.old_price)}
+                                ৳{formatPriceInt(bulk.old_price)}
                               </p>
                             )}
                             <p className="text-sm text-[#777]">{bulk?.title}</p>

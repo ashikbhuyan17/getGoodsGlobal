@@ -1,4 +1,4 @@
-import { getActiveBulkTier, formatPrice } from '@/lib/utils';
+import { getActiveBulkTier, formatPriceInt } from '@/lib/utils';
 
 export default function PriceDetails({
   quantity,
@@ -37,16 +37,16 @@ export default function PriceDetails({
       </div>
       <div className="flex justify-between py-1">
         <p>Product price</p>
-        <p>৳{formatPrice(productPrice)}</p>
+        <p>৳{formatPriceInt(productPrice)}</p>
       </div>
       <div className="flex justify-between py-1">
         <p>Subtotal</p>
-        <p>৳{formatPrice(productPrice)}</p>
+        <p>৳{formatPriceInt(productPrice)}</p>
       </div>
       {productPrice > 0 && (
         <div className="flex justify-between py-1">
           <p>Total</p>
-          <p>৳{formatPrice(Number(productPrice) + Number(shipping))}</p>
+          <p>৳{formatPriceInt(Number(productPrice) + Number(shipping))}</p>
         </div>
       )}
     </div>

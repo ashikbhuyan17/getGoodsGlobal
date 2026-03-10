@@ -1,5 +1,5 @@
 import { fetcher } from '@/lib/fetcher';
-import { formatPrice } from '@/lib/utils';
+import { formatPriceInt } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -24,10 +24,10 @@ async function ProductSuggestions({ slug }: { slug: string }) {
               <div className="text-start space-y-1">
                 <div className="flex gap-2">
                   <h2 className="text-lg font-semibold text-red-500">
-                    ৳{formatPrice(product?.new_price ?? 0)}
+                    ৳{formatPriceInt(product?.new_price ?? 0)}
                   </h2>
                   <h2 className="text-lg font-semibold text-zinc-300 line-through">
-                    ৳{formatPrice(product?.old_price ?? 0)}
+                    ৳{formatPriceInt(product?.old_price ?? 0)}
                   </h2>
                 </div>
                 <h2 className="line-clamp-1">{product?.name}</h2>
