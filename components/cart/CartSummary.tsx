@@ -24,6 +24,7 @@ export default function CartSummary({
   shippingChargeID,
   requiresShippingSelection = false,
   flashSale,
+  orderConditionHtml,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -57,6 +58,8 @@ export default function CartSummary({
     regular_price?: number;
     flash_sale_discount_price?: number;
   } | null;
+  /** HTML string from checkout API: order_condition. Rendered inside Terms & Conditions modal. */
+  orderConditionHtml?: string;
 }) {
   const router = useRouter();
 
@@ -339,6 +342,7 @@ export default function CartSummary({
                 open={showTermsModal}
                 onClose={() => setShowTermsModal(false)}
                 onAccept={handleAcceptTerms}
+                orderConditionHtml={orderConditionHtml}
               />
             </>
           ) : (
