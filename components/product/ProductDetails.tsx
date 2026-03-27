@@ -60,72 +60,74 @@ export default function ProductDetails({
   return (
     <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
       {/* Left Section - Image Gallery */}
-      <div className="flex xl:flex-col gap-2">
-        <div
-          onClick={() =>
-            setImage(`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`)
-          }
-          className="w-17 h-17 rounded-md overflow-hidden border cursor-pointer"
-        >
-          <Image
-            src={`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`}
-            alt={p?.name}
-            width={68}
-            height={68}
-            className="object-cover w-full h-full"
-          />
-        </div>
-        {JSON.parse(p?.PostImage ?? '[]')?.map((img: string) => (
+      <div className='flex gap-2 w-full flex-col xl:flex-row'>
+        <div className="flex lg:flex-col gap-2 order-2 lg:order-1">
           <div
-            key={img}
             onClick={() =>
-              setImage(
-                `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
-              )
+              setImage(`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`)
             }
-            className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
+            className="w-17 h-17 rounded-md overflow-hidden border cursor-pointer"
           >
             <Image
-              src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
+              src={`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`}
               alt={p?.name}
-              width={64}
-              height={64}
+              width={68}
+              height={68}
               className="object-cover w-full h-full"
             />
           </div>
-        ))}
-      </div>
-      <div className="w-full">
-        <div className="relative h-[200px] xl:h-[220px]  2xl:h-[400px] w-full ">
-          <Dialog>
-            <DialogTrigger asChild>
-              <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
-                <Eye size={15} /> <span>Preview</span>
-              </div>
-            </DialogTrigger>
-
-            <DialogContent className="aspect-square  max-2xl:w-[400px]">
-              <DialogTitle className="sr-only">
-                Image preview: {p?.name}
-              </DialogTitle>
-              <DialogDescription className="sr-only">
-                Preview of product image
-              </DialogDescription>
+          {JSON.parse(p?.PostImage ?? '[]')?.map((img: string) => (
+            <div
+              key={img}
+              onClick={() =>
+                setImage(
+                  `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
+                )
+              }
+              className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
+            >
               <Image
-                src={image}
+                src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
                 alt={p?.name}
-                fill
-                className="rounded-lg object-cover"
+                width={64}
+                height={64}
+                className="object-cover w-full h-full"
               />
-            </DialogContent>
-          </Dialog>
-          <Image
-            src={image}
-            alt={p?.name ?? 'Product'}
-            width={180}
-            height={180}
-            className="rounded-lg shadow-md object-contain lg:object-cover w-full h-full p-1"
-          />
+            </div>
+          ))}
+        </div>
+        <div className="w-full order-1 lg:order-2">
+          <div className="relative h-[250px] xl:h-[220px]  2xl:h-[400px] w-full ">
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
+                  <Eye size={15} /> <span>Preview</span>
+                </div>
+              </DialogTrigger>
+
+              <DialogContent className="aspect-square  max-2xl:w-[400px]">
+                <DialogTitle className="sr-only">
+                  Image preview: {p?.name}
+                </DialogTitle>
+                <DialogDescription className="sr-only">
+                  Preview of product image
+                </DialogDescription>
+                <Image
+                  src={image}
+                  alt={p?.name}
+                  fill
+                  className="rounded-lg object-cover"
+                />
+              </DialogContent>
+            </Dialog>
+            <Image
+              src={image}
+              alt={p?.name ?? 'Product'}
+              width={250}
+              height={250}
+              className="rounded-lg shadow-md object-fill  sm:object-contain lg:object-cover w-full h-full p-1"
+            />
+          </div>
         </div>
       </div>
 
@@ -244,7 +246,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                          'border-2 border-primary',
+                        'border-2 border-primary',
                       )}
                     />
                   </div>

@@ -27,10 +27,10 @@ export default async function ProductDescription({
   const avg =
     reviews.length > 0
       ? reviews.reduce(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (sum: number, r: any) => sum + Number(r?.ratting || 0),
-          0,
-        ) / reviews.length
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (sum: number, r: any) => sum + Number(r?.ratting || 0),
+        0,
+      ) / reviews.length
       : 0;
 
   return (
@@ -53,7 +53,7 @@ export default async function ProductDescription({
         <TabsTrigger
           className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
           value="reviews"
-          disabled
+        // disabled
         >
           Reviews
         </TabsTrigger>

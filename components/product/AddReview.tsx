@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -40,7 +41,7 @@ export function AddReview({ productId, email, name }: ReviewFormProps) {
 
     setLoading(true);
 
-    await fetcher("/add-product-review", {
+    const res: any = await fetcher("/add-product-review", {
       method: "POST",
       body: JSON.stringify({
         product_id: productId,
@@ -50,10 +51,12 @@ export function AddReview({ productId, email, name }: ReviewFormProps) {
         review: form.message,
       }),
     });
-    setOpen(false);
-    router.refresh();
-    setForm({ ...form, message: "", rating: 0 });
-    setLoading(false);
+    if (res.status == "success") {
+      setOpen(false);
+      router.refresh();
+      setForm({ ...form, message: "", rating: 0 });
+      setLoading(false);
+    }
   };
 
   return (
