@@ -154,7 +154,7 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
         allDeselected={allDeselected}
         onCheckoutClick={handleCheckoutClick}
         isCheckoutLoading={checkoutLoading}
-        flashSale={cartProducts?.flashSale}
+        priceSummary={cartProducts?.priceSummary}
       />
     </>
   );

@@ -4,8 +4,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
-import { InfoIcon, Loader2 } from 'lucide-react';
-import Link from 'next/link';
+import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import TermsModal from '@/components/checkout/TermsModal';
@@ -23,7 +22,7 @@ export default function CartSummary({
   shippingCharge = 0,
   shippingChargeID,
   requiresShippingSelection = false,
-  flashSale,
+  priceSummary,
   orderConditionHtml,
 }: {
   page?: 'cart' | 'checkout';
@@ -52,11 +51,10 @@ export default function CartSummary({
   shippingChargeID?: number;
   /** When true, user must select a shipping method (checkout with shipping options). */
   requiresShippingSelection?: boolean;
-  /** From checkout API: { flash_sale_title?, regular_price?, flash_sale_discount_price? }. Used for Product Price and Eid Furti row. */
-  flashSale?: {
-    flash_sale_title?: string;
-    regular_price?: number;
-    flash_sale_discount_price?: number;
+  priceSummary?: {
+    product_price?: string | number;
+    final_price?: string | number;
+    discount?: string | number;
   } | null;
   /** HTML string from checkout API: order_condition. Rendered inside Terms & Conditions modal. */
   orderConditionHtml?: string;
@@ -71,24 +69,20 @@ export default function CartSummary({
   const [loading, setLoading] = useState(false);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
-  const productSubtotal =
-    flashSale?.regular_price != null ? Number(flashSale.regular_price) : total;
-  const flashSaleDiscount =
-    flashSale?.flash_sale_discount_price != null
-      ? Number(flashSale.flash_sale_discount_price)
-      : 0;
+  const productPrice = Number(priceSummary?.product_price ?? 0);
+  const summaryDiscount = Number(priceSummary?.discount ?? 0);
+  const summaryFinal = Number(priceSummary?.final_price ?? 0);
 
   const couponDiscountAmount = (() => {
     if (!discount) return 0;
-    const base = productSubtotal - flashSaleDiscount;
+    const base = summaryFinal;
     const val = Number(discount.discount) || 0;
     if (discount.type === 'Solid') return Math.min(val, base);
     if (discount.type === 'Percentage') return (base * val) / 100;
     return 0;
   })();
 
-  const finalPrice =
-    productSubtotal - flashSaleDiscount - couponDiscountAmount + shippingCharge;
+  const finalPrice = summaryFinal + Number(shippingCharge ?? 0);
 
   const validateForm = () => {
     if (page !== 'checkout') return true;
@@ -150,7 +144,6 @@ export default function CartSummary({
     setLoading(true);
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const res: any = await fetcher(`/apply/coupon?coupon_name=${coupon}`);
 
       if (res?.success === true) {
@@ -190,9 +183,6 @@ export default function CartSummary({
         shippingcharge_id: shippingChargeID,
         coupon_code: discount ? coupon : null,
         ...(!isBuyNow && cartIds?.length ? { cart_ids: cartIds } : {}),
-        ...(flashSaleDiscount > 0
-          ? { flash_sale_discount_price: flashSaleDiscount }
-          : {}),
       };
       const endpoint = isBuyNow ? '/buy-order-place' : '/order-place';
       const orderData: any = await fetcher(endpoint, {
@@ -234,16 +224,12 @@ export default function CartSummary({
             </div> */}
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
-              <span className="font-semibold">৳{productSubtotal}</span>
+              <span className="font-semibold">৳{formatPriceInt(productPrice)}</span>
             </div>
-            {flashSale && (
-              <div className="grid grid-cols-[1fr_auto] gap-2 items-center ">
-                <span className="font-semibold">
-                  {flashSale.flash_sale_title ?? 'Flash Sale'}
-                </span>
-                <span className="font-semibold">-৳{flashSaleDiscount}</span>
-              </div>
-            )}
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
+              <span className="font-semibold">Discount</span>
+              <span className="font-semibold">৳{formatPriceInt(summaryDiscount)}</span>
+            </div>
             {discount && (
               <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
                 <span className="font-semibold">
@@ -270,16 +256,12 @@ export default function CartSummary({
           <div className="space-y-3">
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
-              <span className="font-semibold">৳{productSubtotal}</span>
+              <span className="font-semibold">৳{formatPriceInt(productPrice)}</span>
             </div>
-            {flashSale && (
-              <div className="grid grid-cols-[1fr_auto] gap-2 items-center ">
-                <span className="font-semibold">
-                  {flashSale.flash_sale_title ?? 'Flash Sale'}
-                </span>
-                <span className="font-semibold">-৳{flashSaleDiscount}</span>
-              </div>
-            )}
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
+              <span className="font-semibold">Discount</span>
+              <span className="font-semibold">৳{formatPriceInt(summaryDiscount)}</span>
+            </div>
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Final price</span>
               <span className="font-semibold">৳{formatPriceInt(finalPrice)}</span>
