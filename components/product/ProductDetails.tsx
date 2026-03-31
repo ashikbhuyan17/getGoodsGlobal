@@ -17,7 +17,7 @@ import {
 import SizeCard from './SizeCard';
 import FlashSaleBanner from './FlashSaleBanner';
 import { useProductStore } from '@/stores/useProductStore';
-import { getActiveBulkTier, formatPriceInt } from '@/lib/utils';
+import { formatPriceInt } from '@/lib/utils';
 
 export default function ProductDetails({
   product,
@@ -60,7 +60,7 @@ export default function ProductDetails({
   return (
     <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
       {/* Left Section - Image Gallery */}
-      <div className='flex gap-2 w-full flex-col xl:flex-row'>
+      <div className="flex gap-2 w-full flex-col xl:flex-row">
         <div className="flex lg:flex-col gap-2 order-2 lg:order-1">
           <div
             onClick={() =>
@@ -140,9 +140,9 @@ export default function ProductDetails({
                 <div className="grid grid-cols-3 gap-0">
                   {bulkQuantities?.data?.map((bulk: any, i: number) => {
                     if (i >= 3) return null;
-                    const activeTier = getActiveBulkTier(bulkQuantities, totalQuantity);
-                    const isActive =
-                      activeTier && Number(activeTier.min_qty) === Number(bulk?.min_qty ?? 0);
+                    const minQty = Number(bulk?.min_qty ?? 0);
+                    // Keep first step active by default, then activate next steps cumulatively.
+                    const isActive = i === 0 || totalQuantity >= minQty;
                     const tierStyles = [
                       {
                         bg: 'bg-[#E7F2EF]',
@@ -165,7 +165,7 @@ export default function ProductDetails({
                       <div
                         key={bulk?.id}
                         className={cn(
-                          'relative px-4 py-6 transition-colors',
+                          'relative px-4 py-6 transition-all',
                           isActive ? style.bg : 'bg-gray-100',
                         )}
                       >
@@ -246,7 +246,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                        'border-2 border-primary',
+                          'border-2 border-primary',
                       )}
                     />
                   </div>
@@ -274,20 +274,22 @@ export default function ProductDetails({
                 </div>
 
                 {sizes?.map((size: any) => {
-                  return <SizeCard
-                    key={size?.id}
-                    colorId={effectiveColorId}
-                    size={size?.size?.sizeName}
-                    displayLabel={
-                      hasSpecification ? String(specification) : undefined
-                    }
-                    price={size?.SalePrice}
-                    SalePrice={size?.SalePrice}
-                    RegularPrice={size?.RegularPrice}
-                    max={Number(size?.stock)}
-                    bulkQuantities={bulkQuantities}
-                    totalQuantity={bulkQuantities ? totalQuantity : undefined}
-                  />;
+                  return (
+                    <SizeCard
+                      key={size?.id}
+                      colorId={effectiveColorId}
+                      size={size?.size?.sizeName}
+                      displayLabel={
+                        hasSpecification ? String(specification) : undefined
+                      }
+                      price={size?.SalePrice}
+                      SalePrice={size?.SalePrice}
+                      RegularPrice={size?.RegularPrice}
+                      max={Number(size?.stock)}
+                      bulkQuantities={bulkQuantities}
+                      totalQuantity={bulkQuantities ? totalQuantity : undefined}
+                    />
+                  );
                 })}
               </div>
             </ScrollArea>
