@@ -74,9 +74,9 @@ function calculateProductTotals(
   const total = productPrice - discount + chinaCourier;
   const paid = Number(
     orderData?.paid_partial_payment_amount ??
-      orderData?.paid_amount ??
-      orderData?.advance_payment ??
-      0,
+    orderData?.paid_amount ??
+    orderData?.advance_payment ??
+    0,
   );
   const productShare = orderTotal > 0 ? total / orderTotal : 0;
   const discountPct =
@@ -114,6 +114,7 @@ export default function OrderProductDetails({
       {products.map((product, index) => {
         const variants = product.variants ?? [];
         const totals = calculateProductTotals(variants, allVariants, orderData);
+        console.log("🚀 ~ OrderProductDetails ~ totals:", totals)
 
         return (
           <div
@@ -245,7 +246,7 @@ export default function OrderProductDetails({
                     - ৳{Math.round(totals.paid)}
                   </span>
                 </div>
-                {totals.due > 0 && (
+                {totals.due && (
                   <div className="flex justify-between text-sm font-semibold pt-2">
                     <span className="text-gray-900">Due:</span>
                     <span>
