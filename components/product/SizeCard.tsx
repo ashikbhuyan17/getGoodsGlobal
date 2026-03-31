@@ -66,28 +66,20 @@ function SizeCard({
 
       {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
-        <>
+        {useBulk ? (
           <p className="font-semibold text-gray-800">
-            ৳{formatPriceInt(SalePrice)}
+            ৳{formatPriceInt(basePrice)}
           </p>
-          <p className="text-sm text-gray-400 line-through">
-            ৳{formatPriceInt(RegularPrice)}
-          </p>
-        </>
-        {/* {pct > 0 ? (
+        ) : (
           <>
             <p className="font-semibold text-gray-800">
-              ৳{formatPriceInt(discountedPrice)}
+              ৳{formatPriceInt(SalePrice)}
             </p>
             <p className="text-sm text-gray-400 line-through">
               ৳{formatPriceInt(RegularPrice)}
             </p>
           </>
-        ) : (
-          <p className="font-semibold text-gray-800">
-            ৳{formatPriceInt(basePrice)}
-          </p>
-        )} */}
+        )}
       </div>
 
       {/* Quantity Column */}
