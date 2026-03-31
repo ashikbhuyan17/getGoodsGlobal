@@ -273,8 +273,8 @@ export default function ProductDetails({
                   </div>
                 </div>
 
-                {sizes?.map((size: any) => (
-                  <SizeCard
+                {sizes?.map((size: any) => {
+                  return <SizeCard
                     key={size?.id}
                     colorId={effectiveColorId}
                     size={size?.size?.sizeName}
@@ -282,12 +282,13 @@ export default function ProductDetails({
                       hasSpecification ? String(specification) : undefined
                     }
                     price={size?.SalePrice}
+                    SalePrice={size?.SalePrice}
+                    RegularPrice={size?.RegularPrice}
                     max={Number(size?.stock)}
-                    flashSalePercentage={flashSale?.flash_sale_percentage}
                     bulkQuantities={bulkQuantities}
                     totalQuantity={bulkQuantities ? totalQuantity : undefined}
-                  />
-                ))}
+                  />;
+                })}
               </div>
             </ScrollArea>
           </CardContent>
