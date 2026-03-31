@@ -116,7 +116,7 @@ function CheckoutClient({
       <CartSummary
         formData={formData}
         total={grandTotal}
-        flashSale={cartProducts?.flashSale}
+        priceSummary={cartProducts?.priceSummary}
         orderConditionHtml={cartProducts?.order_condition}
         shippingCharge={selectedShipping?.amount ?? 0}
         shippingChargeID={selectedShipping?.id}

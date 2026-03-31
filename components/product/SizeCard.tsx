@@ -9,20 +9,21 @@ function SizeCard({
   size,
   colorId,
   price,
-  max = 999999999,
+  RegularPrice,
+  SalePrice,
+  max,
   displayLabel,
-  flashSalePercentage,
   bulkQuantities,
   totalQuantity,
 }: {
   size: string | number;
   price: string | number;
+  RegularPrice: string | number;
+  SalePrice: string | number;
   colorId: string;
   max?: number;
   /** Optional: show in UI instead of size (e.g. specification). API always receives size. */
   displayLabel?: string;
-  /** Flash sale percentage (e.g. "5"). When set, apply discount and show both prices. */
-  flashSalePercentage?: string;
   /** When set, use bulk tier price instead of variant price. */
   bulkQuantities?: {
     data?: {
@@ -49,19 +50,13 @@ function SizeCard({
     : null;
   const basePrice = bulkTier ? bulkTier.price : Number(price);
 
-  const pct = Number(flashSalePercentage) || 0;
-  const discountedPrice = pct > 0 ? basePrice * (1 - pct / 100) : basePrice;
-  const priceToUse = pct > 0 ? discountedPrice : basePrice;
-
   const handleQuantityChange = (newQty: number) => {
     const newTotal = (totalQuantity ?? 0) - quantity + newQty;
     const tierForNewTotal = useBulk
       ? getActiveBulkTier(bulkQuantities, newTotal)
       : null;
     const priceForVariant = tierForNewTotal ? tierForNewTotal.price : basePrice;
-    const finalPrice =
-      pct > 0 ? priceForVariant * (1 - pct / 100) : priceForVariant;
-    setVariant(String(colorId), String(size), newQty, finalPrice);
+    setVariant(String(colorId), String(size), newQty, priceForVariant);
   };
 
   return (
@@ -71,20 +66,28 @@ function SizeCard({
 
       {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
-        {pct > 0 ? (
+        <>
+          <p className="font-semibold text-gray-800">
+            ৳{formatPriceInt(SalePrice)}
+          </p>
+          <p className="text-sm text-gray-400 line-through">
+            ৳{formatPriceInt(RegularPrice)}
+          </p>
+        </>
+        {/* {pct > 0 ? (
           <>
             <p className="font-semibold text-gray-800">
               ৳{formatPriceInt(discountedPrice)}
             </p>
             <p className="text-sm text-gray-400 line-through">
-              ৳{formatPriceInt(basePrice)}
+              ৳{formatPriceInt(RegularPrice)}
             </p>
           </>
         ) : (
           <p className="font-semibold text-gray-800">
             ৳{formatPriceInt(basePrice)}
           </p>
-        )}
+        )} */}
       </div>
 
       {/* Quantity Column */}

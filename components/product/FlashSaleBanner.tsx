@@ -53,7 +53,7 @@ export default function FlashSaleBanner({ flashSale }: FlashSaleBannerProps) {
   return (
     <div className="rounded-2xl overflow-hidden bg-gradient-to-r from-[#8B2B7A] via-[#9B3A8A] to-[#219F9B] px-4 py-2 2xl:py-3 flex flex-wrap items-center justify-between gap-1">
       <p className="text-white font-bold text-base sm:text-lg">
-        {percentage}% {title.replace(/^\d+%\s*/i, '').trim() || 'Sale'}
+        {title.replace(/^\d+%\s*/i, '').trim() || 'Sale'}
       </p>
       <div className="flex gap-2 sm:gap-3">
         {[
