@@ -24,6 +24,7 @@ export default async function RefundsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = await fetcher('/refunds');
   const refunds = res?.data || [];
+  console.log("🚀 ~ RefundsPage ~ refunds:", refunds)
 
   return (
     <div className="w-full space-y-4 px-2 pb-20">
@@ -68,7 +69,7 @@ export default async function RefundsPage() {
                             href={`/account/orders/${invoiceId}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
                           >
-                            ORD-{String(invoiceId)}
+                            {String(invoiceId)}
                           </Link>
                         ) : (
                           <span className="text-gray-500">—</span>
