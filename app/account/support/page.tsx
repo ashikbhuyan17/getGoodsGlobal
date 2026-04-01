@@ -1,40 +1,39 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Plus, Mail, Database } from "lucide-react";
-import { fetcher } from "@/lib/fetcher";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Plus, Mail, Database } from 'lucide-react';
+import { fetcher } from '@/lib/fetcher';
 
 function formatDateTime(dateString: string) {
-  if (!dateString) return { date: "N/A", time: "N/A" };
+  if (!dateString) return { date: 'N/A', time: 'N/A' };
   try {
     const date = new Date(dateString);
     return {
-      date: date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
+      date: date.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
       }),
-      time: date.toLocaleTimeString("en-GB", {
-        hour: "2-digit",
-        minute: "2-digit",
+      time: date.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
         hour12: true,
       }),
     };
   } catch {
-    return { date: dateString, time: "" };
+    return { date: dateString, time: '' };
   }
 }
 
 function getStatusLabel(status: string) {
-  return status === "1" ? "Open" : status === "0" ? "Closed" : status || "N/A";
+  return status === '1' ? 'Open' : status === '0' ? 'Closed' : status || 'N/A';
 }
 
 export default async function SupportPage() {
   const res = await fetcher<{ status?: boolean; data?: unknown[] }>(
-    "/ticket-list",
+    '/ticket-list',
   );
   const tickets = res?.data || [];
-
   return (
     <div className="w-full space-y-4 px-2">
       <div className="bg-white rounded-sm border-b border-gray-200">
@@ -76,7 +75,7 @@ export default async function SupportPage() {
                 <tr>
                   <td colSpan={7} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2">
                         <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
                       </div>
                       No tickets found
@@ -86,17 +85,29 @@ export default async function SupportPage() {
               ) : (
                 (tickets as Record<string, unknown>[]).map((ticket) => {
                   const { date, time } = formatDateTime(
-                    String(ticket?.created_at ?? ""),
+                    String(ticket?.created_at ?? ''),
                   );
-                  const ticketId = String(ticket?.ticket_id ?? "");
-                  const hasMessage = Array.isArray(ticket?.ticketdetails) && (ticket.ticketdetails as unknown[]).length > 0;
-                  const statusLabel = getStatusLabel(String(ticket?.status ?? ""));
-                  const action = statusLabel === "Closed" ? "View" : "Chat";
+                  const ticketId = String(ticket?.ticket_id ?? '');
+                  const hasMessage =
+                    Array.isArray(ticket?.ticketdetails) &&
+                    (ticket.ticketdetails as unknown[]).length > 0;
+                  const statusLabel = getStatusLabel(
+                    String(ticket?.status ?? ''),
+                  );
+                  const action = statusLabel === 'Closed' ? 'View' : 'Chat';
+                  const orderIdRaw = ticket?.order_id;
+                  const orderId =
+                    orderIdRaw != null && String(orderIdRaw).trim() !== ''
+                      ? String(orderIdRaw).trim()
+                      : null;
 
                   return (
-                    <tr key={String(ticket?.id)} className="hover:bg-gray-50 transition">
+                    <tr
+                      key={String(ticket?.id)}
+                      className="hover:bg-gray-50 transition"
+                    >
                       <td className="py-3 px-4">
-                        <span className="font-medium">{ticketId || "N/A"}</span>
+                        <span className="font-medium">{ticketId || 'N/A'}</span>
                       </td>
                       <td className="py-3 px-4">
                         <span className="block">{date}</span>
@@ -105,19 +116,29 @@ export default async function SupportPage() {
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="text-gray-500">—</span>
+                        {orderId ? (
+                          <Link
+                            href={`/account/orders/${encodeURIComponent(orderId)}`}
+                            className="font-medium text-teal-600 hover:text-teal-700 hover:underline"
+                          >
+                            {orderId}
+                          </Link>
+                        ) : (
+                          <span className="text-gray-500">—</span>
+                        )}
                       </td>
                       <td className="py-3 px-4">
                         <span className="font-medium">
-                          {String(ticket?.name ?? "N/A")}
+                          {String(ticket?.name ?? 'N/A')}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-center">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${statusLabel === "Closed"
-                            ? "bg-gray-900 text-white"
-                            : "bg-red-600 text-white"
-                            }`}
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            statusLabel === 'Closed'
+                              ? 'bg-gray-900 text-white'
+                              : 'bg-red-600 text-white'
+                          }`}
                         >
                           {statusLabel}
                         </span>

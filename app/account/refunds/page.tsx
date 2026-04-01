@@ -24,7 +24,6 @@ export default async function RefundsPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const res: any = await fetcher('/refunds');
   const refunds = res?.data || [];
-  console.log("🚀 ~ RefundsPage ~ refunds:", refunds)
 
   return (
     <div className="w-full space-y-4 px-2 pb-20">
@@ -79,10 +78,10 @@ export default async function RefundsPage() {
                         {formatDateTime(String(refund?.created_at || ''))}
                       </td>
                       <td className="py-3 px-4 font-medium text-gray-900">
-                        ৳{String(refund?.amount ?? 'N/A')}
+                        ৳{String(refund?.paid_partial_payment_amount ?? 'N/A')}
                       </td>
                       <td className="py-3 px-4">
-                        ৳{String(refund?.paid_partial_payment_amount ?? 'N/A')}
+                        ৳{String(refund?.refund_paid_amount ?? 'N/A')}
                       </td>
                       {/* <td className="py-3 px-4">
                         ৳{String(refund?.payment_due_amount ?? 'N/A')}

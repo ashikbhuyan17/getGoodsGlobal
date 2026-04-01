@@ -55,7 +55,7 @@ export default async function PaymentsPage() {
                 <th className="py-3 px-4 font-semibold">Invoice ID</th>
                 <th className="py-3 px-4 font-semibold">Amount</th>
                 <th className="py-3 px-4 font-semibold">Method</th>
-                <th className="py-3 px-4 font-semibold">Payment Slip</th>
+                <th className="py-3 px-4 font-semibold">Pay Slip</th>
                 <th className="py-3 px-4 font-semibold">Status</th>
               </tr>
             </thead>
@@ -65,7 +65,7 @@ export default async function PaymentsPage() {
                 <tr>
                   <td colSpan={6} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2">
                         <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
                       </div>
                       No payments found

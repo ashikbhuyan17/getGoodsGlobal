@@ -128,15 +128,6 @@ export default async function DeliveryPage({
                                 </Button>
                               </Link>
                             )}
-                            <Link href={`/account/orders/${invoiceId}`}>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="rounded px-3 py-1 text-xs"
-                              >
-                                Invoice
-                              </Button>
-                            </Link>
                           </div>
                         </td>
                       </tr>

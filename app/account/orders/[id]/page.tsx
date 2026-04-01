@@ -57,9 +57,7 @@ export default async function OrderDetailsPage({
   const data = normalizeOrderData(
     rawOrder as Record<string, unknown>,
   ) as Record<string, unknown>;
-  const orderId = data?.invoice_id
-    ? `ORD-${String(data.invoice_id)}`
-    : `ORD-${id}`;
+  const orderId = data?.invoice_id ? `${String(data.invoice_id)}` : `ORD-${id}`;
 
   return (
     <div className="">
