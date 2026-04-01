@@ -8,6 +8,7 @@ interface ProductVariant {
   color?: string;
   color_image?: string;
   sale_price?: string | number;
+  regular_price?: string | number;
   price?: string | number;
   size?: string;
   qty?: string | number;
@@ -43,54 +44,69 @@ function getProductImage(product: Product): string {
   return first ? getVariantImage(first) : DEFAULT_PRODUCT_IMAGE;
 }
 
+/** Sum of qty × sale price for variants (payable subtotal before extra deductions). */
+function sumSaleSubtotal(variants: ProductVariant[]): number {
+  let s = 0;
+  for (const v of variants) {
+    const qty = Number(v?.qty ?? 0);
+    const sale = Number(v?.sale_price ?? v?.price ?? 0);
+    s += qty * sale;
+  }
+  return s;
+}
+
+/**
+ * Per-product breakdown. Variant discount amount = (regular_price − sale_price) × qty.
+ * Payable total = sale subtotal − extra line discounts − allocated coupon + China courier.
+ */
 function calculateProductTotals(
   variants: ProductVariant[],
-  allVariants: ProductVariant[],
-  orderData: Record<string, unknown>,
+  couponAllocated: number,
 ) {
-  let productPrice = 0;
-  let discount = 0;
+  let saleSubtotal = 0;
+  /** Savings vs regular list price (informational; line totals already use sale price). */
+  let variantPriceDiscount = 0;
+  let regularSubtotal = 0;
+  let extraLineDiscount = 0;
   let chinaCourier = 0;
 
   for (const v of variants) {
     const qty = Number(v?.qty ?? 0);
-    const price = Number(v?.sale_price ?? v?.price ?? 0);
-    productPrice += qty * price;
-    if (v?.product_discount || v?.discount)
-      discount += Number(v.product_discount ?? v.discount ?? 0);
-    if (v?.china_courier_charge) chinaCourier += Number(v.china_courier_charge);
+    const sale = Number(v?.sale_price ?? v?.price ?? 0);
+    const regular = Number(v?.regular_price ?? 0);
+    saleSubtotal += qty * sale;
+    if (regular > 0) {
+      regularSubtotal += qty * regular;
+      if (regular > sale) {
+        variantPriceDiscount += (regular - sale) * qty;
+      }
+    }
+    if (v?.product_discount || v?.discount) {
+      extraLineDiscount += Number(v.product_discount ?? v.discount ?? 0);
+    }
+    if (v?.china_courier_charge) {
+      chinaCourier += Number(v.china_courier_charge);
+    }
   }
 
-  let orderTotal = 0;
-  for (const v of allVariants) {
-    const qty = Number(v?.qty ?? 0);
-    const price = Number(v?.sale_price ?? v?.price ?? 0);
-    orderTotal +=
-      qty * price -
-      Number(v?.product_discount ?? v?.discount ?? 0) +
-      Number(v?.china_courier_charge ?? 0);
-  }
+  const total =
+    saleSubtotal -
+    extraLineDiscount -
+    couponAllocated +
+    chinaCourier;
 
-  const total = productPrice - discount + chinaCourier;
-  const paid = Number(
-    orderData?.paid_partial_payment_amount ??
-    orderData?.paid_amount ??
-    orderData?.advance_payment ??
-    0,
-  );
-  const productShare = orderTotal > 0 ? total / orderTotal : 0;
   const discountPct =
-    discount > 0 && productPrice > 0
-      ? Math.round((discount / productPrice) * 100)
+    variantPriceDiscount > 0 && regularSubtotal > 0
+      ? Math.round((variantPriceDiscount / regularSubtotal) * 100)
       : null;
 
   return {
-    productPrice,
-    discount,
+    productPrice: saleSubtotal,
+    variantPriceDiscount,
+    extraLineDiscount,
+    couponAllocated,
     chinaCourier,
     total,
-    paid: paid * productShare,
-    due: total - paid * productShare,
     discountPct,
   };
 }
@@ -107,14 +123,34 @@ export default function OrderProductDetails({
     );
   }
 
-  const allVariants = products.flatMap((p) => p.variants ?? []);
+  const couponOrderTotal = Number(orderData?.coupon_discount ?? 0);
+  const saleSubtotals = products.map((p) => sumSaleSubtotal(p.variants ?? []));
+  const allSaleSubtotal = saleSubtotals.reduce((a, b) => a + b, 0);
+
+  const baseMetrics = products.map((product, index) => {
+    const couponAllocated =
+      allSaleSubtotal > 0
+        ? couponOrderTotal * (saleSubtotals[index] / allSaleSubtotal)
+        : 0;
+    return calculateProductTotals(product.variants ?? [], couponAllocated);
+  });
+
+  const orderNetSum = baseMetrics.reduce((sum, m) => sum + m.total, 0);
+  const paidOrder = Number(
+    orderData?.paid_partial_payment_amount ??
+      orderData?.paid_amount ??
+      orderData?.advance_payment ??
+      0,
+  );
 
   return (
     <div className="space-y-6">
       {products.map((product, index) => {
         const variants = product.variants ?? [];
-        const totals = calculateProductTotals(variants, allVariants, orderData);
-        console.log("🚀 ~ OrderProductDetails ~ totals:", totals)
+        const totals = baseMetrics[index];
+        const paidShare =
+          orderNetSum > 0 ? paidOrder * (totals.total / orderNetSum) : 0;
+        const due = totals.total - paidShare;
 
         return (
           <div
@@ -211,21 +247,46 @@ export default function OrderProductDetails({
                   <span className="text-gray-900">Product Price:</span>
                   <span>৳{Math.round(totals.productPrice)}</span>
                 </div>
-                {totals.discount > 0 && (
+                {totals.variantPriceDiscount > 0 && (
                   <div className="flex justify-between items-center text-sm">
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-900">Ramadan Offer:</span>
-                      {totals.discountPct && (
+                      <span className="text-gray-900">Discount amount:</span>
+                      {totals.discountPct != null && totals.discountPct > 0 && (
                         <Badge className="bg-red-100 text-red-700 text-xs px-1.5 py-0.5 rounded">
                           {totals.discountPct}%
                         </Badge>
                       )}
                     </div>
                     <span className="font-medium text-red-600">
-                      - ৳{Math.round(totals.discount)}
+                      - ৳{Math.round(totals.variantPriceDiscount)}
                     </span>
                   </div>
                 )}
+                {totals.extraLineDiscount > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-900">Extra discount:</span>
+                    <span className="font-medium text-red-600">
+                      - ৳{Math.round(totals.extraLineDiscount)}
+                    </span>
+                  </div>
+                )}
+                {/* {totals.couponAllocated > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-900">
+                      Coupon discount
+                      {(orderData?.coupon_name as string) && (
+                        <span className="text-gray-500 font-normal">
+                          {' '}
+                          ({String(orderData.coupon_name)})
+                        </span>
+                      )}
+                      :
+                    </span>
+                    <span className="font-medium text-red-600">
+                      - ৳{Math.round(totals.couponAllocated)}
+                    </span>
+                  </div>
+                )} */}
                 {totals.chinaCourier > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-900">
@@ -243,14 +304,14 @@ export default function OrderProductDetails({
                 <div className="flex justify-between font-semibold text-sm pt-2">
                   <span className="text-gray-900">Paid:</span>
                   <span className="font-medium text-red-600">
-                    - ৳{Math.round(totals.paid)}
+                    - ৳{Math.round(paidShare)}
                   </span>
                 </div>
-                {totals.due && (
+                {due > 0 && (
                   <div className="flex justify-between text-sm font-semibold pt-2">
                     <span className="text-gray-900">Due:</span>
                     <span>
-                      ৳{Math.round(totals.due)}{' '}
+                      ৳{Math.round(due)}{' '}
                       <span className="text-gray-500 font-normal">
                         + Shipping Charge
                       </span>
