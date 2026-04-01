@@ -123,6 +123,7 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
             orderId={`CRT-${product?.id}`}
             image={`${process.env.NEXT_PUBLIC_IMG_URL}/${product?.image}`}
             title={product?.product_name}
+            slug={product?.slug}
             product={product}
             isSelected={selectedItems[product.id] ?? true}
             onSelectChange={(selected) =>

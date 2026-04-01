@@ -55,6 +55,7 @@ export default async function PaymentsPage() {
                 <th className="py-3 px-4 font-semibold">Invoice ID</th>
                 <th className="py-3 px-4 font-semibold">Amount</th>
                 <th className="py-3 px-4 font-semibold">Method</th>
+                <th className="py-3 px-4 font-semibold">Payment Slip</th>
                 <th className="py-3 px-4 font-semibold">Status</th>
               </tr>
             </thead>
@@ -62,7 +63,7 @@ export default async function PaymentsPage() {
             <tbody>
               {payments.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-gray-400">
+                  <td colSpan={6} className="text-center py-12 text-gray-400">
                     <div className="flex flex-col items-center">
                       <div className="w-12 h-12 bg-gray-100 rounded-lg mb-2" >
                         <Database className="w-6 h-6 mx-auto my-3 text-gray-400" />
@@ -111,20 +112,23 @@ export default async function PaymentsPage() {
                       </td>
 
                       <td className="py-3 px-4">
-                        <div className="flex flex-col items-start gap-2">
-                          {paySlipImage ? (
-                            <ImagePreview
-                              src={paySlipImage}
-                              alt={`Payment slip ORD-${invoiceId || 'N/A'}`}
-                              width={48}
-                              height={48}
-                              className="shrink-0 rounded border border-gray-200"
-                            />
-                          ) : null}
-                          <Badge className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-1 rounded-md text-xs font-medium border-0">
-                            {String(payment?.payment_method || 'N/A')}
-                          </Badge>
-                        </div>
+                        <Badge className="bg-gray-900 text-white hover:bg-gray-800 px-3 py-1 rounded-md text-xs font-medium border-0">
+                          {String(payment?.payment_method || 'N/A')}
+                        </Badge>
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {paySlipImage ? (
+                          <ImagePreview
+                            src={paySlipImage}
+                            alt={`Payment slip ORD-${invoiceId || 'N/A'}`}
+                            width={48}
+                            height={48}
+                            className="shrink-0 rounded border border-gray-200"
+                          />
+                        ) : (
+                          <span className="text-gray-500">—</span>
+                        )}
                       </td>
 
                       <td className="py-3 px-4">
