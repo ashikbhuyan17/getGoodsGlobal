@@ -7,6 +7,7 @@ import Link from 'next/link';
 import OrdersTopBar from '@/components/account/orders/OrdersTopBar';
 import { Database } from 'lucide-react';
 import OrderChatButton from '@/components/account/orders/OrderChatButton';
+import InvoiceDownloadButton from '@/components/account/orders/InvoiceDownloadButton';
 
 function buildOrdersSlug(status?: string, keyword?: string): string {
   const params = new URLSearchParams();
@@ -152,7 +153,7 @@ export default async function OrderPage({
                               >
                                 <Button
                                   size="sm"
-                                  className="rounded bg-red-600 hover:bg-red-700 text-white"
+                                  className="rounded bg-primary hover:bg-primary/90 text-white"
                                 >
                                   Pay
                                 </Button>
@@ -167,6 +168,9 @@ export default async function OrderPage({
                                 Details
                               </Button>
                             </Link>
+                            <InvoiceDownloadButton
+                              invoiceId={order?.invoice_id}
+                            />
                             {isPartiallyPaid && (
                               <OrderChatButton invoiceId={order?.invoice_id} />
                             )}

@@ -1,27 +1,40 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Send, Plus } from "lucide-react";
-import { submitTicketReply } from "@/lib/fetcher";
-import { useRouter } from "next/navigation";
-import ImagePreview from "@/components/common/ImagePreview";
-import { toast } from "sonner";
+import { useState, useRef, useLayoutEffect, useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Send, Plus } from 'lucide-react';
+import { submitTicketReply } from '@/lib/fetcher';
+import { useRouter } from 'next/navigation';
+import ImagePreview from '@/components/common/ImagePreview';
+import { toast } from 'sonner';
 
-const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || "";
+const IMG_URL = process.env.NEXT_PUBLIC_IMG_URL || '';
 
 function formatDate(dt?: string) {
-  if (!dt) return "N/A";
+  if (!dt) return 'N/A';
   const date = new Date(dt);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = String(date.getFullYear()).slice(-2);
   const hours = date.getHours();
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const ampm = hours >= 12 ? "PM" : "AM";
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
   const displayHours = hours % 12 || 12;
   return `${day}/${month}/${year} ${displayHours}:${minutes} ${ampm}`;
+}
+
+function ticketImagePath(val: unknown): string | null {
+  if (val == null || String(val).trim() === '') return null;
+  return String(val).trim();
+}
+
+/** e.g. https://next.babuei.com/public/uploads/ticket/… */
+function pathToImgUrl(path: string) {
+  if (path.startsWith('http') || path.startsWith('data:')) return path;
+  const base = IMG_URL.replace(/\/+$/, '');
+  const rel = path.replace(/^\/+/, '');
+  return base ? `${base}/${rel}` : `/${rel}`;
 }
 
 interface LiveChatProps {
@@ -35,13 +48,68 @@ export default function LiveChat({
   ticket,
   managerName,
 }: LiveChatProps) {
-  const [message, setMessage] = useState("");
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const router = useRouter();
+  //auto scroll to bottom
+  const messagesScrollRef = useRef<HTMLDivElement>(null);
+  const messagesInnerRef = useRef<HTMLDivElement>(null);
+  const pinBottomUntilRef = useRef(0);
+
+  const ticketScrollKey = useMemo(() => {
+    const list = ticket as Record<string, unknown>[] | undefined;
+    if (!list?.length) return '0';
+    const last = list[list.length - 1];
+    return `${list.length}:${String(last?.id ?? '')}:${String(last?.created_at ?? '')}`;
+  }, [ticket]);
+
+  useLayoutEffect(() => {
+    const root = messagesScrollRef.current;
+    if (!root) return;
+    pinBottomUntilRef.current = Date.now() + 3500;
+    const scrollToEnd = () => {
+      root.scrollTop = root.scrollHeight;
+    };
+    scrollToEnd();
+    const raf1 = requestAnimationFrame(() => {
+      scrollToEnd();
+      requestAnimationFrame(scrollToEnd);
+    });
+    const t1 = window.setTimeout(scrollToEnd, 0);
+    const t2 = window.setTimeout(scrollToEnd, 120);
+    const t3 = window.setTimeout(scrollToEnd, 400);
+    const t4 = window.setTimeout(scrollToEnd, 900);
+    return () => {
+      cancelAnimationFrame(raf1);
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
+      window.clearTimeout(t4);
+    };
+  }, [ticketScrollKey]);
+
+  useLayoutEffect(() => {
+    const root = messagesScrollRef.current;
+    const inner = messagesInnerRef.current;
+    if (!root || !inner) return;
+    const scrollToEndIfPinned = () => {
+      const scrollToEnd = () => {
+        root.scrollTop = root.scrollHeight;
+      };
+      if (Date.now() < pinBottomUntilRef.current) {
+        scrollToEnd();
+        return;
+      }
+      const dist = root.scrollHeight - root.scrollTop - root.clientHeight;
+      if (dist < 100) scrollToEnd();
+    };
+    const ro = new ResizeObserver(scrollToEndIfPinned);
+    ro.observe(inner);
+    return () => ro.disconnect();
+  }, []);
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,24 +119,19 @@ export default function LiveChat({
       reader.onloadend = () => setUploadedImage(reader.result as string);
       reader.readAsDataURL(file);
     }
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onloadend = () => setImageBase64(reader.result as string);
-    //   reader.readAsDataURL(file);
-    // }
-    e.target.value = "";
+    e.target.value = '';
   };
 
   const handleSendMessage = async () => {
-    if (!message.trim() && !imageBase64) return;
+    if (!message.trim() && !uploadedFile) return;
 
     setSending(true);
     try {
       const formData = new FormData();
-      formData.append("ticket_id", ticketId);
-      formData.append("message", message.trim() || "");
+      formData.append('ticket_id', ticketId);
+      formData.append('message', message.trim() || '');
       if (uploadedImage && uploadedFile) {
-        formData.append("image", uploadedFile);
+        formData.append('image', uploadedFile);
         setUploadedImage(null);
         setUploadedFile(null);
       }
@@ -76,27 +139,17 @@ export default function LiveChat({
       const res = await submitTicketReply(formData);
 
       if (res?.status === true) {
-        setMessage("");
+        setMessage('');
         router.refresh();
-        toast.success("Message sent");
+        toast.success('Message sent');
       } else {
-        toast.error(res?.message || "Failed to send message");
+        toast.error(res?.message || 'Failed to send message');
       }
     } catch {
-      toast.error("Failed to send message");
+      toast.error('Failed to send message');
     } finally {
       setSending(false);
     }
-  };
-
-  const isImageMessage = (item: Record<string, unknown>) => !!item?.image;
-
-  const getImageUrl = (item: Record<string, unknown>) => {
-    const img = item?.image;
-    if (!img) return null;
-    const s = String(img);
-    if (s.startsWith("http") || s.startsWith("data:")) return s;
-    return `${IMG_URL}/${s}`;
   };
 
   return (
@@ -108,70 +161,116 @@ export default function LiveChat({
       </div>
 
       {/* Chat Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-        {(ticket as Record<string, unknown>[])?.map((it) => {
-          const isAdmin = it?.type === "admin" || !!it?.replay;
-          const text = String(it?.replay ?? it?.message ?? "");
-          const hasImage = isImageMessage(it);
-          const imageUrl = hasImage ? getImageUrl(it) : null;
-          const displayText = hasImage && imageUrl ? "" : text;
+      <div
+        ref={messagesScrollRef}
+        className="flex-1 overflow-y-auto overflow-x-hidden p-4 bg-gray-50"
+      >
+        <div ref={messagesInnerRef} className="space-y-4">
+          {(ticket as Record<string, unknown>[])?.map((it) => {
+            const isAdmin =
+              it?.type === 'admin' ||
+              !!String(it?.replay ?? '').trim() ||
+              !!ticketImagePath(it?.replay_image);
 
-          return (
-            <div
-              key={String(it?.id ?? Math.random())}
-              className={`flex ${isAdmin ? "justify-start" : "justify-end"}`}
-            >
+            const userMessage = String(it?.message ?? '');
+            const adminReply = String(it?.replay ?? '');
+
+            const userImgPath = ticketImagePath(it?.image);
+            const replyImgPath = ticketImagePath(it?.replay_image);
+
+            const hasUserImage = !isAdmin && userImgPath !== null;
+            const hasReplyImage = isAdmin && replyImgPath !== null;
+
+            const userImageUrl =
+              hasUserImage && userImgPath ? pathToImgUrl(userImgPath) : null;
+            const replyImageUrl =
+              hasReplyImage && replyImgPath ? pathToImgUrl(replyImgPath) : null;
+
+            const showUserTextOnly = !hasUserImage && !!userMessage.trim();
+            const showAdminTextOnly = !hasReplyImage && !!adminReply.trim();
+
+            return (
               <div
-                className={`max-w-[75%] ${isAdmin ? "items-start" : "items-end"
-                  } flex flex-col`}
+                key={String(it?.id ?? Math.random())}
+                className={`flex ${isAdmin ? 'justify-start' : 'justify-end'}`}
               >
-                {/* Image Message - Right aligned for user, left for admin */}
-                {hasImage && imageUrl && (
-                  <div className={`rounded-lg px-2 py-1 ${isAdmin
-                    ? "bg-teal-100 text-gray-900 rounded-tl-none"
-                    : "bg-white text-gray-900 rounded-tr-none border border-gray-200"
-                    }`}>
-                    <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200 bg-white">
-                      <ImagePreview
-                        src={imageUrl}
-                        alt="Chat image"
-                        width={192}
-                        height={192}
-                        className="w-full h-full"
-                      />
+                <div
+                  className={`max-w-[75%] ${
+                    isAdmin ? 'items-start' : 'items-end'
+                  } flex flex-col gap-1`}
+                >
+                  {/* Customer: `image` + `message` */}
+                  {!isAdmin && hasUserImage && userImageUrl && (
+                    <div className="rounded-lg px-2 py-1 bg-white text-gray-900 rounded-tr-none border border-gray-200">
+                      <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200 bg-white">
+                        <ImagePreview
+                          src={userImageUrl}
+                          alt="Your attachment"
+                          width={192}
+                          height={192}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      {!!userMessage.trim() && (
+                        <p className="mt-1 text-sm text-right whitespace-pre-wrap">
+                          {userMessage}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 text-right mt-1">
+                        {formatDate(String(it?.created_at ?? ''))}
+                      </p>
                     </div>
-                    <div
-                      className={`mt-1 text-sm ${isAdmin ? "text-left" : "text-right"} `}
-                    >
-                      <p> {text}</p>
-                      <p className=" text-xs text-gray-500"> {formatDate(String(it?.created_at ?? ""))}</p>
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Text Message */}
-                {displayText && (
-                  <div
-                    className={`rounded-lg px-2 py-1 ${isAdmin
-                      ? "bg-teal-100 text-gray-900 rounded-tl-none"
-                      : "bg-white text-gray-900 rounded-tr-none border border-gray-200"
-                      }`}
-                  >
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {String(displayText)}
-                    </p>
-                    <p
-                      className={`text-xs text-gray-500  ${isAdmin ? "text-left" : "text-right"
-                        }`}
-                    >
-                      {formatDate(String(it?.created_at ?? ""))}
-                    </p>
-                  </div>
-                )}
+                  {!isAdmin && showUserTextOnly && (
+                    <div className="rounded-lg px-2 py-1 bg-white text-gray-900 rounded-tr-none border border-gray-200">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                        {userMessage}
+                      </p>
+                      <p className="text-xs text-gray-500 text-right">
+                        {formatDate(String(it?.created_at ?? ''))}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Manager: `replay_image` + `replay` */}
+                  {isAdmin && hasReplyImage && replyImageUrl && (
+                    <div className="rounded-lg px-2 py-1 bg-teal-100 text-gray-900 rounded-tl-none">
+                      <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-gray-200 bg-white">
+                        <ImagePreview
+                          src={replyImageUrl}
+                          alt="Manager attachment"
+                          width={192}
+                          height={192}
+                          className="w-full h-full"
+                        />
+                      </div>
+                      {!!adminReply.trim() && (
+                        <p className="mt-1 text-sm text-left whitespace-pre-wrap">
+                          {adminReply}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 text-left mt-1">
+                        {formatDate(String(it?.created_at ?? ''))}
+                      </p>
+                    </div>
+                  )}
+
+                  {isAdmin && showAdminTextOnly && (
+                    <div className="rounded-lg px-2 py-1 bg-teal-100 text-gray-900 rounded-tl-none">
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                        {adminReply}
+                      </p>
+                      <p className="text-xs text-gray-500 text-left">
+                        {formatDate(String(it?.created_at ?? ''))}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Chat Input Section */}
@@ -185,7 +284,10 @@ export default function LiveChat({
             />
             <button
               type="button"
-              onClick={() => setUploadedImage(null)}
+              onClick={() => {
+                setUploadedImage(null);
+                setUploadedFile(null);
+              }}
               className="text-xs text-red-600 hover:underline"
             >
               Remove
@@ -214,7 +316,7 @@ export default function LiveChat({
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
+              if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 handleSendMessage();
               }
@@ -224,11 +326,11 @@ export default function LiveChat({
           />
           <Button
             onClick={handleSendMessage}
-            disabled={(!message.trim() && !imageBase64) || sending}
+            disabled={(!message.trim() && !uploadedFile) || sending}
             className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-4 py-2 shrink-0"
-            aria-label={sending ? "Sending message" : "Send message"}
+            aria-label={sending ? 'Sending message' : 'Send message'}
           >
-            {sending ? "Sending..." : <Send className="h-4 w-4" />}
+            {sending ? 'Sending...' : <Send className="h-4 w-4" />}
           </Button>
         </div>
       </div>

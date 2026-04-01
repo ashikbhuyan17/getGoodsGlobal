@@ -45,9 +45,7 @@ export default function OrderChatButton({ invoiceId }: OrderChatButtonProps) {
         return;
       }
 
-      toast.success(
-        data?.message || 'Ticket created. Redirecting to chat...',
-      );
+      toast.success(data?.message || 'Ticket created. Redirecting to chat...');
       router.push(`/account/support/replay/${ticketId}`);
     } catch {
       toast.dismiss();
@@ -68,16 +66,14 @@ export default function OrderChatButton({ invoiceId }: OrderChatButtonProps) {
       {loading ? (
         <>
           <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-          Chat
+          Support
         </>
       ) : (
         <>
           <MessageCircle className="mr-1 h-4 w-4" />
-          Chat
+          Support
         </>
       )}
     </Button>
   );
 }
-
-

@@ -93,6 +93,7 @@ function CheckoutClient({
             orderId={`CRT-${product?.id}`}
             image={`${process.env.NEXT_PUBLIC_IMG_URL}/${product?.image}`}
             title={product?.product_name}
+            slug={product?.slug}
             product={product}
           >
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}

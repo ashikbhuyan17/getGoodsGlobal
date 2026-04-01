@@ -3,6 +3,7 @@
 import { fetcher } from "@/lib/fetcher";
 import { Check, Eye, Trash2 } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { toast } from "sonner";
@@ -13,6 +14,7 @@ interface CartOrderGroupProps {
   orderId: string;
   image: string;
   title: string;
+  slug?: string;
   page?: "cart" | "checkout";
   children: ReactNode;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,6 +28,7 @@ export default function CartOrderGroup({
   orderId,
   image,
   title,
+  slug,
   children,
   product,
   page = "cart",
@@ -64,6 +67,7 @@ export default function CartOrderGroup({
       onRemoveLoading?.(false);
     }
   };
+  const productHref = slug ? `/product/${slug}` : undefined;
 
   const handleSelectClick = () => {
     if (onSelectChange) {
@@ -129,13 +133,25 @@ export default function CartOrderGroup({
                       />
                     </DialogContent>
                   </Dialog>
-                  <Image
-                    src={image}
-                    alt={title}
-                    width={64}
-                    height={64}
-                    className="w-full h-full rounded shadow-md object-cover"
-                  />
+                  {productHref ? (
+                    <Link href={productHref} aria-label={`Open ${title}`}>
+                      <Image
+                        src={image}
+                        alt={title}
+                        width={64}
+                        height={64}
+                        className="w-full h-full rounded shadow-md object-cover"
+                      />
+                    </Link>
+                  ) : (
+                    <Image
+                      src={image}
+                      alt={title}
+                      width={64}
+                      height={64}
+                      className="w-full h-full rounded shadow-md object-cover"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -144,7 +160,16 @@ export default function CartOrderGroup({
                   Order ID: #{orderId}
                 </p>
 
-                <p className="text-sm font-semibold">{title}</p>
+                {productHref ? (
+                  <Link
+                    href={productHref}
+                    className="text-sm font-semibold hover:text-primary transition-colors"
+                  >
+                    {title}
+                  </Link>
+                ) : (
+                  <p className="text-sm font-semibold">{title}</p>
+                )}
               </div>
             </div>
 

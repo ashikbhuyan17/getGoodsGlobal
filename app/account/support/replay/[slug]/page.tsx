@@ -1,15 +1,15 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import TicketInfoBar from "@/components/account/support/TicketInfoBar";
-import TicketDetailsCard from "@/components/account/support/TicketDetailsCard";
-import LiveChat from "@/components/account/support/LiveChat";
-import { Paperclip } from "lucide-react";
-import { fetcher } from "@/lib/fetcher";
-import { notFound } from "next/navigation";
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import TicketInfoBar from '@/components/account/support/TicketInfoBar';
+import TicketDetailsCard from '@/components/account/support/TicketDetailsCard';
+import LiveChat from '@/components/account/support/LiveChat';
+import { Paperclip } from 'lucide-react';
+import { fetcher } from '@/lib/fetcher';
+import { notFound } from 'next/navigation';
 
 function getStatusLabel(status: string) {
-  return status === "1" ? "Open" : status === "0" ? "Closed" : status || "N/A";
+  return status === '1' ? 'Open' : status === '0' ? 'Closed' : status || 'N/A';
 }
 
 export default async function TicketDetailPage({
@@ -21,7 +21,9 @@ export default async function TicketDetailPage({
   if (!ticketId) notFound();
 
   const [listRes, replayRes] = await Promise.all([
-    fetcher<{ status?: boolean; data?: Record<string, unknown>[] }>("/ticket-list"),
+    fetcher<{ status?: boolean; data?: Record<string, unknown>[] }>(
+      '/ticket-list',
+    ),
     fetcher<{ status?: boolean; data?: Record<string, unknown>[] }>(
       `/ticket-replay-list/${ticketId}`,
     ),
@@ -32,25 +34,35 @@ export default async function TicketDetailPage({
   ) as Record<string, unknown> | undefined;
 
   const chatData = replayRes?.data || [];
-  const firstDetail = (ticketFromList?.ticketdetails as Record<string, unknown>[] | undefined)?.[0];
+  const firstDetail = (
+    ticketFromList?.ticketdetails as Record<string, unknown>[] | undefined
+  )?.[0];
   const issueDescription = firstDetail?.message
     ? String(firstDetail.message)
     : ticketFromList?.message
       ? String(ticketFromList.message)
-      : "No description";
+      : 'No description';
 
   const category = ticketFromList?.type
     ? String(ticketFromList.type)
-    : "General";
-  const status = getStatusLabel(String(ticketFromList?.status ?? ticketFromList?.status ?? "1"));
-  const managerName = String(ticketFromList?.name ?? "Support");
+    : 'General';
+  const status = getStatusLabel(
+    String(ticketFromList?.status ?? ticketFromList?.status ?? '1'),
+  );
+  const managerName = String(ticketFromList?.name ?? 'Support');
 
   const chatMessages = chatData.map((item: Record<string, unknown>) => ({
     id: item?.id,
-    type: item?.replay ? "admin" : "user",
-    message: item?.message ?? "",
+    type:
+      item?.replay != null && String(item.replay).trim() !== ''
+        ? 'admin'
+        : item?.replay_image != null && String(item.replay_image).trim() !== ''
+          ? 'admin'
+          : 'user',
+    message: item?.message ?? '',
     replay: item?.replay,
     image: item?.image,
+    replay_image: item?.replay_image,
     created_at: item?.created_at,
   }));
 

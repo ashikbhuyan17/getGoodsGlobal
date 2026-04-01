@@ -27,6 +27,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "next.mamatazshop.com",
       },
+      {
+        protocol: "https",
+        hostname: "next.babuei.com",
+      },
     ],
   },
   output: "standalone",
