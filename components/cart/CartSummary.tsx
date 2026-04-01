@@ -82,7 +82,7 @@ export default function CartSummary({
     return 0;
   })();
 
-  const finalPrice = summaryFinal + Number(shippingCharge ?? 0);
+  const finalPrice = summaryFinal + Number(shippingCharge ?? 0) - couponDiscountAmount;
 
   const validateForm = () => {
     if (page !== 'checkout') return true;

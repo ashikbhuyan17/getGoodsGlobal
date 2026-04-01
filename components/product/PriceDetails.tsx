@@ -14,8 +14,11 @@ export default function PriceDetails({
   shipping: number;
 }) {
   const bulkTier = bulkQuantities ? getActiveBulkTier(bulkQuantities, quantity) : null;
-  let productPrice = bulkTier
-    ? bulkTier.price * quantity
+  const bulkUnit = bulkTier
+    ? bulkTier.flashSalePrice ?? bulkTier.price
+    : null;
+  let productPrice = bulkUnit != null
+    ? bulkUnit * quantity
     : (price?.reduce(
       (total: number, item: { price: number; quantity: number }) =>
         Number(total) + Number(item.price) * Number(item.quantity),

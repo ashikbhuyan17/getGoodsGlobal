@@ -161,6 +161,9 @@ export default function ProductDetails({
                       bg: 'bg-gray-100',
                       bar: 'bg-gray-200',
                     };
+                    const bulkFlashNum = Number(bulk?.flash_sale_price);
+                    const hasBulkTierFlash =
+                      Number.isFinite(bulkFlashNum) && bulkFlashNum > 0;
                     return (
                       <div
                         key={bulk?.id}
@@ -172,13 +175,22 @@ export default function ProductDetails({
                         <div className="flex flex-col items-center text-center">
                           <div className="flex flex-col items-center gap-1 space-y-2">
                             <p className="text-xl font-semibold text-gray-800">
-                              ৳{formatPriceInt(bulk?.price ?? 0)}
+                              ৳
+                              {formatPriceInt(
+                                hasBulkTierFlash
+                                  ? bulkFlashNum
+                                  : bulk?.price ?? 0,
+                              )}
                             </p>
-                            {bulk?.old_price && (
+                            {hasBulkTierFlash ? (
+                              <p className="text-sm text-gray-400 line-through">
+                                ৳{formatPriceInt(bulk?.price ?? 0)}
+                              </p>
+                            ) : bulk?.old_price ? (
                               <p className="text-sm text-gray-400 line-through">
                                 ৳{formatPriceInt(bulk.old_price)}
                               </p>
-                            )}
+                            ) : null}
                             <p className="text-sm text-[#777]">{bulk?.title}</p>
                           </div>
                         </div>
@@ -273,8 +285,7 @@ export default function ProductDetails({
                   </div>
                 </div>
 
-                {sizes?.map((size: any) => {
-                  return (
+                {sizes?.map((size: any) => (
                     <SizeCard
                       key={size?.id}
                       colorId={effectiveColorId}
@@ -285,12 +296,15 @@ export default function ProductDetails({
                       price={size?.SalePrice}
                       SalePrice={size?.SalePrice}
                       RegularPrice={size?.RegularPrice}
-                      max={Number(size?.stock)}
+                      max={Number(
+                        bulkQuantities
+                          ? (size?.total_stock ?? size?.stock)
+                          : size?.stock,
+                      )}
                       bulkQuantities={bulkQuantities}
                       totalQuantity={bulkQuantities ? totalQuantity : undefined}
                     />
-                  );
-                })}
+                ))}
               </div>
             </ScrollArea>
           </CardContent>

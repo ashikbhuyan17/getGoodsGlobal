@@ -27,33 +27,72 @@ export function getDiscountPercent(newPrice: number, oldPrice: number): number {
   return Math.round(((oldP - newP) / oldP) * 100);
 }
 
-/** Get active bulk tier based on totalQuantity (min_qty <= qty <= max_qty). Returns best tier for display/calculation. */
+export type BulkTierInput = {
+  min_qty?: string | number;
+  max_qty?: string | number;
+  price?: string | number;
+  flash_sale_price?: string | number | null;
+};
+
+export type ActiveBulkTier = {
+  price: number;
+  /** When set, use as sale unit price; `price` is the regular bulk price. */
+  flashSalePrice: number | null;
+  min_qty: number;
+  max_qty: number;
+};
+
+function parseBulkFlashSale(raw: unknown): number | null {
+  if (raw == null || raw === "") return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return n;
+}
+
+/**
+ * Active bulk tier for totalQuantity.
+ * - Prefer a tier with min_qty <= qty <= max_qty (highest min_qty if several match).
+ * - If order size is above every max_qty (e.g. 151 when last max is 150), use the best
+ *   tier still unlocked: highest min_qty where qty >= min_qty (not capped by max_qty).
+ *   Quantity limits stay stock-based in the UI, not max_qty.
+ */
 export function getActiveBulkTier(
-  bulkQuantities: { data?: { min_qty?: string | number; max_qty?: string | number; price?: string | number }[] } | null | undefined,
-  totalQuantity: number
-): { price: number; min_qty: number; max_qty: number } | null {
+  bulkQuantities: { data?: BulkTierInput[] } | null | undefined,
+  totalQuantity: number,
+): ActiveBulkTier | null {
   const list = bulkQuantities?.data;
   if (!list || !Array.isArray(list) || list.length === 0) return null;
   const sorted = [...list].sort(
-    (a, b) => Number(a?.min_qty ?? 0) - Number(b?.min_qty ?? 0)
+    (a, b) => Number(a?.min_qty ?? 0) - Number(b?.min_qty ?? 0),
   );
+  const toTier = (tier: BulkTierInput): ActiveBulkTier => ({
+    price: Number(tier?.price ?? 0),
+    flashSalePrice: parseBulkFlashSale(tier?.flash_sale_price),
+    min_qty: Number(tier?.min_qty ?? 0),
+    max_qty: Number(tier?.max_qty ?? 0),
+  });
   // totalQuantity 0: show first tier for display
   if (totalQuantity <= 0) {
-    const first = sorted[0];
-    return { price: Number(first?.price ?? 0), min_qty: Number(first?.min_qty ?? 0), max_qty: Number(first?.max_qty ?? 0) };
+    return toTier(sorted[0]);
   }
-  // Find tier where min_qty <= totalQuantity <= max_qty. Prefer highest min_qty (best price).
-  let active = sorted[0];
+  let inRange: BulkTierInput | null = null;
   for (const tier of sorted) {
     const min = Number(tier?.min_qty ?? 0);
     const max = Number(tier?.max_qty ?? 999999);
     if (totalQuantity >= min && totalQuantity <= max) {
-      active = tier;
+      inRange = tier;
     }
   }
-  return {
-    price: Number(active?.price ?? 0),
-    min_qty: Number(active?.min_qty ?? 0),
-    max_qty: Number(active?.max_qty ?? 0),
-  };
+  if (inRange) {
+    return toTier(inRange);
+  }
+  // Above last max_qty or gap: last tier whose min_qty is satisfied (best unlocked price).
+  let unlocked: BulkTierInput | null = null;
+  for (const tier of sorted) {
+    const min = Number(tier?.min_qty ?? 0);
+    if (totalQuantity >= min) {
+      unlocked = tier;
+    }
+  }
+  return toTier(unlocked ?? sorted[sorted.length - 1]);
 }

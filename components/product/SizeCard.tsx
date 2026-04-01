@@ -30,6 +30,7 @@ function SizeCard({
       min_qty?: string | number;
       max_qty?: string | number;
       price?: string | number;
+      flash_sale_price?: string | number | null;
     }[];
   };
   totalQuantity?: number;
@@ -48,14 +49,18 @@ function SizeCard({
   const bulkTier = useBulk
     ? getActiveBulkTier(bulkQuantities, totalQuantity)
     : null;
-  const basePrice = bulkTier ? bulkTier.price : Number(price);
+  const bulkEffectivePrice = bulkTier
+    ? bulkTier.flashSalePrice ?? bulkTier.price
+    : Number(price);
 
   const handleQuantityChange = (newQty: number) => {
     const newTotal = (totalQuantity ?? 0) - quantity + newQty;
     const tierForNewTotal = useBulk
       ? getActiveBulkTier(bulkQuantities, newTotal)
       : null;
-    const priceForVariant = tierForNewTotal ? tierForNewTotal.price : basePrice;
+    const priceForVariant = tierForNewTotal
+      ? tierForNewTotal.flashSalePrice ?? tierForNewTotal.price
+      : bulkEffectivePrice;
     setVariant(String(colorId), String(size), newQty, priceForVariant);
   };
 
@@ -67,9 +72,20 @@ function SizeCard({
       {/* Price Column */}
       <div className="flex flex-col items-center gap-1">
         {useBulk ? (
-          <p className="font-semibold text-gray-800">
-            ৳{formatPriceInt(basePrice)}
-          </p>
+          bulkTier?.flashSalePrice != null ? (
+            <>
+              <p className="font-semibold text-gray-800">
+                ৳{formatPriceInt(bulkTier.flashSalePrice)}
+              </p>
+              <p className="text-sm text-gray-400 line-through">
+                ৳{formatPriceInt(bulkTier.price)}
+              </p>
+            </>
+          ) : (
+            <p className="font-semibold text-gray-800">
+              ৳{formatPriceInt(bulkTier?.price ?? 0)}
+            </p>
+          )
         ) : (
           <>
             <p className="font-semibold text-gray-800">
