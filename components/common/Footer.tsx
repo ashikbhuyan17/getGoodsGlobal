@@ -72,7 +72,7 @@ export default async function Footer() {
             <div className="flex flex-col">
               <div className="mb-4">
                 <div className="inline-flex items-center gap-2">
-                  <div className="w-36 rounded-full flex items-center justify-center">
+                  <div className="w-44 rounded-full flex items-center justify-center">
                     <Link href="/" prefetch aria-label="Go to homepage">
                       <Image
                         alt="Logo"

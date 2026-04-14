@@ -8,7 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -24,8 +30,9 @@ import { User, Upload, Eye } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ProfileUpdateForm({ user }: { user: any }) {
   const [name, setName] = useState(user?.data?.name || '');
+  const [email, setEmail] = useState(user?.data?.email || '');
   const [emergencyNumber, setEmergencyNumber] = useState(
-    user?.data?.emergency_number || user?.data?.phone || ''
+    user?.data?.emergency_number || user?.data?.phone || '',
   );
   const [district, setDistrict] = useState(user?.data?.district || '');
   const [city, setCity] = useState(user?.data?.city || '');
@@ -61,6 +68,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
       method: 'POST',
       body: JSON.stringify({
         name,
+        email,
         emergency_number: emergencyNumber,
         district,
         city,
@@ -153,8 +161,12 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
               </button>
             </DialogTrigger>
             <DialogContent className="aspect-square max-w-md p-0 overflow-hidden">
-              <DialogTitle className="sr-only">Profile photo preview</DialogTitle>
-              <DialogDescription className="sr-only">Preview of your profile photo</DialogDescription>
+              <DialogTitle className="sr-only">
+                Profile photo preview
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Preview of your profile photo
+              </DialogDescription>
               <div className="relative w-full h-full min-h-70">
                 {displayImageUrl ? (
                   <Image
@@ -197,7 +209,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
 
       {/* Form: District & City same width, Address full width */}
       <form onSubmit={handleUpdate} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Name */}
           <div className="space-y-2">
             <Label htmlFor="name">
@@ -217,6 +229,19 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
 
           {/* Emergency Number */}
           <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="rounded-md border-gray-300"
+            />
+          </div>
+
+          {/* Emergency Number */}
+          <div className="space-y-2">
             <Label htmlFor="emergency">Emergency Number</Label>
             <Input
               id="emergency"
@@ -226,7 +251,9 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
               className="rounded-md border-gray-300"
             />
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* District - same width as City */}
           <div className="space-y-2">
             <Label htmlFor="district">

@@ -60,7 +60,7 @@ export default async function SupportPage() {
           <table className="w-full text-left text-sm">
             <thead className="border-b">
               <tr>
-                <th className="py-3 px-4 font-semibold">Code</th>
+                {/* <th className="py-3 px-4 font-semibold">Code</th> */}
                 <th className="py-3 px-4 font-semibold">Date</th>
                 <th className="py-3 px-4 font-semibold">Orders</th>
                 <th className="py-3 px-4 font-semibold">Manager</th>
@@ -106,9 +106,9 @@ export default async function SupportPage() {
                       key={String(ticket?.id)}
                       className="hover:bg-gray-50 transition"
                     >
-                      <td className="py-3 px-4">
+                      {/* <td className="py-3 px-4">
                         <span className="font-medium">{ticketId || 'N/A'}</span>
-                      </td>
+                      </td> */}
                       <td className="py-3 px-4">
                         <span className="block">{date}</span>
                         <span className="block text-xs font-medium mt-0.5 text-gray-500">

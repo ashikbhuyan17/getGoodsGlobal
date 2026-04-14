@@ -84,6 +84,9 @@ export default function PaymentPageClient({
   const totalDisplay = roundInt(totalAmount);
   const payableDisplayNum = roundInt(payableAmount);
   const payableDisplay = String(payableDisplayNum);
+  const showCashFeeColumn = cashFeeDisplay > 0;
+  const showPaymentProofFields =
+    !isCodSelected || (advancePercent > 0 && payableDisplayNum > 0);
   const dueDisplay = isCodSelected
     ? String(totalDisplay - payableDisplayNum)
     : '0';
@@ -104,7 +107,7 @@ export default function PaymentPageClient({
       return;
     }
 
-    if (!uploadedFile) {
+    if (showPaymentProofFields && !uploadedFile) {
       toast.error('Please upload payment slip');
       return;
     }
@@ -114,7 +117,9 @@ export default function PaymentPageClient({
 
     try {
       const formData = new FormData();
-      formData.append('pay_slip_image', uploadedFile);
+      if (uploadedFile) {
+        formData.append('pay_slip_image', uploadedFile);
+      }
       formData.append('payment_method', selectedAccount.accountName);
       formData.append('payment_method_id', selectedAccount.id);
       formData.append('invoice_id', invoiceId);
@@ -150,7 +155,9 @@ export default function PaymentPageClient({
                 <tr>
                   <th className="py-3 px-4 font-semibold">Order</th>
                   <th className="py-3 px-4 font-semibold">Sub-Total</th>
-                  <th className="py-3 px-4 font-semibold">Cash Fee</th>
+                  {showCashFeeColumn && (
+                    <th className="py-3 px-4 font-semibold">Cash Fee</th>
+                  )}
                   <th className="py-3 px-4 font-semibold">Total</th>
                   {isCodSelected && (
                     <th className="py-3 px-4 font-semibold">Advance</th>
@@ -172,7 +179,9 @@ export default function PaymentPageClient({
                     </Link>
                   </td>
                   <td className="py-3 px-4">৳{subTotalDisplay}</td>
-                  <td className="py-3 px-4">৳{cashFeeDisplay}</td>
+                  {showCashFeeColumn && (
+                    <td className="py-3 px-4">৳{cashFeeDisplay}</td>
+                  )}
                   <td className="py-3 px-4">৳{totalDisplay}</td>
                   {isCodSelected && (
                     <td className="py-3 px-4">{advancePercent}%</td>
@@ -292,68 +301,76 @@ export default function PaymentPageClient({
                 </div>
               </div>
             )}
-            <div>
-              <Label className="text-sm font-medium mb-2 block text-gray-900">
-                Upload Slip / Screenshot
-              </Label>
-              {uploadedImage ? (
-                <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4">
-                  <div className="relative w-full h-48 mb-4">
-                    <Image
-                      src={uploadedImage}
-                      alt="Payment slip"
-                      fill
-                      className="object-contain rounded"
-                    />
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => {
-                      setUploadedImage(null);
-                      setUploadedFile(null);
-                    }}
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Remove Image
-                  </Button>
-                </div>
-              ) : (
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-teal-600 transition-colors min-h-37.5">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <Plus className="h-12 w-12 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-600">
+            {showPaymentProofFields && (
+              <>
+                <div>
+                  <Label className="text-sm font-medium mb-2 block text-gray-900">
                     Upload Slip / Screenshot
-                  </span>
-                </label>
-              )}
-            </div>
-            <div>
-              <Label
-                htmlFor="paymentAmount"
-                className="text-sm font-medium mb-2 block text-gray-900"
-              >
-                Payable Amount
-              </Label>
-              <Input
-                id="paymentAmount"
-                type="text"
-                value={payableDisplay}
-                readOnly
-                className="w-full"
-              />
-            </div>
+                  </Label>
+                  {uploadedImage ? (
+                    <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4">
+                      <div className="relative w-full h-48 mb-4">
+                        <Image
+                          src={uploadedImage}
+                          alt="Payment slip"
+                          fill
+                          className="object-contain rounded"
+                        />
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          setUploadedImage(null);
+                          setUploadedFile(null);
+                        }}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Remove Image
+                      </Button>
+                    </div>
+                  ) : (
+                    <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-teal-600 transition-colors min-h-37.5">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                      <Plus className="h-12 w-12 text-gray-400 mb-2" />
+                      <span className="text-sm text-gray-600">
+                        Upload Slip / Screenshot
+                      </span>
+                    </label>
+                  )}
+                </div>
+                <div>
+                  <Label
+                    htmlFor="paymentAmount"
+                    className="text-sm font-medium mb-2 block text-gray-900"
+                  >
+                    Payable Amount
+                  </Label>
+                  <Input
+                    id="paymentAmount"
+                    type="text"
+                    value={payableDisplay}
+                    readOnly
+                    className="w-full"
+                  />
+                </div>
+              </>
+            )}
             <div className="flex items-center gap-4">
               <Button
                 type="button"
                 onClick={handlePaymentSubmit}
-                disabled={isSubmitting || !uploadedFile || !selectedAccount}
+                disabled={
+                  isSubmitting ||
+                  !selectedAccount ||
+                  (showPaymentProofFields && !uploadedFile)
+                }
                 className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
@@ -362,7 +379,7 @@ export default function PaymentPageClient({
                     Submitting...
                   </>
                 ) : (
-                  `Pay ৳${payableDisplay}`
+                  'Pay'
                 )}
               </Button>
             </div>

@@ -41,12 +41,14 @@ interface LiveChatProps {
   ticketId: string;
   ticket: any[];
   managerName: string;
+  status?: string;
 }
 
 export default function LiveChat({
   ticketId,
   ticket,
   managerName,
+  status,
 }: LiveChatProps) {
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -65,6 +67,7 @@ export default function LiveChat({
     const last = list[list.length - 1];
     return `${list.length}:${String(last?.id ?? '')}:${String(last?.created_at ?? '')}`;
   }, [ticket]);
+  const isTicketClosed = String(status ?? '').toLowerCase() === 'closed';
 
   useLayoutEffect(() => {
     const root = messagesScrollRef.current;
@@ -123,6 +126,7 @@ export default function LiveChat({
   };
 
   const handleSendMessage = async () => {
+    if (isTicketClosed) return;
     if (!message.trim() && !uploadedFile) return;
 
     setSending(true);
@@ -308,6 +312,7 @@ export default function LiveChat({
             size="icon"
             className="rounded-full w-10 h-10 shrink-0 border-gray-300 hover:bg-gray-50"
             onClick={() => fileInputRef.current?.click()}
+            disabled={isTicketClosed}
             aria-label="Attach image"
           >
             <Plus className="h-5 w-5" />
@@ -321,12 +326,13 @@ export default function LiveChat({
                 handleSendMessage();
               }
             }}
+            disabled={isTicketClosed}
             placeholder="Type your message..."
             className="flex-1 rounded-lg border-gray-300 focus-visible:ring-teal-500"
           />
           <Button
             onClick={handleSendMessage}
-            disabled={(!message.trim() && !uploadedFile) || sending}
+            disabled={isTicketClosed || (!message.trim() && !uploadedFile) || sending}
             className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-4 py-2 shrink-0"
             aria-label={sending ? 'Sending message' : 'Send message'}
           >

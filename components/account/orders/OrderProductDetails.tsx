@@ -90,10 +90,7 @@ function calculateProductTotals(
   }
 
   const total =
-    saleSubtotal -
-    extraLineDiscount -
-    couponAllocated +
-    chinaCourier;
+    saleSubtotal - extraLineDiscount - couponAllocated + chinaCourier;
 
   const discountPct =
     variantPriceDiscount > 0 && regularSubtotal > 0
@@ -243,7 +240,7 @@ export default function OrderProductDetails({
 
             <div className="border-t pt-4 flex justify-end">
               <div className="space-y-2 w-1/2">
-                <div className="flex justify-between font-semibold text-sm">
+                {/* <div className="flex justify-between font-semibold text-sm">
                   <span className="text-gray-900">Product Price:</span>
                   <span>৳{Math.round(totals.productPrice)}</span>
                 </div>
@@ -269,7 +266,7 @@ export default function OrderProductDetails({
                       - ৳{Math.round(totals.extraLineDiscount)}
                     </span>
                   </div>
-                )}
+                )} */}
                 {/* {totals.couponAllocated > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-900">
@@ -301,12 +298,12 @@ export default function OrderProductDetails({
                   <span className="text-gray-900">Total:</span>
                   <span>৳{Math.round(totals.total)}</span>
                 </div>
-                <div className="flex justify-between font-semibold text-sm pt-2">
+                {/* <div className="flex justify-between font-semibold text-sm pt-2">
                   <span className="text-gray-900">Paid:</span>
                   <span className="font-medium text-red-600">
                     - ৳{Math.round(paidShare)}
                   </span>
-                </div>
+                </div> */}
                 {due > 0 && (
                   <div className="flex justify-between text-sm font-semibold pt-2">
                     <span className="text-gray-900">Due:</span>

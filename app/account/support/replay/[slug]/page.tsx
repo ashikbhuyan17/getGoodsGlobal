@@ -107,6 +107,7 @@ export default async function TicketDetailPage({
               ticketId={ticketId}
               ticket={chatMessages}
               managerName={managerName}
+              status={status}
             />
           </div>
         </div>

@@ -14,7 +14,6 @@ export default function CartSummary({
   page = 'cart',
   total,
   formData,
-  allDeselected,
   onCheckoutClick,
   isCheckoutLoading = false,
   cartIds,
@@ -72,6 +71,7 @@ export default function CartSummary({
   const productPrice = Number(priceSummary?.product_price ?? 0);
   const summaryDiscount = Number(priceSummary?.discount ?? 0);
   const summaryFinal = Number(priceSummary?.final_price ?? 0);
+  const cartSelectedTotal = Number(total ?? 0);
 
   const couponDiscountAmount = (() => {
     if (!discount) return 0;
@@ -82,7 +82,10 @@ export default function CartSummary({
     return 0;
   })();
 
-  const finalPrice = summaryFinal + Number(shippingCharge ?? 0) - couponDiscountAmount;
+  const finalPrice =
+    page === 'cart'
+      ? cartSelectedTotal
+      : summaryFinal + Number(shippingCharge ?? 0) - couponDiscountAmount;
 
   const validateForm = () => {
     if (page !== 'checkout') return true;
@@ -222,14 +225,18 @@ export default function CartSummary({
               <span>Qty</span>
               <span>Price</span>
             </div> */}
-            <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+            {/* <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
-              <span className="font-semibold">৳{formatPriceInt(productPrice)}</span>
+              <span className="font-semibold">
+                ৳{formatPriceInt(productPrice)}
+              </span>
             </div>
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Discount</span>
-              <span className="font-semibold">৳{formatPriceInt(summaryDiscount)}</span>
-            </div>
+              <span className="font-semibold">
+                ৳{formatPriceInt(summaryDiscount)}
+              </span>
+            </div> */}
             {discount && (
               <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
                 <span className="font-semibold">
@@ -249,22 +256,27 @@ export default function CartSummary({
             </div>
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Final price</span>
-              <span className="font-semibold">৳{formatPriceInt(finalPrice)}</span>
+              <span className="font-semibold">
+                ৳{formatPriceInt(finalPrice)}
+              </span>
             </div>
           </div>
         ) : (
           <div className="space-y-3">
-            <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+            {/* Kept commented for future reuse in cart page */}
+            {/* <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
               <span className="font-semibold">৳{formatPriceInt(productPrice)}</span>
             </div>
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
               <span className="font-semibold">Discount</span>
               <span className="font-semibold">৳{formatPriceInt(summaryDiscount)}</span>
-            </div>
-            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
+            </div> */}
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold">
               <span className="font-semibold">Final price</span>
-              <span className="font-semibold">৳{formatPriceInt(finalPrice)}</span>
+              <span className="font-semibold">
+                ৳{formatPriceInt(finalPrice)}
+              </span>
             </div>
           </div>
         )}
