@@ -42,14 +42,12 @@ export default async function PaymentPage({
   }
 
   const rawData = payment.data;
-  console.log("🚀 ~ PaymentPage ~ rawData:", rawData)
   const firstPayment = Array.isArray(rawData) ? rawData[0] : rawData;
   if (!firstPayment) notFound();
 
   const orderLabel = invoiceId ? `SKY${invoiceId}` : '—';
   const subTotal = Number(firstPayment?.amount) || 0;
   const banks = Array.isArray(payment?.banks) ? payment.banks : [];
-  console.log("🚀 ~ PaymentPage ~ banks:", banks)
   const advancedPercent = Number(payment?.advanced) || 0;
 
   return (
