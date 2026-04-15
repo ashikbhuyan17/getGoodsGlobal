@@ -4,16 +4,49 @@ import { fetcher } from '@/lib/fetcher';
 import ProductCard from '@/components/common/ProductCard';
 import StatusCards from '@/components/account/StatusCards';
 import Link from 'next/link';
+import { MessageCircle, Phone, MessagesSquare } from 'lucide-react';
 
 export default async function Dashboard() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const wishlist: any = await fetcher('/wishlists');
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dashboardOverview: any = await fetcher('/dashboard-overview');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const userProfile: any = await fetcher('/user-profile');
+
+  const favoriteProducts = wishlist?.data || [];
+  const firstFavoriteSlug = favoriteProducts?.[0]?.product?.slug;
+  // Use the same source as Suggestions UI: related products by slug.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let recentViewProducts: any[] = [];
+  if (firstFavoriteSlug) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recentRes: any = await fetcher(
+      `/related-products/${firstFavoriteSlug}`,
+      {},
+      60,
+    );
+    recentViewProducts = recentRes?.data || [];
+  }
 
   const pending = dashboardOverview?.data?.pendingOrders ?? 0;
   const processing = dashboardOverview?.data?.ProcessingOrders ?? 0;
   const completed = dashboardOverview?.data?.completeOrders ?? 0;
+  const managerName = userProfile?.data?.name || 'N/A';
+  const managerPhoneRaw =
+    userProfile?.data?.account_manager_phone ||
+    userProfile?.data?.manager_phone ||
+    userProfile?.data?.phone ||
+    '';
+  const managerWhatsappRaw = '01409987890';
+  const managerMessenger = 'https://m.me/skybuybd';
+  const managerPhone = String(managerPhoneRaw || '').trim();
+  const managerWhatsapp = String(managerWhatsappRaw || '').trim();
+  const whatsappHref = managerWhatsapp
+    ? `https://wa.me/${managerWhatsapp.replace(/[^\d]/g, '')}`
+    : '#';
+  const phoneHref = managerPhone ? `tel:${managerPhone}` : '#';
+  const messengerHref = managerMessenger ? String(managerMessenger) : '#';
 
   return (
     <div className="w-full rounded space-y-4 px-2">
@@ -23,27 +56,61 @@ export default async function Dashboard() {
         processing={processing}
         completed={completed}
         rightSlot={
-          <div className="flex flex-col gap-3 h-full">
-            <div className="flex items-center gap-3">
-              <Image
-                src="/chat-user.svg"
-                width={60}
-                height={60}
-                alt="manager"
-                className="object-contain shrink-0"
-              />
-              <div className="min-w-0">
-                <p className="font-semibold text-sm text-gray-800">
-                  Open a Support Ticket
-                </p>
-                <p className="text-xs mt-1 text-gray-500">
-                  Submit issues fast and get timely support through tickets.
-                </p>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 md:p-5 h-full">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-3 min-w-0">
+                <Image
+                  src="/chat-user.svg"
+                  width={56}
+                  height={56}
+                  alt="manager"
+                  className="object-contain shrink-0"
+                />
+                <div className="min-w-0">
+                  <p className="font-bold text-lg leading-6 text-gray-900 uppercase wrap-break-word">
+                    {managerName}
+                  </p>
+                  <p className="text-lg font-semibold text-cyan-700 mt-1">
+                    {managerPhone || 'N/A'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                <Link
+                  href={phoneHref}
+                  aria-label="Call manager"
+                  className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors"
+                >
+                  <Phone className="h-5 w-5" />
+                </Link>
+                <Link
+                  href={whatsappHref}
+                  target={managerWhatsapp ? '_blank' : undefined}
+                  aria-label="Contact on WhatsApp"
+                  className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                >
+                  <MessageCircle className="h-5 w-5" />
+                </Link>
+                <Link
+                  href={messengerHref}
+                  target={managerMessenger ? '_blank' : undefined}
+                  aria-label="Contact on Messenger"
+                  className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+                >
+                  <MessagesSquare className="h-5 w-5" />
+                </Link>
               </div>
             </div>
-            <Link prefetch href="/account/support/create" className="mt-auto">
-              <Button className="w-full">Get Help Now</Button>
-            </Link>
+            <p className="text-sm mt-3 text-gray-600 leading-relaxed">
+              Hi {userProfile?.data?.name || 'there'}, I am your account
+              manager, please feel free to contact me for any assistance.
+            </p>
+            {/* <div className="mt-4">
+              <Link prefetch href="/account/support/create" className="mt-auto">
+                <Button className="w-full">Get Help Now</Button>
+              </Link>
+            </div> */}
           </div>
         }
       />
@@ -52,7 +119,7 @@ export default async function Dashboard() {
         {/* Favorites */}
         <div className="p-4">
           <div className="flex justify-between items-center mb-3">
-            <p className="font-semibold text-gray-800">Your Favorites</p>
+            <p className="font-semibold text-gray-800"> Favorite View</p>
             <Button variant="outline" className="h-7 text-xs px-3 rounded-lg">
               View All
             </Button>
@@ -60,7 +127,7 @@ export default async function Dashboard() {
 
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {wishlist?.data?.map((item: any, i: number) => (
+            {favoriteProducts?.map((item: any, i: number) => (
               <ProductCard
                 title={item?.product?.name}
                 slug={item?.product?.slug}
@@ -71,6 +138,32 @@ export default async function Dashboard() {
               />
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-sm">
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-3">
+            <p className="font-semibold text-gray-800">Recent View</p>
+          </div>
+
+          {recentViewProducts?.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {recentViewProducts?.map((item: any, i: number) => (
+                <ProductCard
+                  key={`recent-${item?.id ?? i}`}
+                  title={item?.name}
+                  slug={item?.slug}
+                  image={item?.image?.image}
+                  newPrice={item?.new_price}
+                  oldPrice={item?.old_price}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No recent views found.</p>
+          )}
         </div>
       </div>
     </div>

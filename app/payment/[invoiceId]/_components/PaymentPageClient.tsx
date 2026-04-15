@@ -42,8 +42,8 @@ export default function PaymentPageClient({
               : '/bank-placeholder.png',
             accountName: bank.account_name,
             accountNumber: bank.account_number,
-            branch: bank.branch || 'N/A',
-            routingNo: bank.routing_number || 'N/A',
+            branch: bank.branch ? String(bank.branch).trim() : '',
+            routingNo: bank.routing_number ? String(bank.routing_number).trim() : '',
             description: bank.description || '',
             cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
           }))
@@ -85,11 +85,15 @@ export default function PaymentPageClient({
   const payableDisplayNum = roundInt(payableAmount);
   const payableDisplay = String(payableDisplayNum);
   const showCashFeeColumn = cashFeeDisplay > 0;
+  const showCodAdvancePayable =
+    isCodSelected && advancePercent > 0 && payableDisplayNum > 0;
   const showPaymentProofFields =
-    !isCodSelected || (advancePercent > 0 && payableDisplayNum > 0);
+    !isCodSelected || showCodAdvancePayable;
   const dueDisplay = isCodSelected
     ? String(totalDisplay - payableDisplayNum)
     : '0';
+  const hasBranch = Boolean(selectedAccount?.branch);
+  const hasRoutingNo = Boolean(selectedAccount?.routingNo);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -159,11 +163,13 @@ export default function PaymentPageClient({
                     <th className="py-3 px-4 font-semibold">Cash Fee</th>
                   )}
                   <th className="py-3 px-4 font-semibold">Total</th>
-                  {isCodSelected && (
+                  {showCodAdvancePayable && (
                     <th className="py-3 px-4 font-semibold">Advance</th>
                   )}
-                  <th className="py-3 px-4 font-semibold">Payable</th>
-                  {isCodSelected && (
+                  {(!isCodSelected || showCodAdvancePayable) && (
+                    <th className="py-3 px-4 font-semibold">Payable</th>
+                  )}
+                  {showCodAdvancePayable && (
                     <th className="py-3 px-4 font-semibold min-w-30">Due</th>
                   )}
                 </tr>
@@ -183,11 +189,13 @@ export default function PaymentPageClient({
                     <td className="py-3 px-4">৳{cashFeeDisplay}</td>
                   )}
                   <td className="py-3 px-4">৳{totalDisplay}</td>
-                  {isCodSelected && (
+                  {showCodAdvancePayable && (
                     <td className="py-3 px-4">{advancePercent}%</td>
                   )}
-                  <td className="py-3 px-4">৳{payableDisplay}</td>
-                  {isCodSelected && (
+                  {(!isCodSelected || showCodAdvancePayable) && (
+                    <td className="py-3 px-4">৳{payableDisplay}</td>
+                  )}
+                  {showCodAdvancePayable && (
                     <td className="py-3 px-4">৳{dueDisplay}</td>
                   )}
                 </tr>
@@ -267,22 +275,26 @@ export default function PaymentPageClient({
                   </div>
                   {selectedAccount.accountName != 'BKash' && (
                     <>
-                      <div className="grid grid-cols-12 border-b">
-                        <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                          Branch
+                      {hasBranch && (
+                        <div className="grid grid-cols-12 border-b">
+                          <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                            Branch
+                          </div>
+                          <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                            {selectedAccount.branch}
+                          </div>
                         </div>
-                        <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                          {selectedAccount.branch}
+                      )}
+                      {hasRoutingNo && (
+                        <div className="grid grid-cols-12 border-b">
+                          <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
+                            Routing No
+                          </div>
+                          <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
+                            {selectedAccount.routingNo}
+                          </div>
                         </div>
-                      </div>
-                      <div className="grid grid-cols-12 border-b">
-                        <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-2 text-sm text-gray-600 font-medium">
-                          Routing No
-                        </div>
-                        <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                          {selectedAccount.routingNo}
-                        </div>
-                      </div>
+                      )}
                     </>
                   )}
                   {selectedAccount.description && (
@@ -379,7 +391,7 @@ export default function PaymentPageClient({
                     Submitting...
                   </>
                 ) : (
-                  'Pay'
+                  isCodSelected && !showCodAdvancePayable ? 'Confirm order' : 'Pay'
                 )}
               </Button>
             </div>

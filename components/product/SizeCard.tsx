@@ -52,8 +52,10 @@ function SizeCard({
   const bulkEffectivePrice = bulkTier
     ? bulkTier.flashSalePrice ?? bulkTier.price
     : Number(price);
+  const isOutOfStock = Number(max ?? 0) <= 0;
 
   const handleQuantityChange = (newQty: number) => {
+    if (isOutOfStock) return;
     const newTotal = (totalQuantity ?? 0) - quantity + newQty;
     const tierForNewTotal = useBulk
       ? getActiveBulkTier(bulkQuantities, newTotal)
@@ -100,7 +102,11 @@ function SizeCard({
 
       {/* Quantity Column */}
       <div className="flex flex-col items-end gap-1">
-        {quantity < 1 ? (
+        {isOutOfStock ? (
+          <Button disabled size="sm" variant="outline" className="px-3">
+            Stock Out
+          </Button>
+        ) : quantity < 1 ? (
           <Button
             onClick={() => handleQuantityChange(1)}
             className=" text-white px-4 py-2 rounded-md"

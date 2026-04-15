@@ -33,30 +33,39 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
     }));
   };
 
-  // Calculate total only for selected items
-  const selectedTotal = useMemo(() => {
+  // Calculate total and quantity together for selected items
+  const selectedSummary = useMemo(() => {
     return (
       cartProducts?.data?.reduce(
         (
-          sum: number,
+          acc: { total: number; quantity: number },
           product: {
             id: string;
             cartdetails?: { quantity: number; price: number }[];
           },
         ) => {
-          if (selectedItems[product.id]) {
-            const itemTotal = product?.cartdetails?.reduce(
-              (itemSum: number, item: { quantity: number; price: number }) => {
-                return itemSum + Number(item?.quantity) * Number(item?.price);
-              },
-              0,
-            );
-            return sum + (itemTotal ?? 0);
-          }
-          return sum;
+          if (!selectedItems[product.id]) return acc;
+
+          const { itemTotal, itemQty } =
+            product?.cartdetails?.reduce(
+              (
+                itemAcc: { itemTotal: number; itemQty: number },
+                item: { quantity: number; price: number },
+              ) => ({
+                itemTotal:
+                  itemAcc.itemTotal + Number(item?.quantity) * Number(item?.price),
+                itemQty: itemAcc.itemQty + Number(item?.quantity),
+              }),
+              { itemTotal: 0, itemQty: 0 },
+            ) ?? { itemTotal: 0, itemQty: 0 };
+
+          return {
+            total: acc.total + itemTotal,
+            quantity: acc.quantity + itemQty,
+          };
         },
-        0,
-      ) || 0
+        { total: 0, quantity: 0 },
+      ) ?? { total: 0, quantity: 0 }
     );
   }, [cartProducts?.data, selectedItems]);
 
@@ -151,7 +160,8 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
       {/* Cart Summary */}
       <CartSummary
         page="cart"
-        total={selectedTotal}
+        total={selectedSummary.total}
+        totalQuantity={selectedSummary.quantity}
         allDeselected={allDeselected}
         onCheckoutClick={handleCheckoutClick}
         isCheckoutLoading={checkoutLoading}

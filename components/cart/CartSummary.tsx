@@ -13,6 +13,7 @@ import { formatPriceInt } from '@/lib/utils';
 export default function CartSummary({
   page = 'cart',
   total,
+  totalQuantity = 0,
   formData,
   onCheckoutClick,
   isCheckoutLoading = false,
@@ -26,6 +27,7 @@ export default function CartSummary({
 }: {
   page?: 'cart' | 'checkout';
   total: number;
+  totalQuantity?: number;
   formData?: {
     name: string;
     phone: string;
@@ -220,11 +222,17 @@ export default function CartSummary({
       <div className="p-2 lg:p-6 space-y-2">
         {page === 'checkout' ? (
           <div className="space-y-3">
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
+              <span className="font-semibold">Product Price</span>
+              <span className="font-semibold">
+                ৳{formatPriceInt(productPrice)}
+              </span>
+            </div>
             {/* <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm font-semibold text-gray-600 border-b pb-2">
               <span>Item</span>
               <span>Qty</span>
               <span>Price</span>
-            </div> */}
+            </div> 
             {/* <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
               <span className="font-semibold">
@@ -273,7 +281,11 @@ export default function CartSummary({
               <span className="font-semibold">৳{formatPriceInt(summaryDiscount)}</span>
             </div> */}
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold">
-              <span className="font-semibold">Final price</span>
+              <span className="font-semibold">Quantity</span>
+              <span className="font-semibold">{totalQuantity}</span>
+            </div>
+            <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold">
+              <span className="font-semibold">Product price</span>
               <span className="font-semibold">
                 ৳{formatPriceInt(finalPrice)}
               </span>

@@ -64,10 +64,10 @@ export default function StatusCards({
 
   return (
     <div className="w-full">
-      <div className="w-full grid grid-cols-1 xl:grid-cols-[1fr_auto] gap-5 sm:gap-6 items-stretch">
+      <div className="w-full grid grid-cols-1 xl:grid-cols-[70%_30%] gap-5 sm:gap-6 items-stretch">
         {/* Left section: status cards – full width, own shadow */}
         <div className="rounded bg-white p-5 sm:p-6 shadow min-w-0 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 sm:gap-6 w-full">
             {items.map(({ label, value }) => (
               <Card
                 key={label}
@@ -96,7 +96,7 @@ export default function StatusCards({
         </div>
         {/* Right section: support – own shadow */}
         {rightSlot ? (
-          <div className="rounded bg-white p-5 sm:p-6 shadow min-w-0 lg:w-72 shrink-0 w-full">
+          <div className="rounded bg-white p-5 sm:p-6 shadow min-w-0 w-full">
             {rightSlot}
           </div>
         ) : null}
