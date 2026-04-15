@@ -38,13 +38,17 @@ export default async function Dashboard() {
     userProfile?.data?.manager_phone ||
     userProfile?.data?.phone ||
     '';
-  const managerWhatsappRaw = '01409987890';
-  const managerMessenger = 'https://m.me/skybuybd';
+  const managerWhatsappRaw = '01827997700';
+  const managerMessenger = 'https://m.me/179069901947541';
   const managerPhone = String(managerPhoneRaw || '').trim();
   const managerWhatsapp = String(managerWhatsappRaw || '').trim();
-  const whatsappHref = managerWhatsapp
-    ? `https://wa.me/${managerWhatsapp.replace(/[^\d]/g, '')}`
-    : '#';
+  const whatsappDigits = managerWhatsapp.replace(/[^\d]/g, '');
+  const whatsappNumber = whatsappDigits.startsWith('880')
+    ? whatsappDigits
+    : whatsappDigits.startsWith('0')
+      ? `88${whatsappDigits}`
+      : whatsappDigits;
+  const whatsappHref = whatsappNumber ? `https://wa.me/${whatsappNumber}` : '#';
   const phoneHref = managerPhone ? `tel:${managerPhone}` : '#';
   const messengerHref = managerMessenger ? String(managerMessenger) : '#';
 
@@ -56,9 +60,9 @@ export default async function Dashboard() {
         processing={processing}
         completed={completed}
         rightSlot={
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 md:p-5 h-full">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex flex-col gap-3 min-w-0">
+          <div className="">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-2 min-w-0">
                 <Image
                   src="/chat-user.svg"
                   width={56}
@@ -102,7 +106,7 @@ export default async function Dashboard() {
                 </Link>
               </div>
             </div>
-            <p className="text-sm mt-3 text-gray-600 leading-relaxed">
+            <p className="text-sm mt-2 text-gray-600 leading-relaxed">
               Hi {userProfile?.data?.name || 'there'}, I am your account
               manager, please feel free to contact me for any assistance.
             </p>
