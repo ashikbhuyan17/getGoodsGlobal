@@ -4,7 +4,7 @@ import { fetcher } from '@/lib/fetcher';
 import ProductCard from '@/components/common/ProductCard';
 import StatusCards from '@/components/account/StatusCards';
 import Link from 'next/link';
-import { MessageCircle, Phone, MessagesSquare } from 'lucide-react';
+import { Phone } from 'lucide-react';
 
 export default async function Dashboard() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -32,7 +32,6 @@ export default async function Dashboard() {
   const pending = dashboardOverview?.data?.pendingOrders ?? 0;
   const processing = dashboardOverview?.data?.ProcessingOrders ?? 0;
   const completed = dashboardOverview?.data?.completeOrders ?? 0;
-  const managerName = userProfile?.data?.name || 'N/A';
   const managerPhoneRaw =
     userProfile?.data?.account_manager_phone ||
     userProfile?.data?.manager_phone ||
@@ -71,11 +70,11 @@ export default async function Dashboard() {
                   className="object-contain shrink-0"
                 />
                 <div className="min-w-0">
-                  <p className="font-bold text-lg leading-6 text-gray-900 uppercase wrap-break-word">
-                    {managerName}
+                  <p className="font-bold leading-6 text-gray-900 uppercase wrap-break-word">
+                    GetGoods Team
                   </p>
-                  <p className="text-lg font-semibold text-cyan-700 mt-1">
-                    {managerPhone || 'N/A'}
+                  <p className="font-semibold text-cyan-700 mt-1">
+                    01827997700/01827993399
                   </p>
                 </div>
               </div>
@@ -94,7 +93,7 @@ export default async function Dashboard() {
                   aria-label="Contact on WhatsApp"
                   className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
                 >
-                  <MessageCircle className="h-5 w-5" />
+                  <i className="fa-brands fa-whatsapp text-lg" />
                 </Link>
                 <Link
                   href={messengerHref}
@@ -102,7 +101,7 @@ export default async function Dashboard() {
                   aria-label="Contact on Messenger"
                   className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors"
                 >
-                  <MessagesSquare className="h-5 w-5" />
+                  <i className="fa-brands fa-facebook-messenger text-base" />
                 </Link>
               </div>
             </div>
