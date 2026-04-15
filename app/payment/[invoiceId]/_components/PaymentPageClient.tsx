@@ -43,7 +43,9 @@ export default function PaymentPageClient({
             accountName: bank.account_name,
             accountNumber: bank.account_number,
             branch: bank.branch ? String(bank.branch).trim() : '',
-            routingNo: bank.routing_number ? String(bank.routing_number).trim() : '',
+            routingNo: bank.routing_number
+              ? String(bank.routing_number).trim()
+              : '',
             description: bank.description || '',
             cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
           }))
@@ -70,6 +72,7 @@ export default function PaymentPageClient({
   const isCodSelected = selectedAccount?.accountName
     ?.toLowerCase()
     .includes('cash on delivery');
+  console.log('🚀 ~ PaymentPageClient ~ isCodSelected:', isCodSelected);
   // Advance percentage (from payment API). Used only when COD method is selected.
   const advancePercent = isCodSelected ? Math.max(0, Number(advanced) || 0) : 0;
   // BKash/Bank: Payable = Total. COD: Payable = Total * advance%.
@@ -87,8 +90,7 @@ export default function PaymentPageClient({
   const showCashFeeColumn = cashFeeDisplay > 0;
   const showCodAdvancePayable =
     isCodSelected && advancePercent > 0 && payableDisplayNum > 0;
-  const showPaymentProofFields =
-    !isCodSelected || showCodAdvancePayable;
+  const showPaymentProofFields = !isCodSelected || showCodAdvancePayable;
   const dueDisplay = isCodSelected
     ? String(totalDisplay - payableDisplayNum)
     : '0';
@@ -163,13 +165,8 @@ export default function PaymentPageClient({
                     <th className="py-3 px-4 font-semibold">Cash Fee</th>
                   )}
                   <th className="py-3 px-4 font-semibold">Total</th>
-                  {showCodAdvancePayable && (
-                    <th className="py-3 px-4 font-semibold">Advance</th>
-                  )}
-                  {(!isCodSelected || showCodAdvancePayable) && (
-                    <th className="py-3 px-4 font-semibold">Payable</th>
-                  )}
-                  {showCodAdvancePayable && (
+                  <th className="py-3 px-4 font-semibold">Payable</th>
+                  {isCodSelected && (
                     <th className="py-3 px-4 font-semibold min-w-30">Due</th>
                   )}
                 </tr>
@@ -189,13 +186,8 @@ export default function PaymentPageClient({
                     <td className="py-3 px-4">৳{cashFeeDisplay}</td>
                   )}
                   <td className="py-3 px-4">৳{totalDisplay}</td>
-                  {showCodAdvancePayable && (
-                    <td className="py-3 px-4">{advancePercent}%</td>
-                  )}
-                  {(!isCodSelected || showCodAdvancePayable) && (
-                    <td className="py-3 px-4">৳{payableDisplay}</td>
-                  )}
-                  {showCodAdvancePayable && (
+                  <td className="py-3 px-4">৳{payableDisplay}</td>
+                  {isCodSelected && (
                     <td className="py-3 px-4">৳{dueDisplay}</td>
                   )}
                 </tr>
@@ -390,8 +382,10 @@ export default function PaymentPageClient({
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                     Submitting...
                   </>
+                ) : isCodSelected && !showCodAdvancePayable ? (
+                  'Confirm order'
                 ) : (
-                  isCodSelected && !showCodAdvancePayable ? 'Confirm order' : 'Pay'
+                  'Pay'
                 )}
               </Button>
             </div>

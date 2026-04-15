@@ -74,10 +74,14 @@ export default function CartSummary({
   const summaryDiscount = Number(priceSummary?.discount ?? 0);
   const summaryFinal = Number(priceSummary?.final_price ?? 0);
   const cartSelectedTotal = Number(total ?? 0);
+  const checkoutBasePrice =
+    page === 'checkout' ? cartSelectedTotal : summaryFinal;
+  const checkoutProductPrice =
+    page === 'checkout' ? cartSelectedTotal : productPrice;
 
   const couponDiscountAmount = (() => {
     if (!discount) return 0;
-    const base = summaryFinal;
+    const base = checkoutBasePrice;
     const val = Number(discount.discount) || 0;
     if (discount.type === 'Solid') return Math.min(val, base);
     if (discount.type === 'Percentage') return (base * val) / 100;
@@ -87,7 +91,7 @@ export default function CartSummary({
   const finalPrice =
     page === 'cart'
       ? cartSelectedTotal
-      : summaryFinal + Number(shippingCharge ?? 0) - couponDiscountAmount;
+      : checkoutBasePrice + Number(shippingCharge ?? 0) - couponDiscountAmount;
 
   const validateForm = () => {
     if (page !== 'checkout') return true;
@@ -225,7 +229,7 @@ export default function CartSummary({
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
               <span className="font-semibold">Product Price</span>
               <span className="font-semibold">
-                ৳{formatPriceInt(productPrice)}
+                ৳{formatPriceInt(checkoutProductPrice)}
               </span>
             </div>
             {/* <div className="grid grid-cols-[1fr_auto_auto] gap-2 text-sm font-semibold text-gray-600 border-b pb-2">
