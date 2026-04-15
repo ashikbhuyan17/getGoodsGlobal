@@ -106,8 +106,8 @@ export default async function Dashboard() {
               </div>
             </div>
             <p className="text-sm mt-2 text-gray-600 leading-relaxed">
-              Hi {userProfile?.data?.name || 'there'}, I am your account
-              manager, please feel free to contact me for any assistance.
+              Hi {userProfile?.data?.name || 'there'}, please feel free to
+              contact us for any general queries or support.
             </p>
             {/* <div className="mt-4">
               <Link prefetch href="/account/support/create" className="mt-auto">
