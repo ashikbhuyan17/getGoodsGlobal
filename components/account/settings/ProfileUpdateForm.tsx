@@ -22,21 +22,44 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { fetcher, uploadProfilePhoto } from '@/lib/fetcher';
+import {
+  submitUserSettingsForm,
+  submitUserSettingsWithFields,
+} from '@/lib/fetcher';
 import { toast } from 'sonner';
 import { BANGLADESH_DISTRICTS } from '@/lib/constants/districts';
 import { User, Upload, Eye } from 'lucide-react';
 
+function firstValidationError(errors: unknown): string | undefined {
+  if (!errors || typeof errors !== 'object') return undefined;
+  for (const v of Object.values(errors as Record<string, unknown>)) {
+    if (Array.isArray(v) && typeof v[0] === 'string') return v[0];
+    if (typeof v === 'string') return v;
+  }
+  return undefined;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function profileRecord(user: any): Record<string, unknown> {
+  return (user?.data ?? user ?? {}) as Record<string, unknown>;
+}
+
+function existingProfileImagePath(user: unknown): string {
+  const image = profileRecord(user).image;
+  return typeof image === 'string' && image.trim() ? image.trim() : '';
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function ProfileUpdateForm({ user }: { user: any }) {
-  const [name, setName] = useState(user?.data?.name || '');
-  const [email, setEmail] = useState(user?.data?.email || '');
+  const pr = profileRecord(user);
+  const [name, setName] = useState(String(pr.name ?? ''));
+  const [email, setEmail] = useState(String(pr.email ?? ''));
   const [emergencyNumber, setEmergencyNumber] = useState(
-    user?.data?.emergency_number || user?.data?.phone || '',
+    String(pr.emergency_number ?? pr.phone ?? ''),
   );
-  const [district, setDistrict] = useState(user?.data?.district || '');
-  const [city, setCity] = useState(user?.data?.city || '');
-  const [address, setAddress] = useState(user?.data?.address || '');
+  const [district, setDistrict] = useState(String(pr.district ?? ''));
+  const [city, setCity] = useState(String(pr.city ?? ''));
+  const [address, setAddress] = useState(String(pr.address ?? ''));
 
   const [errors, setErrors] = useState<Record<string, string>>({
     name: '',
@@ -59,32 +82,55 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const buildSettingsFormData = (file?: File) => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', emergencyNumber);
+    formData.append('emergency_number', emergencyNumber);
+    formData.append('district', district);
+    formData.append('city', city);
+    formData.append('address', address);
+    if (file) {
+      formData.append('image', file);
+    }
+    return formData;
+  };
+
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
+    const savedImage = existingProfileImagePath(user);
+
+    // Multipart like new upload: existing file is re-fetched on server and sent as `image` Blob + filename.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res: any = await fetcher('/user-settings', {
-      method: 'POST',
-      body: JSON.stringify({
-        name,
-        email,
-        emergency_number: emergencyNumber,
-        district,
-        city,
-        address,
-      }),
+    const res: any = await submitUserSettingsWithFields({
+      name,
+      email,
+      phone: emergencyNumber,
+      emergency_number: emergencyNumber,
+      district,
+      city,
+      address,
+      ...(savedImage ? { existingImageRelativePath: savedImage } : {}),
     });
 
     if (res?.status) {
       toast.success(res?.message ?? 'Profile updated');
+      router.refresh();
     } else {
-      toast.error(res?.message ?? 'Failed to update profile');
+      toast.error(
+        res?.message ||
+          firstValidationError(res?.errors) ||
+          'Failed to update profile',
+      );
     }
   };
 
-  const profileImageUrl = user?.data?.image
-    ? `${process.env.NEXT_PUBLIC_IMG_URL || ''}/${user.data.image}`
+  const savedImagePath = existingProfileImagePath(user);
+  const profileImageUrl = savedImagePath
+    ? `${process.env.NEXT_PUBLIC_IMG_URL || ''}/${savedImagePath}`
     : null;
   const displayImageUrl = previewUrl ?? profileImageUrl;
 
@@ -95,23 +141,35 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
       toast.error('Please select an image file');
       return;
     }
+    if (!validate()) {
+      toast.error(
+        'Please fill required fields (name, district, city, address) before uploading a photo',
+      );
+      e.target.value = '';
+      return;
+    }
     if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setIsUploading(true);
     e.target.value = '';
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('photo', file);
-      const res = await uploadProfilePhoto(formData);
-      if (res?.status) {
+      const res = await submitUserSettingsForm(buildSettingsFormData(file));
+      const ok =
+        res?.status === true ||
+        res?.status === 'success' ||
+        String(res?.status || '').toLowerCase() === 'success';
+      if (ok) {
         toast.success(res?.message ?? 'Photo updated');
         setPreviewUrl(null);
         setTimeout(() => URL.revokeObjectURL(url), 0);
         router.refresh();
       } else {
-        toast.error(res?.message ?? 'Failed to upload photo');
+        const msg =
+          (typeof res?.message === 'string' && res.message) ||
+          firstValidationError(res?.errors) ||
+          'Failed to upload photo';
+        toast.error(msg);
       }
     } catch {
       toast.error('Failed to upload photo');

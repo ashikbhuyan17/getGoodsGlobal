@@ -71,28 +71,6 @@ export async function fetchFlashSalePage(
   }
 }
 
-/** Upload profile photo (multipart/form-data). Expects API endpoint e.g. /user-profile-photo */
-export async function uploadProfilePhoto(
-  formData: FormData,
-): Promise<{ status?: boolean; message?: string; data?: { image?: string } }> {
-  try {
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get('token')?.value;
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/user-profile-photo`,
-      {
-        method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: formData,
-      },
-    );
-    return res.json();
-  } catch (error) {
-    console.log('Upload profile photo error:', error);
-    return { status: false, message: 'Upload failed' };
-  }
-}
-
 /** GET cart-order-products with selected cart IDs. Used before redirecting to checkout. */
 export async function cartOrderProducts(
   cartIds: string[],
@@ -188,4 +166,78 @@ export async function submitPayment(
     console.log('Submit payment error:', error);
     return { status: false, message: 'Payment submission failed' };
   }
+}
+
+/** User settings with optional profile image (multipart/form-data). Same POST pattern as submitTicketReply / submitPayment. */
+export async function submitUserSettingsForm(
+  formData: FormData,
+): Promise<{
+  status?: boolean | string;
+  message?: string;
+  data?: unknown;
+  errors?: unknown;
+}> {
+  try {
+    const cookiesStore = await cookies();
+    const token = cookiesStore.get('token')?.value;
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user-settings`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: formData,
+    });
+    return res.json();
+  } catch (error) {
+    console.log('User settings form error:', error);
+    return { status: false, message: 'Update failed' };
+  }
+}
+
+/** Text fields + optional existing image path. Re-fetches the image server-side and appends it as `image` (Blob + filename), same multipart shape as a new file upload. Falls back to string path if fetch fails. */
+export async function submitUserSettingsWithFields(fields: {
+  name: string;
+  email: string;
+  phone: string;
+  emergency_number: string;
+  district: string;
+  city: string;
+  address: string;
+  existingImageRelativePath?: string;
+}): Promise<{
+  status?: boolean | string;
+  message?: string;
+  data?: unknown;
+  errors?: unknown;
+}> {
+  const formData = new FormData();
+  formData.append('name', fields.name);
+  formData.append('email', fields.email);
+  formData.append('phone', fields.phone);
+  formData.append('emergency_number', fields.emergency_number);
+  formData.append('district', fields.district);
+  formData.append('city', fields.city);
+  formData.append('address', fields.address);
+
+  const path = fields.existingImageRelativePath?.trim();
+  if (path) {
+    const base = (process.env.NEXT_PUBLIC_IMG_URL || '').replace(/\/+$/, '');
+    const rel = path.replace(/^\/+/, '');
+    const url = base ? `${base}/${rel}` : rel;
+    try {
+      const imgRes = await fetch(url, { cache: 'no-store' });
+      if (imgRes.ok) {
+        const buf = await imgRes.arrayBuffer();
+        const ct =
+          imgRes.headers.get('content-type') || 'application/octet-stream';
+        const blob = new Blob([buf], { type: ct });
+        const filename = rel.split('/').pop() || 'profile-image';
+        formData.append('image', blob, filename);
+      } else {
+        formData.append('image', path);
+      }
+    } catch {
+      formData.append('image', path);
+    }
+  }
+
+  return submitUserSettingsForm(formData);
 }

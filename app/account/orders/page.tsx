@@ -105,9 +105,10 @@ export default async function OrderPage({
 
                     const firstItem = order?.order_details?.[0];
                     const status = formatStatus(order?.order_status ?? '');
-                    const isPartiallyPaid = status.label
-                      ?.toLowerCase()
-                      .includes('partially');
+                    const statusLabelLower = status.label?.toLowerCase() ?? '';
+                    const isPartiallyPaid =
+                      statusLabelLower.includes('partially');
+                    const isDelivered = statusLabelLower.includes('delivered');
 
                     return (
                       <tr
@@ -171,7 +172,7 @@ export default async function OrderPage({
                             <InvoiceDownloadButton
                               invoiceId={order?.invoice_id}
                             />
-                            {isPartiallyPaid && (
+                            {(isPartiallyPaid || isDelivered) && (
                               <OrderChatButton invoiceId={order?.invoice_id} />
                             )}
                           </div>

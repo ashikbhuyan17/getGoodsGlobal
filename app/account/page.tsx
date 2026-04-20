@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fetcher } from '@/lib/fetcher';
 import ProductCard from '@/components/common/ProductCard';
 import StatusCards from '@/components/account/StatusCards';
@@ -51,6 +52,24 @@ export default async function Dashboard() {
   const phoneHref = managerPhone ? `tel:${managerPhone}` : '#';
   const messengerHref = managerMessenger ? String(managerMessenger) : '#';
 
+  const userImagePath =
+    typeof userProfile?.data?.image === 'string'
+      ? userProfile.data.image.trim()
+      : '';
+  const userAvatarUrl = userImagePath
+    ? `${(process.env.NEXT_PUBLIC_IMG_URL || '').replace(/\/+$/, '')}/${userImagePath.replace(/^\/+/, '')}`
+    : null;
+  const displayName = userProfile?.data?.name || 'there';
+  const userInitialsForAvatar =
+    displayName === 'there'
+      ? 'U'
+      : displayName
+          .split(' ')
+          .map((n: string) => n[0])
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
+
   return (
     <div className="w-full rounded space-y-4 px-2">
       {/* Status cards + Support in one div (bg, shadow); Support on right */}
@@ -62,13 +81,26 @@ export default async function Dashboard() {
           <div className="">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-2 min-w-0">
-                <Image
-                  src="/chat-user.svg"
-                  width={56}
-                  height={56}
-                  alt="manager"
-                  className="object-contain shrink-0"
-                />
+                {userAvatarUrl ? (
+                  <Avatar className="h-14 w-14 shrink-0">
+                    <AvatarImage
+                      src={userAvatarUrl}
+                      alt={displayName}
+                      className="object-cover"
+                    />
+                    <AvatarFallback className="text-lg font-semibold bg-gray-200 text-gray-700">
+                      {userInitialsForAvatar}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <Image
+                    src="/chat-user.svg"
+                    width={56}
+                    height={56}
+                    alt="manager"
+                    className="object-contain shrink-0"
+                  />
+                )}
                 <div className="min-w-0">
                   <p className="font-bold leading-6 text-gray-900 uppercase wrap-break-word">
                     GetGoods Team
@@ -106,8 +138,8 @@ export default async function Dashboard() {
               </div>
             </div>
             <p className="text-sm mt-2 text-gray-600 leading-relaxed">
-              Hi {userProfile?.data?.name || 'there'}, please feel free to
-              contact us for any general queries or support.
+              Hi {displayName}, please feel free to contact us for any general
+              queries or support.
             </p>
             {/* <div className="mt-4">
               <Link prefetch href="/account/support/create" className="mt-auto">

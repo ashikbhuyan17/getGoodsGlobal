@@ -1,6 +1,7 @@
 'use client';
 
 import { User } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetcher } from '@/lib/fetcher';
@@ -66,18 +67,32 @@ function SigninBtn() {
     );
   }
 
+  const imagePath =
+    typeof user?.data?.image === 'string' ? user.data.image.trim() : '';
+  const headerAvatarSrc = imagePath
+    ? `${(process.env.NEXT_PUBLIC_IMG_URL || '').replace(/\/+$/, '')}/${imagePath.replace(/^\/+/, '')}`
+    : null;
+
   return (
     <button
       onClick={handlePush}
-      aria-label={user?.data?.name ? "Account menu" : "Sign in"}
-      className={`flex h-10 items-center gap-2 rounded-full "
-        }`}
+      aria-label={user?.data?.name ? 'Account menu' : 'Sign in'}
+      className="flex h-10 items-center gap-2 rounded-full"
     >
       {user?.data?.name ? (
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md">
-          <span className="text-xl font-semibold">
-            {user?.data?.name?.charAt(0).toUpperCase()}
-          </span>
+        <div className="shrink-0 rounded-full bg-white shadow-sm ring-1 ring-gray-200/80 hover:shadow-md transition-all overflow-hidden h-10 w-10">
+          <Avatar className="h-10 w-10">
+            {headerAvatarSrc ? (
+              <AvatarImage
+                src={headerAvatarSrc}
+                alt={user.data.name || ''}
+                className="object-cover"
+              />
+            ) : null}
+            <AvatarFallback className="bg-white text-primary text-xl font-semibold">
+              {user?.data?.name?.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
         </div>
       ) : (
         <div className="flex h-10 w-10 shrink-0 items-center  rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md  justify-center">

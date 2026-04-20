@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   GridIcon,
   ShoppingCart,
@@ -22,6 +22,7 @@ interface UserData {
     name?: string;
     email?: string;
     points?: number;
+    image?: string;
   };
 }
 
@@ -59,6 +60,12 @@ export default function Header() {
       .join('')
       .toUpperCase() || 'U';
 
+  const imagePath =
+    typeof user?.data?.image === 'string' ? user.data.image.trim() : '';
+  const avatarSrc = imagePath
+    ? `${(process.env.NEXT_PUBLIC_IMG_URL || '').replace(/\/+$/, '')}/${imagePath.replace(/^\/+/, '')}`
+    : null;
+
   return (
     <header className="px-2 pt-2">
       <div className="bg-white border-b border-gray-200 rounded mb-4">
@@ -67,6 +74,13 @@ export default function Header() {
             {/* User Profile Section */}
             <div className="flex items-center justify-center max-xl:flex-col gap-2 md:gap-4 shrink-0 lg:w-1/4">
               <Avatar className="h-14 w-14 bg-gray-300 shrink-0">
+                {avatarSrc ? (
+                  <AvatarImage
+                    src={avatarSrc}
+                    alt={user?.data?.name || 'Profile'}
+                    className="object-cover"
+                  />
+                ) : null}
                 <AvatarFallback className="text-lg font-semibold text-gray-700">
                   {userInitials}
                 </AvatarFallback>
