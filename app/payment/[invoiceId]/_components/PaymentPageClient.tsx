@@ -162,26 +162,26 @@ export default function PaymentPageClient({
             <table className="w-full text-left text-sm">
               <thead className="border-b">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Order</th>
-                  <th className="py-3 px-4 font-semibold">Sub-Total</th>
+                  <th className="py-3 px-2 font-semibold">Order</th>
+                  <th className="py-3 px-2 font-semibold">Sub-Total</th>
                   {showCashFeeColumn && (
-                    <th className="py-3 px-4 font-semibold">COD/MFS</th>
+                    <th className="py-3 px-2 font-semibold">COD/MFS</th>
                   )}
-                  <th className="py-3 px-4 font-semibold">Total</th>
+                  <th className="py-3 px-2 font-semibold">Total</th>
                   {showCodAdvancePayable && (
-                    <th className="py-3 px-4 font-semibold">Advance</th>
+                    <th className="py-3 px-2 font-semibold">Advance</th>
                   )}
                   {(!isCodSelected || showCodAdvancePayable) && (
-                    <th className="py-3 px-4 font-semibold">Payable</th>
+                    <th className="py-3 px-2 font-semibold">Payable</th>
                   )}
                   {isCodSelected && (
-                    <th className="py-3 px-4 font-semibold min-w-30">Due</th>
+                    <th className="py-3 px-2 font-semibold min-w-30">Due</th>
                   )}
                 </tr>
               </thead>
               <tbody>
                 <tr className="hover:bg-gray-50 transition font-semibold">
-                  <td className="py-3 px-4">
+                  <td className="py-3 px-2">
                     <Link
                       href={`/account/orders/${invoiceId}`}
                       className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
@@ -189,19 +189,19 @@ export default function PaymentPageClient({
                       {orderLabel}
                     </Link>
                   </td>
-                  <td className="py-3 px-4">৳{subTotalDisplay}</td>
+                  <td className="py-3 px-2">৳{subTotalDisplay}</td>
                   {showCashFeeColumn && (
-                    <td className="py-3 px-4">৳{cashFeeDisplay}</td>
+                    <td className="py-3 px-2">৳{cashFeeDisplay}</td>
                   )}
-                  <td className="py-3 px-4">৳{totalDisplay}</td>
+                  <td className="py-3 px-2">৳{totalDisplay}</td>
                   {showCodAdvancePayable && (
-                    <td className="py-3 px-4">{advancePercent}%</td>
+                    <td className="py-3 px-2">{advancePercent}%</td>
                   )}
                   {(!isCodSelected || showCodAdvancePayable) && (
-                    <td className="py-3 px-4">৳{payableDisplay}</td>
+                    <td className="py-3 px-2">৳{payableDisplay}</td>
                   )}
                   {isCodSelected && (
-                    <td className="py-3 px-4">৳{dueDisplay}</td>
+                    <td className="py-3 px-2">৳{dueDisplay}</td>
                   )}
                 </tr>
               </tbody>
