@@ -296,7 +296,7 @@ export default function OrderProductDetails({
                 )}
                 <div className="flex justify-between text-sm font-semibold pt-2">
                   <span className="text-gray-900">Total:</span>
-                  <span>৳{Math.round(totals.total)}</span>
+                  <span>৳{totals.productPrice.toFixed(2)}</span>
                 </div>
                 {/* <div className="flex justify-between font-semibold text-sm pt-2">
                   <span className="text-gray-900">Paid:</span>

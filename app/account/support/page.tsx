@@ -57,7 +57,7 @@ export default async function SupportPage() {
 
       <Card className="rounded shadow">
         <CardContent className="p-0 overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full xl:w-2/3 text-left text-sm">
             <thead className="border-b">
               <tr>
                 {/* <th className="py-3 px-4 font-semibold">Code</th> */}
@@ -142,7 +142,7 @@ export default async function SupportPage() {
                           {statusLabel}
                         </span>
                       </td>
-                     
+
                       <td className="py-3 px-4 text-right">
                         <Link href={`/account/support/replay/${ticketId}`}>
                           <Button
