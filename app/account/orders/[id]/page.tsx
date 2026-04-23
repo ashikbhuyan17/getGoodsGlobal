@@ -40,7 +40,8 @@ function normalizeOrderData(
       raw?.payment_method ?? raw?.order_type ?? 'Cash On Delivery',
     paid_partial_payment_amount:
       raw?.paid_partial_payment_amount ?? raw?.advance,
-    paid_amount: raw?.paid_partial_payment_amount ?? raw?.advance,
+    paid_amount:
+      raw?.paid_amount ?? raw?.paid_partial_payment_amount ?? raw?.advance,
   };
 }
 
