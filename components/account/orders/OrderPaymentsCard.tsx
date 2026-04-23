@@ -164,12 +164,12 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
           />
         )}
         <Row label="Shipping Charge" value={`৳${formatMoney(shipping)}`} />
-        <Row
+        {/* <Row
           label="Sub-Total"
           value={
             <span className="font-semibold">৳{formatMoney(subTotal)}</span>
           }
-        />
+        /> */}
       </div>
 
       <div className="h-3 bg-white border-t" aria-hidden />

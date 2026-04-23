@@ -1,5 +1,5 @@
-/** Reusable list of Bangladesh districts for District select UI */
-export const BANGLADESH_DISTRICTS = [
+/** Reusable list of Bangladesh districts for District select UI (A–Z) */
+const BANGLADESH_DISTRICTS_UNORDERED = [
   "Barguna",
   "Barisal",
   "Bhola",
@@ -64,4 +64,8 @@ export const BANGLADESH_DISTRICTS = [
   "Moulvibazar",
   "Sunamganj",
   "Sylhet",
-];
+] as const;
+
+export const BANGLADESH_DISTRICTS = [...BANGLADESH_DISTRICTS_UNORDERED].sort(
+  (a, b) => a.localeCompare(b, "en"),
+);

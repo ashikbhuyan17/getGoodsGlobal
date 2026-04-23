@@ -34,14 +34,8 @@ export default async function TicketDetailPage({
   ) as Record<string, unknown> | undefined;
 
   const chatData = replayRes?.data || [];
-  const firstDetail = (
-    ticketFromList?.ticketdetails as Record<string, unknown>[] | undefined
-  )?.[0];
-  const issueDescription = firstDetail?.message
-    ? String(firstDetail.message)
-    : ticketFromList?.message
-      ? String(ticketFromList.message)
-      : 'No description';
+
+
 
   const category = ticketFromList?.type
     ? String(ticketFromList.type)
@@ -80,26 +74,7 @@ export default async function TicketDetailPage({
               manager={managerName}
             />
 
-            <Card className="bg-white border border-gray-200 shadow-sm">
-              <CardContent className="p-4 md:p-6">
-                <div className="mb-3">
-                  <Badge className="bg-orange-100 text-orange-700 border-orange-200 text-xs px-2 py-1 rounded">
-                    Issue
-                  </Badge>
-                </div>
-                <p className="text-sm text-gray-700 leading-relaxed mb-4 whitespace-pre-wrap">
-                  {issueDescription}
-                </p>
-                <Button
-                  variant="outline"
-                  className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                >
-                  <Paperclip className="h-4 w-4 mr-2" />
-                  Additional Files
-                </Button>
-                <p className="text-xs text-gray-500 mt-2">No File attached.</p>
-              </CardContent>
-            </Card>
+
           </div>
 
           <div className="space-y-6">

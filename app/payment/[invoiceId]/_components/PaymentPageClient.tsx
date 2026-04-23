@@ -33,22 +33,22 @@ export default function PaymentPageClient({
   const paymentAccounts =
     Array.isArray(banks) && banks.length > 0
       ? banks
-          .filter((bank: any) => bank.status === '1')
-          .map((bank: any) => ({
-            id: String(bank.id),
-            name: bank.account_name,
-            icon: bank.image
-              ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
-              : '/bank-placeholder.png',
-            accountName: bank.account_name,
-            accountNumber: bank.account_number,
-            branch: bank.branch ? String(bank.branch).trim() : '',
-            routingNo: bank.routing_number
-              ? String(bank.routing_number).trim()
-              : '',
-            description: bank.description || '',
-            cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
-          }))
+        .filter((bank: any) => bank.status === '1')
+        .map((bank: any) => ({
+          id: String(bank.id),
+          name: bank.account_name,
+          icon: bank.image
+            ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
+            : '/bank-placeholder.png',
+          accountName: bank.account_name,
+          accountNumber: bank.account_number,
+          branch: bank.branch ? String(bank.branch).trim() : '',
+          routingNo: bank.routing_number
+            ? String(bank.routing_number).trim()
+            : '',
+          description: bank.description || '',
+          cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
+        }))
       : [];
 
   const [selectedPayment, setSelectedPayment] = useState<string>(
@@ -165,7 +165,7 @@ export default function PaymentPageClient({
                   <th className="py-3 px-4 font-semibold">Order</th>
                   <th className="py-3 px-4 font-semibold">Sub-Total</th>
                   {showCashFeeColumn && (
-                    <th className="py-3 px-4 font-semibold">Cash Fee</th>
+                    <th className="py-3 px-4 font-semibold">COD/MFS Charge</th>
                   )}
                   <th className="py-3 px-4 font-semibold">Total</th>
                   {showCodAdvancePayable && (
@@ -224,11 +224,10 @@ export default function PaymentPageClient({
                       type="button"
                       onClick={() => setSelectedPayment(account.id)}
                       aria-label={`Select ${account.name} payment method`}
-                      className={`relative p-4 border-2 rounded-lg transition-all ${
-                        isSelected
-                          ? 'border-teal-600 bg-teal-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                      className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
+                        ? 'border-teal-600 bg-teal-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                        }`}
                     >
                       {isSelected && (
                         <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">

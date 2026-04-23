@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { fetcher } from '@/lib/fetcher';
 import ProductCard from '@/components/common/ProductCard';
 import StatusCards from '@/components/account/StatusCards';
@@ -8,12 +8,15 @@ import Link from 'next/link';
 import { Phone } from 'lucide-react';
 
 export default async function Dashboard() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const wishlist: any = await fetcher('/wishlists');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const dashboardOverview: any = await fetcher('/dashboard-overview');
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userProfile: any = await fetcher('/user-profile');
+  const [wishlist, dashboardOverview, userProfile, contact] = (await Promise.all([
+    fetcher('/wishlists'),
+    fetcher('/dashboard-overview'),
+    fetcher('/user-profile'),
+    fetcher('/contact'),
+  ])) as [any, any, any, any];
+
+  const phoneNumber = contact?.data?.phone;
+  const hotlineNumber = contact?.data?.hotline;
 
   const favoriteProducts = wishlist?.data || [];
   const firstFavoriteSlug = favoriteProducts?.[0]?.product?.slug;
@@ -38,7 +41,7 @@ export default async function Dashboard() {
     userProfile?.data?.manager_phone ||
     userProfile?.data?.phone ||
     '';
-  const managerWhatsappRaw = '01827997700';
+  const managerWhatsappRaw = phoneNumber ?? '01827997700';
   const managerMessenger = 'https://m.me/179069901947541';
   const managerPhone = String(managerPhoneRaw || '').trim();
   const managerWhatsapp = String(managerWhatsappRaw || '').trim();
@@ -52,23 +55,7 @@ export default async function Dashboard() {
   const phoneHref = managerPhone ? `tel:${managerPhone}` : '#';
   const messengerHref = managerMessenger ? String(managerMessenger) : '#';
 
-  const userImagePath =
-    typeof userProfile?.data?.image === 'string'
-      ? userProfile.data.image.trim()
-      : '';
-  const userAvatarUrl = userImagePath
-    ? `${(process.env.NEXT_PUBLIC_IMG_URL || '').replace(/\/+$/, '')}/${userImagePath.replace(/^\/+/, '')}`
-    : null;
   const displayName = userProfile?.data?.name || 'there';
-  const userInitialsForAvatar =
-    displayName === 'there'
-      ? 'U'
-      : displayName
-          .split(' ')
-          .map((n: string) => n[0])
-          .join('')
-          .toUpperCase()
-          .slice(0, 2);
 
   return (
     <div className="w-full rounded space-y-4 px-2">
@@ -78,47 +65,35 @@ export default async function Dashboard() {
         processing={processing}
         completed={completed}
         rightSlot={
-          <div className="">
+          <div className="p-2">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex flex-col gap-2 min-w-0">
-                {userAvatarUrl ? (
-                  <Avatar className="h-14 w-14 shrink-0">
-                    <AvatarImage
-                      src={userAvatarUrl}
-                      alt={displayName}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="text-lg font-semibold bg-gray-200 text-gray-700">
-                      {userInitialsForAvatar}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <Image
-                    src="/chat-user.svg"
-                    width={56}
-                    height={56}
-                    alt="manager"
-                    className="object-contain shrink-0"
-                  />
-                )}
+                <Image
+                  src="/chat-user.svg"
+                  width={56}
+                  height={56}
+                  alt="manager"
+                  className="object-contain shrink-0"
+                />
+
                 <div className="min-w-0">
-                  <p className="font-bold leading-6 text-gray-900 uppercase wrap-break-word">
+                  <p className="font-bold leading-6 text-gray-900  wrap-break-word">
                     GetGoods Team
                   </p>
                   <p className="font-semibold text-cyan-700 mt-1">
-                    01827997700/01827993399
+                    {phoneNumber}/{hotlineNumber}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 shrink-0 flex-wrap">
-                <Link
+                {/* <Link
                   href={phoneHref}
                   aria-label="Call manager"
                   className="inline-flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-full bg-green-600 text-white hover:bg-green-700 transition-colors"
                 >
                   <Phone className="h-5 w-5" />
-                </Link>
+                </Link> */}
                 <Link
                   href={whatsappHref}
                   target={managerWhatsapp ? '_blank' : undefined}

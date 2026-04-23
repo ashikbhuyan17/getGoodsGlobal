@@ -65,7 +65,6 @@ export default async function SupportPage() {
                 <th className="py-3 px-4 font-semibold">Orders</th>
                 <th className="py-3 px-4 font-semibold">Manager</th>
                 <th className="py-3 px-4 font-semibold text-center">Status</th>
-                <th className="py-3 px-4 font-semibold text-center">Message</th>
                 <th className="py-3 px-4 font-semibold text-right">Action</th>
               </tr>
             </thead>
@@ -143,9 +142,7 @@ export default async function SupportPage() {
                           {statusLabel}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-center">
-                        <Mail className="h-5 w-5 text-gray-400 mx-auto" />
-                      </td>
+                     
                       <td className="py-3 px-4 text-right">
                         <Link href={`/account/support/replay/${ticketId}`}>
                           <Button

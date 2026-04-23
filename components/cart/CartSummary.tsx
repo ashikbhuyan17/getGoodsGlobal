@@ -252,7 +252,7 @@ export default function CartSummary({
             {discount && (
               <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
                 <span className="font-semibold">
-                  Coupon Code Discount{' '}
+                  Coupon Discount{' '}
                   {discount.type === 'Percentage'
                     ? `${discount.discount}%`
                     : ''}
@@ -263,7 +263,7 @@ export default function CartSummary({
               </div>
             )}
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
-              <span className="font-semibold">Shipping fee</span>
+              <span className="font-semibold">Shipping Charge</span>
               <span className="font-semibold">৳{shippingCharge}</span>
             </div>
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center font-semibold border-t pt-3 mt-3">
