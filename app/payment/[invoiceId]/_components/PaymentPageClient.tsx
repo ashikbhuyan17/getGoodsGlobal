@@ -165,7 +165,7 @@ export default function PaymentPageClient({
                   <th className="py-3 px-4 font-semibold">Order</th>
                   <th className="py-3 px-4 font-semibold">Sub-Total</th>
                   {showCashFeeColumn && (
-                    <th className="py-3 px-4 font-semibold">COD/MFS Charge</th>
+                    <th className="py-3 px-4 font-semibold">COD/MFS</th>
                   )}
                   <th className="py-3 px-4 font-semibold">Total</th>
                   {showCodAdvancePayable && (
