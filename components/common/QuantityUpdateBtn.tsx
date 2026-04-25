@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import { MinusIcon, PlusIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from 'react';
+import { MinusIcon, PlusIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 export default function QuantityUpdateBtn({
   quantity,
@@ -26,10 +28,18 @@ export default function QuantityUpdateBtn({
   min?: number;
   handleAddToCart?: (qty: number) => void;
 }) {
-  const updateAll = (newVal: number) => {
-    // clamp within range
-    const val = Math.max(min, Math.min(max, newVal));
+  /**
+   * While the input is focused, keep a string draft so the user can clear the
+   * field and type a new quantity (e.g. 0 → 5) without the controlled value
+   * snapping back each keystroke.
+   */
+  const [draft, setDraft] = useState<string | null>(null);
 
+  const displayValue = draft !== null ? draft : String(quantity);
+
+  const updateAll = (newVal: number) => {
+    const val = Math.max(min, Math.min(max, newVal));
+    setDraft(null);
     setQuantity(val);
 
     if (handleAddToCart) {
@@ -43,54 +53,107 @@ export default function QuantityUpdateBtn({
     if (setPrice) {
       setPrice((prev: any) =>
         prev?.map((item: any) =>
-          item?.id === id ? { ...item, quantity: val } : item
-        )
+          item?.id === id ? { ...item, quantity: val } : item,
+        ),
       );
     }
   };
 
-  const decrease = () => updateAll(quantity - 1);
-  const increase = () => updateAll(quantity + 1);
+  const effectiveQuantity = () => {
+    if (draft !== null && draft !== '') {
+      const n = parseInt(draft, 10);
+      if (!Number.isNaN(n)) return Math.max(min, Math.min(max, n));
+    }
+    return quantity;
+  };
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value, 10);
+  const decrease = () => updateAll(effectiveQuantity() - 1);
+  const increase = () => updateAll(effectiveQuantity() + 1);
 
-    // if NaN, set to min
-    if (isNaN(val)) {
+  const commitInput = (raw: string) => {
+    if (raw === '') {
       updateAll(min);
       return;
     }
-
-    updateAll(val);
+    const n = parseInt(raw, 10);
+    if (Number.isNaN(n)) {
+      setDraft(null);
+      return;
+    }
+    updateAll(n);
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div
+      className={cn(
+        'flex w-full min-w-0 max-w-full items-center justify-center gap-0.5 rounded-full border border-gray-200 bg-gray-50/90 p-0.5 pl-0.5 shadow-sm sm:inline-flex sm:w-auto sm:max-w-none sm:gap-1 sm:pl-1',
+      )}
+      role="group"
+      aria-label="Quantity"
+    >
       <Button
-        className="rounded-full w-5 h-5"
+        type="button"
+        variant="secondary"
         size="icon"
+        className="h-7 w-7 shrink-0 rounded-full border-0 bg-white shadow-sm hover:bg-gray-100 sm:h-8 sm:w-8"
         onClick={decrease}
-        disabled={quantity <= min}
+        disabled={effectiveQuantity() <= min}
+        aria-label="Decrease quantity"
       >
-        <MinusIcon size={16} aria-hidden="true" />
+        <MinusIcon className="size-3.5 sm:size-4" aria-hidden />
       </Button>
 
       <Input
-        type="number"
-        className="w-12 px-0 text-center"
-        value={quantity}
-        min={min}
-        max={max}
-        onChange={onChange}
+        type="text"
+        inputMode="numeric"
+        autoComplete="off"
+        className="h-7 min-w-0 max-w-11 flex-1 border-0 bg-transparent px-0.5 text-center text-xs font-medium tabular-nums focus-visible:ring-1 focus-visible:ring-teal-500 sm:h-8 sm:max-w-12 sm:flex-none sm:px-1 sm:text-sm"
+        value={displayValue}
+        aria-label="Quantity value"
+        onFocus={() => setDraft(String(quantity))}
+        onChange={(e) => {
+          const next = e.target.value;
+          if (next === '') {
+            setDraft('');
+            return;
+          }
+          if (!/^\d*$/.test(next)) {
+            return;
+          }
+          const n = parseInt(next, 10);
+          if (Number.isNaN(n)) {
+            setDraft(next);
+            return;
+          }
+          if (n > max) {
+            updateAll(max);
+            return;
+          }
+          setDraft(next);
+        }}
+        onBlur={() => {
+          if (draft === null) return;
+          const raw = draft;
+          setDraft(null);
+          commitInput(raw);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            (e.target as HTMLInputElement).blur();
+          }
+        }}
       />
 
       <Button
-        className="rounded-full w-5 h-5"
+        type="button"
+        variant="secondary"
         size="icon"
+        className="h-7 w-7 shrink-0 rounded-full border-0 bg-white shadow-sm hover:bg-gray-100 sm:h-8 sm:w-8"
         onClick={increase}
-        disabled={quantity >= max}
+        disabled={effectiveQuantity() >= max}
+        aria-label="Increase quantity"
       >
-        <PlusIcon size={16} aria-hidden="true" />
+        <PlusIcon className="size-3.5 sm:size-4" aria-hidden />
       </Button>
     </div>
   );

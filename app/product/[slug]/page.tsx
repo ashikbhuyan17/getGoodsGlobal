@@ -52,11 +52,11 @@ async function ProductPage({ params }: { params: { slug: string } }) {
           shippingOptions={shippingOptions}
         />
         <div className="w-full grid grid-cols-8 gap-4 rounded-sm mt-4">
-          <div className="bg-white px-4 pb-4 col-span-8 lg:col-span-6 rounded-sm">
+          <div className="bg-white px-4 pb-4 col-span-8 lg:col-span-5 xl:col-span-6 rounded-sm">
             {/* <SellerRatingCard /> */}
             <ProductDescription product={product} slug={slug} />
           </div>
-          <div className="col-span-8 lg:col-span-2">
+          <div className="col-span-8 lg:col-span-3 xl:col-span-2">
             <ProductSuggestions slug={slug} />
           </div>
         </div>

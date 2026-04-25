@@ -1,10 +1,12 @@
-"use client";
-import CartOrderGroup from "@/components/cart/CartOrderGroup";
-import CartItemRow from "@/components/cart/CartItemRow";
-import CartSummary from "@/components/cart/CartSummary";
-import OrderForm from "@/components/checkout/OrderForm";
-import ShippingMethodSection, { type ShippingOption } from "@/components/checkout/ShippingMethodSection";
-import { useState, useMemo } from "react";
+'use client';
+import CartOrderGroup from '@/components/cart/CartOrderGroup';
+import CartItemRow from '@/components/cart/CartItemRow';
+import CartSummary from '@/components/cart/CartSummary';
+import OrderForm from '@/components/checkout/OrderForm';
+import ShippingMethodSection, {
+  type ShippingOption,
+} from '@/components/checkout/ShippingMethodSection';
+import { useState, useMemo } from 'react';
 function CheckoutClient({
   cartProducts,
   user,
@@ -21,11 +23,11 @@ function CheckoutClient({
   const [formData, setFormData] = useState({
     name: user?.data?.name,
     phone: user?.data?.phone,
-    address: user?.data?.address ?? "",
-    district: user?.data?.district ?? "",
-    city: user?.data?.city ?? "",
+    address: user?.data?.address ?? '',
+    district: user?.data?.district ?? '',
+    city: user?.data?.city ?? '',
     customer_id: user?.data?.id,
-    payment_method: "Cash On Delivery",
+    payment_method: 'Cash On Delivery',
   });
   const [selectedShipping, setSelectedShipping] = useState<{
     id: number;
@@ -43,31 +45,34 @@ function CheckoutClient({
   }, [cartProducts?.data]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const productsWithTotals = normalizedProducts?.map((product: any) => {
-    const itemTotal = product?.cartdetails?.reduce(
-      (sum: number, item: { quantity: number; price: number }) => {
-        return sum + Number(item?.quantity) * Number(item?.price);
-      },
-      0
-    );
+  const productsWithTotals =
+    normalizedProducts?.map((product: any) => {
+      const itemTotal = product?.cartdetails?.reduce(
+        (sum: number, item: { quantity: number; price: number }) => {
+          return sum + Number(item?.quantity) * Number(item?.price);
+        },
+        0,
+      );
 
-    return {
-      ...product,
-      totalPrice: itemTotal,
-    };
-  }) ?? [];
+      return {
+        ...product,
+        totalPrice: itemTotal,
+      };
+    }) ?? [];
 
   const grandTotal = productsWithTotals.reduce(
     (sum: number, product: { totalPrice: number }) => {
       return sum + product.totalPrice;
     },
-    0
+    0,
   );
 
-  const cartIds = isBuyNow ? undefined : productsWithTotals.map((p: { id: string | number }) => Number(p.id));
+  const cartIds = isBuyNow
+    ? undefined
+    : productsWithTotals.map((p: { id: string | number }) => Number(p.id));
 
   return (
-    <div className="mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="mx-auto grid min-w-0 grid-cols-1 gap-8 px-1 md:px-4 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-6">
         <OrderForm formData={formData} setFormData={setFormData} />
         <ShippingMethodSection
@@ -77,11 +82,11 @@ function CheckoutClient({
             setSelectedShipping(
               opt
                 ? {
-                  id: opt.id,
-                  name: opt.name,
-                  amount: Number(opt.amount) || 0,
-                }
-                : null
+                    id: opt.id,
+                    name: opt.name,
+                    amount: Number(opt.amount) || 0,
+                  }
+                : null,
             )
           }
         />
@@ -102,7 +107,7 @@ function CheckoutClient({
                 id={cart?.id}
                 page="checkout"
                 key={cart?.id}
-                color={cart?.color ?? product?.color ?? ""}
+                color={cart?.color ?? product?.color ?? ''}
                 qty={Number(cart?.quantity)}
                 price={Number(cart?.price)}
                 size={cart?.size}

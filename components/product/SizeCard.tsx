@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '../ui/button';
 import QuantityUpdateBtn from '../common/QuantityUpdateBtn';
 import { useProductStore } from '@/stores/useProductStore';
@@ -45,6 +46,16 @@ function SizeCard({
         String(v.size) === String(size),
     )?.quantity ?? 0;
 
+  const isOutOfStock = Number(max ?? 0) <= 0;
+
+  /**
+   * Stays true after the user hits "Add" so at qty 0 the stepper remains and
+   * they can set a new value without the Add button coming back.
+   */
+  const [lineExpanded, setLineExpanded] = useState(false);
+  const showQuantityStepper =
+    !isOutOfStock && (quantity > 0 || lineExpanded);
+
   const useBulk = bulkQuantities && totalQuantity !== undefined;
   const bulkTier = useBulk
     ? getActiveBulkTier(bulkQuantities, totalQuantity)
@@ -52,7 +63,6 @@ function SizeCard({
   const bulkEffectivePrice = bulkTier
     ? bulkTier.flashSalePrice ?? bulkTier.price
     : Number(price);
-  const isOutOfStock = Number(max ?? 0) <= 0;
 
   const handleQuantityChange = (newQty: number) => {
     if (isOutOfStock) return;
@@ -67,49 +77,59 @@ function SizeCard({
   };
 
   return (
-    <div className="grid grid-cols-3 gap-0 items-center py-3 px-1">
+    <div className="grid grid-cols-3 items-center gap-x-1 gap-y-1 py-2.5 sm:py-3 px-0.5 sm:px-1 min-w-0">
       {/* Size Column - displayLabel for UI, size used for variant/API */}
-      <p className="text-left text-gray-800">{displayLabel ?? size}</p>
+      <p className="min-w-0 truncate text-left text-xs sm:text-sm text-gray-800">
+        {displayLabel ?? size}
+      </p>
 
       {/* Price Column */}
-      <div className="flex flex-col items-center gap-1">
+      <div className="flex min-w-0 flex-col items-center gap-0.5 sm:gap-1">
         {useBulk ? (
           bulkTier?.flashSalePrice != null ? (
             <>
-              <p className="font-semibold text-gray-800">
+              <p className="min-w-0 truncate text-center text-xs font-semibold text-gray-800 sm:text-sm">
                 ৳{formatPriceInt(bulkTier.flashSalePrice)}
               </p>
-              <p className="text-sm text-gray-400 line-through">
+              <p className="text-[10px] text-gray-400 line-through sm:text-sm">
                 ৳{formatPriceInt(bulkTier.price)}
               </p>
             </>
           ) : (
-            <p className="font-semibold text-gray-800">
+            <p className="min-w-0 truncate text-center text-xs font-semibold text-gray-800 sm:text-sm">
               ৳{formatPriceInt(bulkTier?.price ?? 0)}
             </p>
           )
         ) : (
           <>
-            <p className="font-semibold text-gray-800">
+            <p className="min-w-0 truncate text-center text-xs font-semibold text-gray-800 sm:text-sm">
               ৳{formatPriceInt(SalePrice)}
             </p>
-            <p className="text-sm text-gray-400 line-through">
+            <p className="text-[10px] text-gray-400 line-through sm:text-sm">
               ৳{formatPriceInt(RegularPrice)}
             </p>
           </>
         )}
       </div>
 
-      {/* Quantity Column */}
-      <div className="flex flex-col items-end gap-1">
+      {/* Quantity Column — min-w-0 so the stepper can shrink inside the grid */}
+      <div className="flex min-w-0 flex-col items-stretch justify-center sm:items-end">
         {isOutOfStock ? (
-          <Button disabled size="sm" variant="outline" className="px-3">
+          <Button
+            disabled
+            size="sm"
+            variant="outline"
+            className="w-full max-w-full shrink px-2 text-xs sm:ml-auto sm:w-auto sm:px-3 sm:text-sm"
+          >
             Stock Out
           </Button>
-        ) : quantity < 1 ? (
+        ) : !showQuantityStepper ? (
           <Button
-            onClick={() => handleQuantityChange(1)}
-            className=" text-white px-4 py-2 rounded-md"
+            onClick={() => {
+              setLineExpanded(true);
+              handleQuantityChange(1);
+            }}
+            className="w-full max-w-full shrink whitespace-nowrap rounded-md px-3 py-2 text-xs text-white sm:ml-auto sm:w-auto sm:px-4 sm:text-sm"
           >
             Add
           </Button>
@@ -119,6 +139,7 @@ function SizeCard({
             setQuantity={(val: number) => handleQuantityChange(val)}
             size={size}
             max={max}
+            min={0}
           />
         )}
       </div>

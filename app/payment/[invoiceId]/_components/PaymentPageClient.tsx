@@ -122,6 +122,11 @@ export default function PaymentPageClient({
     reader.readAsDataURL(file);
   };
 
+  const payButtonDisabled =
+    isSubmitting ||
+    !selectedAccount ||
+    (showPaymentProofFields && !uploadedFile);
+
   const handlePaymentSubmit = async () => {
     if (!selectedAccount) {
       toast.error('Please select a payment method');
@@ -166,7 +171,7 @@ export default function PaymentPageClient({
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6 lg:grid-cols-5">
       {/* Left – Order summary: Order > Sub-Total > Cash Payment Fee > Total > Payable > Due (only for COD). Advance removed. */}
       <div className="lg:col-span-3">
         <Card className="rounded shadow">
@@ -391,20 +396,16 @@ export default function PaymentPageClient({
                 </div>
               </>
             )}
-            <div className="flex items-center gap-4">
+            <div className="hidden items-center gap-4 lg:flex">
               <Button
                 type="button"
                 onClick={handlePaymentSubmit}
-                disabled={
-                  isSubmitting ||
-                  !selectedAccount ||
-                  (showPaymentProofFields && !uploadedFile)
-                }
-                className="flex-1 bg-teal-600 hover:bg-teal-700 text-white py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={payButtonDisabled}
+                className="flex-1 bg-teal-600 py-6 text-lg text-white hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Submitting...
                   </>
                 ) : isCodSelected && !showCodAdvancePayable ? (
@@ -416,6 +417,47 @@ export default function PaymentPageClient({
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Mobile: fixed bottom pay bar (same idea as checkout “Place Order”) */}
+      <div
+        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-2 pb-0 pt-1 lg:hidden"
+        style={{
+          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
+        }}
+      >
+        <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
+          <div className="flex items-center justify-between gap-2 px-0.5">
+            <span className="text-xs text-gray-600">
+              {isCodSelected && !showCodAdvancePayable
+                ? 'Order total'
+                : 'Payable now'}
+            </span>
+            <span className="text-sm font-bold tabular-nums text-gray-900">
+              ৳
+              {isCodSelected && !showCodAdvancePayable
+                ? totalDisplay
+                : payableDisplay}
+            </span>
+          </div>
+          <Button
+            type="button"
+            onClick={handlePaymentSubmit}
+            disabled={payButtonDisabled}
+            className="h-10 w-full bg-teal-600 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : isCodSelected && !showCodAdvancePayable ? (
+              'Confirm order'
+            ) : (
+              'Pay'
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

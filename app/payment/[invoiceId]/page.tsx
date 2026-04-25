@@ -51,11 +51,11 @@ export default async function PaymentPage({
   const advancedPercent = Number(payment?.advanced) || 0;
 
   return (
-    <div className="min-h-screen space-y-4 max-md:mb-20 mb-10">
-      <div className="bg-white p-3 -mt-1 flex items-center">
+    <div className="min-h-screen min-w-0 space-y-4 pb-20 lg:pb-10">
+      <div className="-mt-1 flex items-center bg-white p-3">
         <h1 className="text-lg font-bold text-gray-900">Payment</h1>
       </div>
-      <div className="px-2">
+      <div className="min-w-0 px-2">
         <PaymentPageClient
           invoiceId={invoiceId}
           orderLabel={orderLabel}

@@ -254,7 +254,9 @@ export default function ActionButtons({
             variant="outline"
             size="lg"
             className="h-12 w-12 shrink-0 rounded-full border-2 p-0 shadow-sm"
-            aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+            aria-label={
+              isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'
+            }
           >
             {renderWishIcon()}
           </Button>
@@ -263,7 +265,6 @@ export default function ActionButtons({
             disabled={isAddToCartLoading}
             onClick={handleAddToCart}
             size="lg"
-            variant="secondary"
             className="h-12 min-w-0 flex-1 text-sm font-semibold shadow-sm"
           >
             {isAddToCartLoading ? (

@@ -179,7 +179,7 @@ export default function ProductDetails({
                               {formatPriceInt(
                                 hasBulkTierFlash
                                   ? bulkFlashNum
-                                  : bulk?.price ?? 0,
+                                  : (bulk?.price ?? 0),
                               )}
                             </p>
                             {hasBulkTierFlash ? (
@@ -265,45 +265,45 @@ export default function ProductDetails({
                 ))}
               </div>
             </div>
-            <ScrollArea className="h-56 max-lg:w-full max-2xl:w-[320px]">
-              <div className="mt-4 border-2 border-[#EEEEEE] rounded-md overflow-hidden">
-                <div className="grid grid-cols-3 gap-3 p-1 py-2 border-gray-200">
-                  <div className="text-start">
-                    <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-start">
+            <ScrollArea className="h-56 min-w-0 max-w-full max-lg:w-full ">
+              <div className="mt-4 min-w-0 border-2 border-[#EEEEEE] rounded-md overflow-hidden">
+                <div className="grid min-w-0 grid-cols-3 gap-1 p-1 py-2 sm:gap-3">
+                  <div className="min-w-0 text-start">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-start text-[10px] font-medium sm:px-3 sm:py-2 sm:text-sm">
                       {hasSpecification ? 'Specification' : 'Size'}
                     </span>
                   </div>
-                  <div className="text-center">
-                    <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-center">
+                  <div className="min-w-0 text-center">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-center text-[10px] font-medium sm:px-3 sm:py-2 sm:text-sm">
                       Price
                     </span>
                   </div>
-                  <div className="text-center ">
-                    <span className="block w-full bg-[#F5F5F5]  font-medium px-3 py-2 rounded-md text-sm text-center">
+                  <div className="min-w-0 text-center">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-center text-[10px] font-medium sm:px-3 sm:py-2 sm:text-sm">
                       Quantity
                     </span>
                   </div>
                 </div>
 
                 {sizes?.map((size: any) => (
-                    <SizeCard
-                      key={size?.id}
-                      colorId={effectiveColorId}
-                      size={size?.size?.sizeName}
-                      displayLabel={
-                        hasSpecification ? String(specification) : undefined
-                      }
-                      price={size?.SalePrice}
-                      SalePrice={size?.SalePrice}
-                      RegularPrice={size?.RegularPrice}
-                      max={Number(
-                        bulkQuantities
-                          ? (size?.total_stock ?? size?.stock)
-                          : size?.stock,
-                      )}
-                      bulkQuantities={bulkQuantities}
-                      totalQuantity={bulkQuantities ? totalQuantity : undefined}
-                    />
+                  <SizeCard
+                    key={size?.id}
+                    colorId={effectiveColorId}
+                    size={size?.size?.sizeName}
+                    displayLabel={
+                      hasSpecification ? String(specification) : undefined
+                    }
+                    price={size?.SalePrice}
+                    SalePrice={size?.SalePrice}
+                    RegularPrice={size?.RegularPrice}
+                    max={Number(
+                      bulkQuantities
+                        ? (size?.total_stock ?? size?.stock)
+                        : size?.stock,
+                    )}
+                    bulkQuantities={bulkQuantities}
+                    totalQuantity={bulkQuantities ? totalQuantity : undefined}
+                  />
                 ))}
               </div>
             </ScrollArea>

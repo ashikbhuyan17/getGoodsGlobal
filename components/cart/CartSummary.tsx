@@ -217,7 +217,7 @@ export default function CartSummary({
   };
 
   return (
-    <div className="bg-white rounded-lg max-md:mb-12">
+    <div className="bg-white rounded-lg lg:mb-0 max-lg:pb-5">
       <h2 className="text-base font-bold text-center p-2 lg:p-4">
         Cart Summary
       </h2>
@@ -342,12 +342,41 @@ export default function CartSummary({
         {
           page === 'checkout' ? (
             <>
-              <Button
-                onClick={handlePlaceOrderClick}
-                className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
+              {/* Desktop / tablet: button in summary card */}
+              <div className="hidden lg:block">
+                <Button
+                  onClick={handlePlaceOrderClick}
+                  className="w-full bg-primary py-6 text-base hover:bg-primary/95"
+                >
+                  Place Order & Pay
+                </Button>
+              </div>
+
+              {/* Mobile: fixed bottom bar (same pattern as product page actions) */}
+              <div
+                className="lg:hidden pointer-events-none fixed inset-x-0 bottom-0 z-50 px-2 pb-0 pt-1"
+                style={{
+                  paddingBottom:
+                    'max(0.5rem, env(safe-area-inset-bottom, 0px))',
+                }}
               >
-                Place Order & Pay
-              </Button>
+                <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
+                  <div className="flex items-center justify-between gap-2 px-0.5">
+                    <span className="text-xs text-gray-600">Total payable</span>
+                    <span className="text-sm font-bold tabular-nums text-gray-900">
+                      ৳{formatPriceInt(finalPrice)}
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={handlePlaceOrderClick}
+                    className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90"
+                  >
+                    Place Order & Pay
+                  </Button>
+                </div>
+              </div>
+
               <TermsModal
                 open={showTermsModal}
                 onClose={() => setShowTermsModal(false)}
