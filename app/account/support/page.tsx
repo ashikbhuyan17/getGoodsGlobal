@@ -35,7 +35,7 @@ export default async function SupportPage() {
   );
   const tickets = res?.data || [];
   return (
-    <div className="w-full space-y-4 px-2">
+    <div className="w-full space-y-4 px-2 pb-20">
       <div className="bg-white rounded-sm border-b border-gray-200">
         <div className="px-6 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -55,8 +55,8 @@ export default async function SupportPage() {
         </div>
       </div>
 
-      <Card className="rounded shadow">
-        <CardContent className="p-0 overflow-x-auto">
+      <Card className="rounded shadow ">
+        <CardContent className="p-0  overflow-x-auto">
           <table className="w-full xl:w-2/3 text-left text-sm">
             <thead className="border-b">
               <tr>

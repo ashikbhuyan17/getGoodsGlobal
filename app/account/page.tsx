@@ -8,12 +8,13 @@ import Link from 'next/link';
 import { Phone } from 'lucide-react';
 
 export default async function Dashboard() {
-  const [wishlist, dashboardOverview, userProfile, contact] = (await Promise.all([
-    fetcher('/wishlists'),
-    fetcher('/dashboard-overview'),
-    fetcher('/user-profile'),
-    fetcher('/contact'),
-  ])) as [any, any, any, any];
+  const [wishlist, dashboardOverview, userProfile, contact] =
+    (await Promise.all([
+      fetcher('/wishlists'),
+      fetcher('/dashboard-overview'),
+      fetcher('/user-profile'),
+      fetcher('/contact'),
+    ])) as [any, any, any, any];
 
   const phoneNumber = contact?.data?.phone;
   const hotlineNumber = contact?.data?.hotline;
@@ -58,7 +59,7 @@ export default async function Dashboard() {
   const displayName = userProfile?.data?.name || 'there';
 
   return (
-    <div className="w-full rounded space-y-4 px-2">
+    <div className="w-full rounded space-y-4 px-2 pb-20">
       {/* Status cards + Support in one div (bg, shadow); Support on right */}
       <StatusCards
         pending={pending}

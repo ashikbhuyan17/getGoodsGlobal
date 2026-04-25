@@ -53,15 +53,14 @@ function SizeCard({
    * they can set a new value without the Add button coming back.
    */
   const [lineExpanded, setLineExpanded] = useState(false);
-  const showQuantityStepper =
-    !isOutOfStock && (quantity > 0 || lineExpanded);
+  const showQuantityStepper = !isOutOfStock && (quantity > 0 || lineExpanded);
 
   const useBulk = bulkQuantities && totalQuantity !== undefined;
   const bulkTier = useBulk
     ? getActiveBulkTier(bulkQuantities, totalQuantity)
     : null;
   const bulkEffectivePrice = bulkTier
-    ? bulkTier.flashSalePrice ?? bulkTier.price
+    ? (bulkTier.flashSalePrice ?? bulkTier.price)
     : Number(price);
 
   const handleQuantityChange = (newQty: number) => {
@@ -71,7 +70,7 @@ function SizeCard({
       ? getActiveBulkTier(bulkQuantities, newTotal)
       : null;
     const priceForVariant = tierForNewTotal
-      ? tierForNewTotal.flashSalePrice ?? tierForNewTotal.price
+      ? (tierForNewTotal.flashSalePrice ?? tierForNewTotal.price)
       : bulkEffectivePrice;
     setVariant(String(colorId), String(size), newQty, priceForVariant);
   };
@@ -79,7 +78,7 @@ function SizeCard({
   return (
     <div className="grid grid-cols-3 items-center gap-x-1 gap-y-1 py-2.5 sm:py-3 px-0.5 sm:px-1 min-w-0">
       {/* Size Column - displayLabel for UI, size used for variant/API */}
-      <p className="min-w-0 truncate text-left text-xs sm:text-sm text-gray-800">
+      <p className="min-w-0 truncate text-left text-sm text-gray-800">
         {displayLabel ?? size}
       </p>
 
@@ -88,24 +87,24 @@ function SizeCard({
         {useBulk ? (
           bulkTier?.flashSalePrice != null ? (
             <>
-              <p className="min-w-0 truncate text-center text-xs font-semibold text-gray-800 sm:text-sm">
+              <p className="min-w-0 truncate text-center  font-semibold text-gray-800 text-sm">
                 ৳{formatPriceInt(bulkTier.flashSalePrice)}
               </p>
-              <p className="text-[10px] text-gray-400 line-through sm:text-sm">
+              <p className=" text-gray-400 line-through text-sm">
                 ৳{formatPriceInt(bulkTier.price)}
               </p>
             </>
           ) : (
-            <p className="min-w-0 truncate text-center text-xs font-semibold text-gray-800 sm:text-sm">
+            <p className="min-w-0 truncate text-center font-semibold text-gray-800 text-sm">
               ৳{formatPriceInt(bulkTier?.price ?? 0)}
             </p>
           )
         ) : (
           <>
-            <p className="min-w-0 truncate text-center text-xs font-semibold text-gray-800 sm:text-sm">
+            <p className="min-w-0 truncate text-center  font-semibold text-gray-800 text-sm">
               ৳{formatPriceInt(SalePrice)}
             </p>
-            <p className="text-[10px] text-gray-400 line-through sm:text-sm">
+            <p className=" text-gray-400 line-through text-sm">
               ৳{formatPriceInt(RegularPrice)}
             </p>
           </>

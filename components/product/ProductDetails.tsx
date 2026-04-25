@@ -269,17 +269,17 @@ export default function ProductDetails({
               <div className="mt-4 min-w-0 border-2 border-[#EEEEEE] rounded-md overflow-hidden">
                 <div className="grid min-w-0 grid-cols-3 gap-1 p-1 py-2 sm:gap-3">
                   <div className="min-w-0 text-start">
-                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-start text-[10px] font-medium sm:px-3 sm:py-2 sm:text-sm">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-start  font-medium sm:px-3 sm:py-2 text-sm">
                       {hasSpecification ? 'Specification' : 'Size'}
                     </span>
                   </div>
                   <div className="min-w-0 text-center">
-                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-center text-[10px] font-medium sm:px-3 sm:py-2 sm:text-sm">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-center  font-medium sm:px-3 sm:py-2 text-sm">
                       Price
                     </span>
                   </div>
                   <div className="min-w-0 text-center">
-                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-center text-[10px] font-medium sm:px-3 sm:py-2 sm:text-sm">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-center  font-medium sm:px-3 sm:py-2 text-sm">
                       Quantity
                     </span>
                   </div>
