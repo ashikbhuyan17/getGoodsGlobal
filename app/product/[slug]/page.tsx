@@ -44,7 +44,7 @@ async function ProductPage({ params }: { params: { slug: string } }) {
   return (
     <main>
       <ProductInfoBar product={product} slug={slug} />
-      <div className="flex flex-col gap-2 px-2 max-md:pb-20">
+      <div className="flex flex-col gap-2 px-2 pb-24 lg:pb-2">
         <ProductPageClient
           bulkQuantities={bulkQuantities}
           product={product}

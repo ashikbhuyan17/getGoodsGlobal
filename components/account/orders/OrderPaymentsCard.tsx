@@ -1,3 +1,18 @@
+import type { ReactNode } from 'react';
+
+function PaymentRow({ label, value }: { label: string; value: ReactNode }) {
+  return (
+    <div className="grid grid-cols-12 border-b last:border-b-0">
+      <div className="col-span-4 md:col-span-5 bg-gray-50 px-4 py-3 text-sm text-gray-600 font-medium">
+        {label}
+      </div>
+      <div className="col-span-8 md:col-span-7 px-4 py-3 text-sm text-gray-900">
+        {value ?? 'N/A'}
+      </div>
+    </div>
+  );
+}
+
 interface OrderPaymentsCardProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   payment: any;
@@ -69,7 +84,7 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
   );
 
   /**
-   * pre-COD subtotal: items + ship − order discounts (equals Sub-Total in the reference layout).
+   * pre-COD subtotal: items + ship − order discounts (used for Sub-Total + due when variants missing).
    * When variants are missing or not parsed, infer from due + paid − cod so the card matches the API.
    */
   const hasLineItems = totalQty > 0 || productSubtotal > 0;
@@ -78,51 +93,36 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
       ? num(payment.payment_due_amount) - codCharge + paid
       : null;
 
-  /** Product Price row: prefer API `amount`; otherwise sum variants or infer from due. */
   const hasAmount =
     payment?.amount != null && String(payment.amount).trim() !== '';
-  const productBase = hasAmount
-    ? num(payment.amount)
+  const amountNum = hasAmount ? num(payment.amount) : 0;
+
+  /** Base for Sub-Total: API amount, else variant sum, else inferred from due. */
+  const itemsBase = hasAmount
+    ? amountNum
     : hasLineItems
       ? productSubtotal
       : preCodFromApi != null
         ? preCodFromApi - shipping + couponOnly + flashDiscount
         : productSubtotal;
 
-  const subTotal = productBase - couponOnly - flashDiscount + shipping;
+  /**
+   * Product Price row: Amount + coupon_discount − cod_charge − shipping_charge
+   * (when `amount` is present). Otherwise same fallback as before for items base.
+   */
+  const displayProductPrice = hasAmount
+    ? amountNum + couponOnly - codCharge - shipping
+    : itemsBase;
+
+  /** Sub-Total: API `amount` when present; else roll up from line breakdown. */
+  const subTotal = hasAmount
+    ? amountNum
+    : displayProductPrice - couponOnly - flashDiscount + shipping;
 
   const dueRaw =
     payment?.payment_due_amount != null
       ? num(payment.payment_due_amount)
       : subTotal + codCharge - paid;
-
-  // const formatDate = (dateString: string) => {
-  //   if (!dateString) return 'N/A';
-  //   try {
-  //     const date = new Date(dateString);
-  //     return date.toLocaleString('en-GB', {
-  //       day: '2-digit',
-  //       month: '2-digit',
-  //       year: 'numeric',
-  //       hour: '2-digit',
-  //       minute: '2-digit',
-  //       hour12: true,
-  //     });
-  //   } catch {
-  //     return dateString;
-  //   }
-  // };
-
-  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
-    <div className="grid grid-cols-12 border-b last:border-b-0">
-      <div className="col-span-4 md:col-span-5 bg-gray-50 px-4 py-3 text-sm text-gray-600 font-medium">
-        {label}
-      </div>
-      <div className="col-span-8 md:col-span-7 px-4 py-3 text-sm text-gray-900">
-        {value ?? 'N/A'}
-      </div>
-    </div>
-  );
 
   const couponDiscountDisplay =
     couponOnly > 0 ? `−৳${formatMoney(couponOnly)}` : `৳${formatMoney(0)}`;
@@ -133,51 +133,40 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
         <h3 className="text-base font-semibold text-gray-900">Payments</h3>
       </div>
 
-      {/* <div className="divide-y">
-        <Row
-          label="Method"
-          value={
-            <Badge className="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full">
-              {payment?.payment_method ||
-                payment?.order_type ||
-                payment?.method ||
-                'N/A'}
-            </Badge>
-          }
-        />
-        <Row
-          label="Date"
-          value={formatDate(
-            payment?.created_at || payment?.date || payment?.payment_date,
-          )}
-        />
-      </div> */}
-
       <div className="divide-y border-t">
-        <Row label="Quantity" value={String(totalQty || '0')} />
-        <Row label="Product Price" value={`৳${formatMoney(productBase)}`} />
-        <Row label="Coupon Discount" value={couponDiscountDisplay} />
+        <PaymentRow label="Quantity" value={String(totalQty || '0')} />
+        <PaymentRow
+          label="Product Price"
+          value={`৳${formatMoney(displayProductPrice)}`}
+        />
+        <PaymentRow label="Coupon Discount" value={couponDiscountDisplay} />
         {flashDiscount > 0 && (
-          <Row
+          <PaymentRow
             label="Flash Sale Discount"
             value={`−৳${formatMoney(flashDiscount)}`}
           />
         )}
-        <Row label="Shipping Charge" value={`৳${formatMoney(shipping)}`} />
-        {/* <Row
-          label="Sub-Total"
-          value={
-            <span className="font-semibold">৳{formatMoney(subTotal)}</span>
-          }
-        /> */}
+        <PaymentRow
+          label="Shipping Charge"
+          value={`৳${formatMoney(shipping)}`}
+        />
       </div>
 
       <div className="h-3 bg-white border-t" aria-hidden />
 
       <div className="divide-y">
-        <Row label="COD/MFS Charge" value={`৳${formatMoney(codCharge)}`} />
-        <Row label="Paid" value={`৳${formatMoney(paid)}`} />
-        <Row
+        <PaymentRow
+          label="COD/MFS Charge"
+          value={`৳${formatMoney(codCharge)}`}
+        />
+        <PaymentRow
+          label="Sub-Total"
+          value={
+            <span className="font-semibold">৳{formatMoney(subTotal)}</span>
+          }
+        />
+        <PaymentRow label="Paid" value={`৳${formatMoney(paid)}`} />
+        <PaymentRow
           label="Due"
           value={<span className="font-semibold">৳{formatMoney(dueRaw)}</span>}
         />
@@ -186,19 +175,19 @@ export default function OrderPaymentsCard({ payment }: OrderPaymentsCardProps) {
       {(payment?.bkash_tranxId ||
         payment?.transaction_id ||
         payment?.trx_id) && (
-          <div className="divide-y border-t">
-            <Row
-              label="Trx ID"
-              value={
-                <span className="font-mono">
-                  {payment?.bkash_tranxId ||
-                    payment?.transaction_id ||
-                    payment?.trx_id}
-                </span>
-              }
-            />
-          </div>
-        )}
+        <div className="divide-y border-t">
+          <PaymentRow
+            label="Trx ID"
+            value={
+              <span className="font-mono">
+                {payment?.bkash_tranxId ||
+                  payment?.transaction_id ||
+                  payment?.trx_id}
+              </span>
+            }
+          />
+        </div>
+      )}
     </div>
   );
 }

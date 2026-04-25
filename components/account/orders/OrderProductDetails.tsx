@@ -304,7 +304,7 @@ export default function OrderProductDetails({
                     - ৳{Math.round(paidShare)}
                   </span>
                 </div> */}
-                {due > 0 && (
+                {/* {due > 0 && (
                   <div className="flex justify-between text-sm font-semibold pt-2">
                     <span className="text-gray-900">Due:</span>
                     <span>
@@ -314,7 +314,7 @@ export default function OrderProductDetails({
                       </span>
                     </span>
                   </div>
-                )}
+                )} */}
               </div>
             </div>
           </div>

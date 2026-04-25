@@ -1,4 +1,23 @@
+import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
+
+function formatOrderDate(dateString: unknown): string {
+  if (dateString == null || String(dateString).trim() === '') return 'N/A';
+  try {
+    const date = new Date(String(dateString));
+    if (Number.isNaN(date.getTime())) return 'N/A';
+    return date.toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
+  } catch {
+    return 'N/A';
+  }
+}
 
 interface OrderDetailsCardProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,7 +49,7 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
     return statusStr;
   };
 
-  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
+  const Row = ({ label, value }: { label: string; value: ReactNode }) => (
     <div className="grid grid-cols-12 border-b last:border-b-0">
       <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-3 text-sm text-gray-600 font-medium">
         {label}
@@ -93,6 +112,24 @@ export default function OrderDetailsCard({ data }: OrderDetailsCardProps) {
               {data?.shipping_method || data?.order_type || 'N/A'}
             </Badge>
           }
+        />
+
+        <Row
+          label="Payment Method"
+          value={
+            <Badge className="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">
+              {data?.payment_method ||
+                data?.order_type ||
+                data?.method ||
+                'N/A'}
+            </Badge>
+          }
+        />
+        <Row
+          label="Date"
+          value={formatOrderDate(
+            data?.created_at || data?.date || data?.payment_date,
+          )}
         />
 
         <Row

@@ -28,6 +28,10 @@ import {
 } from '@/lib/fetcher';
 import { toast } from 'sonner';
 import { BANGLADESH_DISTRICTS } from '@/lib/constants/districts';
+import {
+  isImageFileSizeValid,
+  getImageFileTooLargeMessage,
+} from '@/lib/fileUpload';
 import { User, Upload, Eye } from 'lucide-react';
 
 function firstValidationError(errors: unknown): string | undefined {
@@ -139,6 +143,12 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file');
+      e.target.value = '';
+      return;
+    }
+    if (!isImageFileSizeValid(file)) {
+      toast.error(getImageFileTooLargeMessage());
+      e.target.value = '';
       return;
     }
     if (!validate()) {

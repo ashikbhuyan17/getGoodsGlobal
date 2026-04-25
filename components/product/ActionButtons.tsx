@@ -70,13 +70,6 @@ export default function ActionButtons({
 
     const { cartDetails } = validated;
     setIsAddToCartLoading(true);
-    console.log({
-      product_id: String(productId),
-      shippingcharge_id: shippingArea?.id,
-      shippingfee: Number(shippingArea?.amount ?? 0),
-      total_quantity: String(totalQuantity),
-      cart_details: cartDetails,
-    });
     try {
       const res: any = await fetcher('/product-add-to-cart', {
         method: 'POST',
@@ -195,51 +188,105 @@ export default function ActionButtons({
     }
   };
 
+  const renderWishIcon = () =>
+    isWishlistLoading ? (
+      <Loader2 className="size-5 animate-spin" />
+    ) : (
+      <Heart
+        size={22}
+        className={cn(isInWishlist ? 'text-red-600' : 'text-gray-500')}
+        fill={isInWishlist ? '#e7000b' : 'none'}
+      />
+    );
+
   return (
-    <div className="flex flex-wrap gap-2 mt-4">
-      <Button
-        disabled={isWishlistLoading}
-        onClick={handleWishlist}
-        variant="outline"
-        size="lg"
-        className="p-0 w-12"
-      >
-        {isWishlistLoading ? (
-          <Loader2 className="animate-spin" />
-        ) : (
-          <Heart
-            size={22}
-            className={cn(isInWishlist ? 'text-red-600' : 'text-gray-500')}
-            fill={isInWishlist ? '#e7000b' : 'none'}
-          />
-        )}
-      </Button>
+    <>
+      {/* Large screens: same sizing as before (default Button lg; no extra h/min-w) */}
+      <div className="mt-4 hidden flex-wrap gap-2 lg:flex">
+        <Button
+          disabled={isWishlistLoading}
+          onClick={handleWishlist}
+          variant="outline"
+          size="lg"
+          className="p-0 w-12"
+        >
+          {renderWishIcon()}
+        </Button>
 
-      <Button
-        disabled={isAddToCartLoading}
-        onClick={handleAddToCart}
-        size="lg"
-        className="flex-1"
-      >
-        {isAddToCartLoading ? (
-          <Loader2 className="animate-spin size-5" />
-        ) : (
-          'Add to Cart'
-        )}
-      </Button>
+        <Button
+          disabled={isAddToCartLoading}
+          onClick={handleAddToCart}
+          size="lg"
+          className="flex-1"
+        >
+          {isAddToCartLoading ? (
+            <Loader2 className="size-5 animate-spin" />
+          ) : (
+            'Add to Cart'
+          )}
+        </Button>
 
-      <Button
-        disabled={isBuyNowLoading}
-        onClick={handleBuyNow}
-        size="lg"
-        className="flex-1 bg-[#279ACE] hover:bg-[#1b8cbf]"
+        <Button
+          disabled={isBuyNowLoading}
+          onClick={handleBuyNow}
+          size="lg"
+          className="flex-1 bg-[#279ACE] hover:bg-[#1b8cbf]"
+        >
+          {isBuyNowLoading ? (
+            <Loader2 className="size-5 animate-spin" />
+          ) : (
+            'Buy Now'
+          )}
+        </Button>
+      </div>
+
+      {/* Small screens: fixed bottom bar — stays visible while scrolling */}
+      <div
+        className="lg:hidden pointer-events-none fixed inset-x-0 bottom-0 z-50 p-2 pb-0"
+        style={{
+          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
+        }}
       >
-        {isBuyNowLoading ? (
-          <Loader2 className="animate-spin size-5" />
-        ) : (
-          'Buy Now'
-        )}
-      </Button>
+        <div className="pointer-events-auto mx-auto flex max-w-3xl items-stretch gap-2 rounded-2xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
+          <Button
+            disabled={isWishlistLoading}
+            onClick={handleWishlist}
+            variant="outline"
+            size="lg"
+            className="h-12 w-12 shrink-0 rounded-full border-2 p-0 shadow-sm"
+            aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
+          >
+            {renderWishIcon()}
+          </Button>
+
+          <Button
+            disabled={isAddToCartLoading}
+            onClick={handleAddToCart}
+            size="lg"
+            variant="secondary"
+            className="h-12 min-w-0 flex-1 text-sm font-semibold shadow-sm"
+          >
+            {isAddToCartLoading ? (
+              <Loader2 className="size-5 animate-spin" />
+            ) : (
+              'Add to Cart'
+            )}
+          </Button>
+
+          <Button
+            disabled={isBuyNowLoading}
+            onClick={handleBuyNow}
+            size="lg"
+            className="h-12 min-w-0 flex-1 bg-[#279ACE] text-sm font-semibold shadow-sm transition hover:bg-[#1b8cbf]"
+          >
+            {isBuyNowLoading ? (
+              <Loader2 className="size-5 animate-spin" />
+            ) : (
+              'Buy Now'
+            )}
+          </Button>
+        </div>
+      </div>
 
       <MinOrderModal
         open={showMinOrderModal}
@@ -251,6 +298,6 @@ export default function ActionButtons({
         open={showAddToCartModal}
         onClose={() => setShowAddToCartModal(false)}
       />
-    </div>
+    </>
   );
 }

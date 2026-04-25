@@ -11,7 +11,14 @@ import { Check, Plus, X, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
 import { submitPayment } from '@/lib/fetcher';
+import {
+  getImageFileTooLargeMessage,
+  isImageFileSizeValid,
+} from '@/lib/fileUpload';
 import { formatPriceInt } from '@/lib/utils';
+
+/** Payment method id from API that represents Cash on Delivery (not matched by name). */
+const COD_PAYMENT_METHOD_ID = '5';
 
 export default function PaymentPageClient({
   invoiceId,
@@ -33,22 +40,22 @@ export default function PaymentPageClient({
   const paymentAccounts =
     Array.isArray(banks) && banks.length > 0
       ? banks
-        .filter((bank: any) => bank.status === '1')
-        .map((bank: any) => ({
-          id: String(bank.id),
-          name: bank.account_name,
-          icon: bank.image
-            ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
-            : '/bank-placeholder.png',
-          accountName: bank.account_name,
-          accountNumber: bank.account_number,
-          branch: bank.branch ? String(bank.branch).trim() : '',
-          routingNo: bank.routing_number
-            ? String(bank.routing_number).trim()
-            : '',
-          description: bank.description || '',
-          cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
-        }))
+          .filter((bank: any) => bank.status === '1')
+          .map((bank: any) => ({
+            id: String(bank.id),
+            name: bank.account_name,
+            icon: bank.image
+              ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
+              : '/bank-placeholder.png',
+            accountName: bank.account_name,
+            accountNumber: bank.account_number,
+            branch: bank.branch ? String(bank.branch).trim() : '',
+            routingNo: bank.routing_number
+              ? String(bank.routing_number).trim()
+              : '',
+            description: bank.description || '',
+            cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
+          }))
       : [];
 
   const [selectedPayment, setSelectedPayment] = useState<string>(
@@ -69,9 +76,7 @@ export default function PaymentPageClient({
       : 0;
   const cashPaymentFeeNum = subTotal * (codPercent / 100);
   const totalAmount = subTotal + cashPaymentFeeNum;
-  const isCodSelected = selectedAccount?.accountName
-    ?.toLowerCase()
-    .includes('cash on delivery');
+  const isCodSelected = selectedAccount?.id === COD_PAYMENT_METHOD_ID;
   // Advance percentage (from payment API). Used only when COD method is selected.
   const advancePercent = isCodSelected ? Math.max(0, Number(advanced) || 0) : 0;
   const isCodAdvanceEnabled = isCodSelected && codPercent > 0;
@@ -92,7 +97,10 @@ export default function PaymentPageClient({
   const payableDisplay = String(payableDisplayNum);
   const showCashFeeColumn = cashFeeDisplay > 0;
   const showCodAdvancePayable =
-    isCodSelected && isCodAdvanceEnabled && advancePercent > 0 && payableDisplayNum > 0;
+    isCodSelected &&
+    isCodAdvanceEnabled &&
+    advancePercent > 0 &&
+    payableDisplayNum > 0;
   const showPaymentProofFields = !isCodSelected || showCodAdvancePayable;
   const dueDisplay = isCodSelected
     ? String(totalDisplay - payableDisplayNum)
@@ -102,12 +110,16 @@ export default function PaymentPageClient({
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => setUploadedImage(reader.result as string);
-      reader.readAsDataURL(file);
+    if (!file) return;
+    if (!isImageFileSizeValid(file)) {
+      toast.error(getImageFileTooLargeMessage());
+      e.target.value = '';
+      return;
     }
+    setUploadedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => setUploadedImage(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   const handlePaymentSubmit = async () => {
@@ -224,10 +236,11 @@ export default function PaymentPageClient({
                       type="button"
                       onClick={() => setSelectedPayment(account.id)}
                       aria-label={`Select ${account.name} payment method`}
-                      className={`relative p-4 border-2 rounded-lg transition-all ${isSelected
-                        ? 'border-teal-600 bg-teal-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                      className={`relative p-4 border-2 rounded-lg transition-all ${
+                        isSelected
+                          ? 'border-teal-600 bg-teal-50'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
                     >
                       {isSelected && (
                         <div className="absolute top-1 right-1 bg-green-500 rounded-full p-0.5">
