@@ -6,7 +6,7 @@ export default async function ProfilePage() {
   const userData = await fetcher("/user-profile");
 
   return (
-    <div className="px-2 pb-36 lg:pb-0">
+    <div className="px-2">
       <div className="flex w-full justify-center rounded-sm bg-white py-2 max-md:mb-22">
         <Card className="w-full max-w-4xl rounded-2xl shadow-none border-none">
           <CardContent>

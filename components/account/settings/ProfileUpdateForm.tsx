@@ -34,10 +34,6 @@ import {
 } from '@/lib/fileUpload';
 import { User, Upload, Eye } from 'lucide-react';
 
-/** Same as checkout/cart: above BottomNav on small screens. */
-const MOBILE_CTA_BAR_PIN =
-  'fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]';
-
 function firstValidationError(errors: unknown): string | undefined {
   if (!errors || typeof errors !== 'object') return undefined;
   for (const v of Object.values(errors as Record<string, unknown>)) {
@@ -280,11 +276,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
       </div>
 
       {/* Form: District & City same width, Address full width */}
-      <form
-        id="profile-update-form"
-        onSubmit={handleUpdate}
-        className="space-y-6"
-      >
+      <form onSubmit={handleUpdate} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Name */}
           <div className="space-y-2">
@@ -390,28 +382,13 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
           )}
         </div>
 
-        <div className="hidden lg:block">
-          <Button
-            type="submit"
-            className="w-full rounded-md py-3 text-base font-medium text-white"
-          >
-            Update
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          className="w-full rounded-md py-3 text-base font-medium text-white"
+        >
+          Update
+        </Button>
       </form>
-
-      {/* Mobile: fixed Update bar */}
-      <div className={`pointer-events-none lg:hidden ${MOBILE_CTA_BAR_PIN}`}>
-        <div className="pointer-events-auto mx-auto max-w-3xl rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
-          <Button
-            type="submit"
-            form="profile-update-form"
-            className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90"
-          >
-            Update
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
