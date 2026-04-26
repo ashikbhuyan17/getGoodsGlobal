@@ -15,6 +15,7 @@ export default async function Dashboard() {
       fetcher('/user-profile'),
       fetcher('/contact'),
     ])) as [any, any, any, any];
+  console.log('🚀 ~ Dashboard ~ dashboardOverview:', dashboardOverview);
 
   const phoneNumber = contact?.data?.phone;
   const hotlineNumber = contact?.data?.hotline;
@@ -37,6 +38,7 @@ export default async function Dashboard() {
   const pending = dashboardOverview?.data?.pendingOrders ?? 0;
   const processing = dashboardOverview?.data?.ProcessingOrders ?? 0;
   const completed = dashboardOverview?.data?.completeOrders ?? 0;
+  const dispached = dashboardOverview?.data?.dispachedOrders ?? 0;
   const managerPhoneRaw =
     userProfile?.data?.account_manager_phone ||
     userProfile?.data?.manager_phone ||
@@ -65,6 +67,7 @@ export default async function Dashboard() {
         pending={pending}
         processing={processing}
         completed={completed}
+        dispached={dispached}
         rightSlot={
           <div className="p-2">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">

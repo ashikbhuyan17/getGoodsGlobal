@@ -63,7 +63,7 @@ export default async function SupportPage() {
                 {/* <th className="py-3 px-4 font-semibold">Code</th> */}
                 <th className="py-3 px-4 font-semibold">Date</th>
                 <th className="py-3 px-4 font-semibold">Orders</th>
-                <th className="py-3 px-4 font-semibold">Manager</th>
+                {/* <th className="py-3 px-4 font-semibold">Manager</th> */}
                 <th className="py-3 px-4 font-semibold text-center">Status</th>
                 <th className="py-3 px-4 font-semibold text-right">Action</th>
               </tr>
@@ -126,11 +126,11 @@ export default async function SupportPage() {
                           <span className="text-gray-500">—</span>
                         )}
                       </td>
-                      <td className="py-3 px-4">
+                      {/* <td className="py-3 px-4">
                         <span className="font-medium">
                           {String(ticket?.name ?? 'N/A')}
                         </span>
-                      </td>
+                      </td> */}
                       <td className="py-3 px-4 text-center">
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${

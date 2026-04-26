@@ -5,6 +5,7 @@ interface StatusCardsProps {
   pending: number;
   processing: number;
   completed: number;
+  dispached: number;
   rightSlot?: ReactNode;
 }
 
@@ -53,13 +54,15 @@ export default function StatusCards({
   pending,
   processing,
   completed,
+  dispached,
   rightSlot,
 }: StatusCardsProps) {
-  const total = pending + processing + completed;
+  const total = pending + processing + completed + dispached;
   const items = [
     { label: 'Pending', value: pending },
     { label: 'Processing', value: processing },
     { label: 'Completed', value: completed },
+    { label: 'Dispatched', value: dispached },
   ] as const;
 
   return (
@@ -67,7 +70,7 @@ export default function StatusCards({
       <div className="w-full grid grid-cols-1 xl:grid-cols-[70%_30%] gap-5 sm:gap-6 items-start">
         {/* Left section: status cards – full width, own shadow */}
         <div className="rounded bg-white p-5 lg:p-8 shadow min-w-0 w-full">
-          <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-5 sm:gap-6 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 w-full">
             {items.map(({ label, value }) => (
               <Card
                 key={label}
