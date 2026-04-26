@@ -51,7 +51,7 @@ export default async function PaymentPage({
   const advancedPercent = Number(payment?.advanced) || 0;
 
   return (
-    <div className="min-h-screen min-w-0 space-y-4 pb-20 lg:pb-10">
+    <div className="min-h-screen min-w-0 space-y-4 pb-36 lg:pb-10">
       <div className="-mt-1 flex items-center bg-white p-3">
         <h1 className="text-lg font-bold text-gray-900">Payment</h1>
       </div>

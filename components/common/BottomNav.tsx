@@ -6,14 +6,104 @@ import {
   Grid2x2,
   MessageSquare,
   Headphones,
+  Heart,
+  Package,
+  User,
+  Settings,
 } from 'lucide-react';
 import { fetcher } from '@/lib/fetcher';
+import BottomNavAuthTile from './BottomNavAuthTile';
 import MobileCategorySheet from './MobileCategorySheet';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-const Footer = ({ settings, contact }: { settings: any; contact: any }) => (
-  <div className="px-3 border-t border-border mt-4">
-    <div className="grid grid-cols-1 items-starts gap-1">
+const MoreSheetContent = ({
+  settings,
+  contact,
+  wishlistCount,
+  cartCount,
+  isLoggedIn,
+}: {
+  settings: any;
+  contact: any;
+  wishlistCount: number;
+  cartCount: number;
+  isLoggedIn: boolean;
+}) => (
+  <div className="px-3 pb-6 pt-2">
+    <div
+      className="mx-auto mb-3 h-1 w-10 shrink-0 rounded-full bg-muted"
+      aria-hidden
+    />
+    <p className="px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      Quick links
+    </p>
+    <div className="grid grid-cols-3 gap-2">
+      <Link
+        href="/wishlist"
+        prefetch
+        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
+      >
+        <span className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
+          <Heart className="h-5 w-5" strokeWidth={2} aria-hidden />
+          {wishlistCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-white tabular-nums">
+              {wishlistCount > 99 ? '99+' : wishlistCount}
+            </span>
+          )}
+        </span>
+        <span className="text-[11px] font-medium leading-tight">Wishlist</span>
+      </Link>
+      <Link
+        href="/cart"
+        prefetch
+        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
+      >
+        <span className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
+          <ShoppingBag className="h-5 w-5" strokeWidth={2} aria-hidden />
+          {cartCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-white tabular-nums">
+              {cartCount > 99 ? '99+' : cartCount}
+            </span>
+          )}
+        </span>
+        <span className="text-[11px] font-medium leading-tight">Cart</span>
+      </Link>
+      <Link
+        href="/account/orders"
+        prefetch
+        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
+      >
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
+          <Package className="h-5 w-5" strokeWidth={2} aria-hidden />
+        </span>
+        <span className="text-[11px] font-medium leading-tight">Orders</span>
+      </Link>
+      <Link
+        href="/account"
+        prefetch
+        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
+      >
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
+          <User className="h-5 w-5" strokeWidth={2} aria-hidden />
+        </span>
+        <span className="text-[11px] font-medium leading-tight">Account</span>
+      </Link>
+      <Link
+        href="/account/settings"
+        prefetch
+        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
+      >
+        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
+          <Settings className="h-5 w-5" strokeWidth={2} aria-hidden />
+        </span>
+        <span className="text-[11px] font-medium leading-tight">Settings</span>
+      </Link>
+      <BottomNavAuthTile isLoggedIn={isLoggedIn} />
+    </div>
+    <p className="mt-4 px-1 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      Support
+    </p>
+    <div className="grid grid-cols-3 gap-2">
       <Link
         href={settings?.data?.messenger}
         target="_blank"
@@ -56,19 +146,21 @@ const Footer = ({ settings, contact }: { settings: any; contact: any }) => (
 export default async function BottomNav({
   menuCategories,
 }: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   menuCategories?: any;
 }) {
   const settings: any = await fetcher(`/settings`);
   const contact: any = await fetcher(`/contact`);
 
-  let cartProducts: any = null;
-  try {
-    cartProducts = await fetcher('/cart-products');
-  } catch {
-    // Handle error gracefully
-  }
+  const safeFetch = (p: Promise<any>) => p.catch(() => null);
+  const [cartProducts, wishlist, userProfile] = await Promise.all([
+    safeFetch(fetcher('/cart-products')),
+    safeFetch(fetcher('/wishlists')),
+    safeFetch(fetcher('/user-profile')),
+  ]);
   const cartCount = cartProducts?.data?.length ?? 0;
+  const wishlistCount =
+    wishlist?.status === 'error' || !wishlist?.data ? 0 : wishlist.data.length;
+  const isLoggedIn = Boolean(userProfile?.data?.email);
 
   return (
     <nav
@@ -113,10 +205,8 @@ export default async function BottomNav({
 
         {/* Account */}
         <li className="flex flex-col items-center">
-          <Link href="/account" className="flex flex-col items-center">
-            <div className="h-7 w-7 bg-teal-600 text-white rounded-full flex items-center justify-center text-[12px] font-medium">
-              A
-            </div>
+          <Link href="/account" className="flex flex-col items-center gap-0.5">
+            <User className="h-5 w-5" />
             <span>Account</span>
           </Link>
         </li>
@@ -124,15 +214,24 @@ export default async function BottomNav({
         {/* More Drawer */}
         <li className="flex flex-col items-center">
           <Sheet>
-            <SheetTrigger className="flex flex-col items-center" aria-label="Open more menu">
+            <SheetTrigger
+              className="flex flex-col items-center"
+              aria-label="Open more menu"
+            >
               <Grid2x2 className="h-5 w-5" />
               <span className="text-xs">More</span>
             </SheetTrigger>
             <SheetContent
               side="bottom"
-              className="p-0 h-48 rounded-t-2xl overflow-y-auto"
+              className="p-0 max-h-[min(85vh,520px)] rounded-t-2xl overflow-y-auto"
             >
-              <Footer settings={settings} contact={contact} />
+              <MoreSheetContent
+                settings={settings}
+                contact={contact}
+                wishlistCount={wishlistCount}
+                cartCount={cartCount}
+                isLoggedIn={isLoggedIn}
+              />
             </SheetContent>
           </Sheet>
         </li>

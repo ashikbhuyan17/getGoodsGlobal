@@ -10,6 +10,10 @@ import { toast } from 'sonner';
 import TermsModal from '@/components/checkout/TermsModal';
 import { formatPriceInt } from '@/lib/utils';
 
+/** Below lg: sticky CTA. max-md: above BottomNav; md–lg: flush bottom (nav hidden). */
+const MOBILE_CTA_BAR_PIN =
+  'fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]';
+
 export default function CartSummary({
   page = 'cart',
   total,
@@ -24,6 +28,7 @@ export default function CartSummary({
   requiresShippingSelection = false,
   priceSummary,
   orderConditionHtml,
+  allDeselected = false,
 }: {
   page?: 'cart' | 'checkout';
   total: number;
@@ -217,7 +222,7 @@ export default function CartSummary({
   };
 
   return (
-    <div className="bg-white rounded-lg lg:mb-0 max-lg:pb-20">
+    <div className="bg-white rounded-lg lg:mb-0 max-lg:pb-4">
       <h2 className="text-base font-bold text-center p-2 lg:p-4">
         Cart Summary
       </h2>
@@ -342,7 +347,7 @@ export default function CartSummary({
         {
           page === 'checkout' ? (
             <>
-              {/* Desktop / tablet: button in summary card */}
+              {/* Desktop: always show (modal overlays on top) */}
               <div className="hidden lg:block">
                 <Button
                   onClick={handlePlaceOrderClick}
@@ -352,30 +357,30 @@ export default function CartSummary({
                 </Button>
               </div>
 
-              {/* Mobile: fixed bottom bar (same pattern as product page actions) */}
-              <div
-                className="lg:hidden pointer-events-none fixed inset-x-0 bottom-0 z-50 px-2 pb-0 pt-1"
-                style={{
-                  paddingBottom:
-                    'max(0.5rem, env(safe-area-inset-bottom, 0px))',
-                }}
-              >
-                <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
-                  <div className="flex items-center justify-between gap-2 px-0.5">
-                    <span className="text-xs text-gray-600">Total payable</span>
-                    <span className="text-sm font-bold tabular-nums text-gray-900">
-                      ৳{formatPriceInt(finalPrice)}
-                    </span>
+              {/* Mobile: hide floating bar while Terms modal is open */}
+              {!showTermsModal && (
+                <div
+                  className={`lg:hidden pointer-events-none ${MOBILE_CTA_BAR_PIN}`}
+                >
+                  <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
+                    <div className="flex items-center justify-between gap-2 px-0.5">
+                      <span className="text-xs text-gray-600">
+                        Total payable
+                      </span>
+                      <span className="text-sm font-bold tabular-nums text-gray-900">
+                        ৳{formatPriceInt(finalPrice)}
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={handlePlaceOrderClick}
+                      className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90"
+                    >
+                      Place Order & Pay
+                    </Button>
                   </div>
-                  <Button
-                    type="button"
-                    onClick={handlePlaceOrderClick}
-                    className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90"
-                  >
-                    Place Order & Pay
-                  </Button>
                 </div>
-              </div>
+              )}
 
               <TermsModal
                 open={showTermsModal}
@@ -385,20 +390,52 @@ export default function CartSummary({
               />
             </>
           ) : (
-            <Button
-              onClick={onCheckoutClick}
-              disabled={isCheckoutLoading}
-              className="w-full bg-primary hover:bg-primary/95 py-6 text-base"
-            >
-              {isCheckoutLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait...
-                </>
-              ) : (
-                'Go to Checkout'
-              )}
-            </Button>
+            <>
+              <div className="hidden lg:block">
+                <Button
+                  onClick={onCheckoutClick}
+                  disabled={isCheckoutLoading || allDeselected}
+                  className="w-full bg-primary py-6 text-base hover:bg-primary/95 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isCheckoutLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Please wait...
+                    </>
+                  ) : (
+                    'Go to Checkout'
+                  )}
+                </Button>
+              </div>
+
+              <div
+                className={`pointer-events-none lg:hidden ${MOBILE_CTA_BAR_PIN}`}
+              >
+                <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
+                  <div className="flex items-center justify-between gap-2 px-0.5">
+                    <span className="text-xs text-gray-600">Subtotal</span>
+                    <span className="text-sm font-bold tabular-nums text-gray-900">
+                      ৳{formatPriceInt(finalPrice)}
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    onClick={onCheckoutClick}
+                    disabled={isCheckoutLoading || allDeselected}
+                    className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {isCheckoutLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Please wait...
+                      </>
+                    ) : (
+                      'Go to Checkout'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </>
           )
 
           // onCheckoutClick ? (

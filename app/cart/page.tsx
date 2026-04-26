@@ -19,7 +19,7 @@ export default async function CartPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 pb-36 lg:pb-0">
       <CartInfoBar />
       <div className="container mx-auto px-4 py-6 md:py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

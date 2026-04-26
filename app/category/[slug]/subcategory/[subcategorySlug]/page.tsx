@@ -1,6 +1,6 @@
-import ProductList from "@/components/common/ProductList";
-import InfoBar from "@/components/shop/InfoBar";
-import { SubcategoryPills } from "@/components/shop/SubcategoryPills";
+import ProductList from '@/components/common/ProductList';
+import InfoBar from '@/components/shop/InfoBar';
+import { SubcategoryPills } from '@/components/shop/SubcategoryPills';
 
 async function SubcategoryPage({
   params,
@@ -13,7 +13,7 @@ async function SubcategoryPage({
   const { max, min } = await searchParams;
 
   return (
-    <div className="min-h-screen space-y-5">
+    <div className="min-h-screen space-y-5 max-lg:pb-16">
       <InfoBar slug={subcategorySlug} />
       <div className="px-2">
         <div className="bg-white rounded-sm border-border p-4 space-y-3">

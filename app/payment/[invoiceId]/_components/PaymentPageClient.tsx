@@ -421,10 +421,7 @@ export default function PaymentPageClient({
 
       {/* Mobile: fixed bottom pay bar (same idea as checkout “Place Order”) */}
       <div
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 px-2 pb-0 pt-1 lg:hidden"
-        style={{
-          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
-        }}
+        className="pointer-events-none fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] lg:hidden"
       >
         <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
           <div className="flex items-center justify-between gap-2 px-0.5">

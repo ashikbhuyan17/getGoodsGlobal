@@ -100,7 +100,7 @@ export default async function PaymentsPage() {
                             href={`/account/orders/${invoiceId}`}
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium"
                           >
-                            ORD-{invoiceId}
+                            {invoiceId}
                           </Link>
                         ) : (
                           <span className="text-gray-500">—</span>
