@@ -29,7 +29,7 @@ const MoreSheetContent = ({
   cartCount: number;
   isLoggedIn: boolean;
 }) => (
-  <div className="px-3 pb-6 pt-2">
+  <div className="px-2 pb-6 pt-2">
     <div
       className="mx-auto mb-3 h-1 w-10 shrink-0 rounded-full bg-muted"
       aria-hidden
@@ -38,46 +38,6 @@ const MoreSheetContent = ({
       Quick links
     </p>
     <div className="grid grid-cols-3 gap-2">
-      <Link
-        href="/wishlist"
-        prefetch
-        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
-      >
-        <span className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
-          <Heart className="h-5 w-5" strokeWidth={2} aria-hidden />
-          {wishlistCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-white tabular-nums">
-              {wishlistCount > 99 ? '99+' : wishlistCount}
-            </span>
-          )}
-        </span>
-        <span className="text-[11px] font-medium leading-tight">Wishlist</span>
-      </Link>
-      <Link
-        href="/cart"
-        prefetch
-        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
-      >
-        <span className="relative inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
-          <ShoppingBag className="h-5 w-5" strokeWidth={2} aria-hidden />
-          {cartCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-white tabular-nums">
-              {cartCount > 99 ? '99+' : cartCount}
-            </span>
-          )}
-        </span>
-        <span className="text-[11px] font-medium leading-tight">Cart</span>
-      </Link>
-      <Link
-        href="/account/orders"
-        prefetch
-        className="flex flex-col items-center gap-1 rounded-xl bg-gray-100 p-2.5 text-center hover:bg-gray-200 transition"
-      >
-        <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center text-primary">
-          <Package className="h-5 w-5" strokeWidth={2} aria-hidden />
-        </span>
-        <span className="text-[11px] font-medium leading-tight">Orders</span>
-      </Link>
       <Link
         href="/account"
         prefetch
@@ -200,6 +160,22 @@ export default async function BottomNav({
               )}
             </span>
             <span>Cart</span>
+          </Link>
+        </li>
+        <li className="flex flex-col items-center">
+          <Link
+            href="/wishlist"
+            className="relative flex flex-col items-center"
+          >
+            <span className="relative inline-block">
+              <Heart className="h-5 w-5" />
+              {wishlistCount > 0 && (
+                <span className="absolute -right-0.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-0.5 text-[9px] font-semibold text-white tabular-nums">
+                  {wishlistCount > 99 ? '99+' : wishlistCount}
+                </span>
+              )}
+            </span>
+            <span>Wishlist</span>
           </Link>
         </li>
 
