@@ -69,18 +69,15 @@ export default function StatusCards({
     <div className="w-full">
       <div className="w-full grid grid-cols-1 xl:grid-cols-[70%_30%] gap-5 sm:gap-6 items-start">
         {/* Left section: status cards – full width, own shadow */}
-        <div className="rounded bg-white p-5 lg:p-8 shadow min-w-0 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 w-full">
+        <div className="rounded bg-white p-1.5 sm:p-2 md:p-8 shadow min-w-0 w-full">
+          <div className="grid grid-cols-2 xl:grid-cols-4 gap-1.5 sm:gap-6 w-full">
             {items.map(({ label, value }) => (
               <Card
                 key={label}
-                className="bg-gray-50 flex flex-row items-center justify-between gap-4 rounded-md shadow-none p-5 sm:p-6 min-w-0 w-full "
+                className="bg-gray-50 flex flex-row items-center justify-between gap-2 sm:gap-4 rounded-md shadow-none p-2.5 sm:p-6 min-w-0 w-full"
               >
                 <div className="min-w-0 flex-1">
-                  <p
-                    className="text-base font-medium text-[#333333] mb-1"
-                    style={{ fontSize: '16px' }}
-                  >
+                  <p className="font-medium text-[#333333] mb-1 text-xs md:text-base">
                     {label}
                   </p>
                   <p

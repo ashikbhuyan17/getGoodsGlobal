@@ -15,7 +15,6 @@ export default async function Dashboard() {
       fetcher('/user-profile'),
       fetcher('/contact'),
     ])) as [any, any, any, any];
-  console.log('🚀 ~ Dashboard ~ dashboardOverview:', dashboardOverview);
 
   const phoneNumber = contact?.data?.phone;
   const hotlineNumber = contact?.data?.hotline;
