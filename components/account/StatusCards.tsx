@@ -61,8 +61,8 @@ export default function StatusCards({
   const items = [
     { label: 'Pending', value: pending },
     { label: 'Processing', value: processing },
-    { label: 'Completed', value: completed },
     { label: 'Dispatched', value: dispached },
+    { label: 'Completed', value: completed },
   ] as const;
 
   return (
