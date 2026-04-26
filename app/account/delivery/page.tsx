@@ -83,7 +83,7 @@ export default async function DeliveryPage({
                       d?.paid_partial_payment_amount ?? 0,
                     );
                     const due = Number(d?.payment_due_amount ?? 0);
-                    const method = d?.shipping_method ?? 'N/A';
+                    const method = String(d?.shipping_method ?? 'N/A');
 
                     return (
                       <tr
