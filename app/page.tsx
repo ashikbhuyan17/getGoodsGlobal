@@ -34,7 +34,7 @@ export default async function Home() {
         <Suspense fallback={<CategorySectionSkeleton />}>
           <CategorySection />
         </Suspense>
-        <div className="space-y-2 lg:space-y-3">
+        {/* <div className="space-y-2 lg:space-y-3">
           {(frontCategory as { data?: unknown[] })?.data?.map((cat: any) => (
             <ProductsSlider
               title={cat?.name}
@@ -43,6 +43,21 @@ export default async function Home() {
               products={cat?.products}
             />
           ))}
+          
+        </div> */}
+        <div className="space-y-2 lg:space-y-3">
+          {(frontCategory as { data?: any[] })?.data
+            ?.filter(
+              (cat) => Array.isArray(cat?.products) && cat.products.length > 0,
+            )
+            ?.map((cat: any) => (
+              <ProductsSlider
+                title={cat?.name}
+                image={cat?.image}
+                key={cat?.id}
+                products={cat?.products}
+              />
+            ))}
         </div>
       </div>
       <Footer />

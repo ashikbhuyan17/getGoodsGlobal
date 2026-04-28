@@ -50,7 +50,9 @@ export default function ProductCard({
           {/* Info Section */}
           <div className="mt-1 p-3 space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-[#ff0050] font-bold text-lg">৳{formatPriceInt(newP)}</span>
+              <span className="text-[#ff0050] font-bold text-lg">
+                ৳{formatPriceInt(newP)}
+              </span>
               {oldP > 0 && oldP > newP && (
                 <span className="text-[#80807B] font-bold text-sm line-through">
                   ৳{formatPriceInt(oldP)}
