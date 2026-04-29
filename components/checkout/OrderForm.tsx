@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BANGLADESH_DISTRICTS } from '@/lib/constants/districts';
+import { BD_DISTRICT_NAMES, getThanaPsByDistrict } from '@/lib/constants/bd-locations';
 
 export default function OrderForm({
   formData,
@@ -28,6 +28,8 @@ export default function OrderForm({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormData: any;
 }) {
+  const thanaOptions = getThanaPsByDistrict(formData?.district || '');
+
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
       <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -70,9 +72,14 @@ export default function OrderForm({
           </Label>
           <Select
             value={formData?.district || ''}
-            onValueChange={(value) =>
-              setFormData({ ...formData, district: value })
-            }
+            onValueChange={(value) => {
+              const isSameDistrict = (formData?.district || '') === value;
+              setFormData({
+                ...formData,
+                district: value,
+                city: isSameDistrict ? formData?.city || '' : '',
+              });
+            }}
             required
           >
             <SelectTrigger
@@ -83,7 +90,7 @@ export default function OrderForm({
               <SelectValue placeholder="Select district" />
             </SelectTrigger>
             <SelectContent>
-              {BANGLADESH_DISTRICTS.map((district) => (
+              {BD_DISTRICT_NAMES.map((district) => (
                 <SelectItem key={district} value={district}>
                   {district}
                 </SelectItem>
@@ -97,13 +104,26 @@ export default function OrderForm({
           <Label htmlFor="city">
             Thana/PS <span className="text-red-500">*</span>
           </Label>
-          <Input
+          <Select
             value={formData?.city || ''}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            id="city"
-            placeholder="Enter city name"
+            onValueChange={(value) => setFormData({ ...formData, city: value })}
             required
-          />
+          >
+            <SelectTrigger className="w-full" id="city" aria-required="true">
+              <SelectValue
+                placeholder={
+                  formData?.district ? 'Select thana/PS' : 'Select district first'
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              {thanaOptions.map((thana) => (
+                <SelectItem key={thana} value={thana}>
+                  {thana}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Address */}

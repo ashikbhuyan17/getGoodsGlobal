@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
@@ -27,7 +27,10 @@ import {
   submitUserSettingsWithFields,
 } from '@/lib/fetcher';
 import { toast } from 'sonner';
-import { BANGLADESH_DISTRICTS } from '@/lib/constants/districts';
+import {
+  BD_DISTRICT_NAMES,
+  getThanaPsByDistrict,
+} from '@/lib/constants/bd-locations';
 import {
   isImageFileSizeValid,
   getImageFileTooLargeMessage,
@@ -76,6 +79,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const thanaOptions = useMemo(() => getThanaPsByDistrict(district), [district]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -337,7 +341,16 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
           {/* District - same width as City */}
           <div className="space-y-2">
             <Label htmlFor="district">District</Label>
-            <Select value={district || ''} onValueChange={setDistrict}>
+            <Select
+              value={district || ''}
+              onValueChange={(value) => {
+                const isSameDistrict = district === value;
+                setDistrict(value);
+                if (!isSameDistrict) {
+                  setCity('');
+                }
+              }}
+            >
               <SelectTrigger
                 id="district"
                 className="rounded-md border-gray-300 w-full"
@@ -345,7 +358,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
                 <SelectValue placeholder="Select district" />
               </SelectTrigger>
               <SelectContent>
-                {BANGLADESH_DISTRICTS.map((d) => (
+                {BD_DISTRICT_NAMES.map((d) => (
                   <SelectItem key={d} value={d}>
                     {d}
                   </SelectItem>
@@ -357,13 +370,20 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
           {/* City - same width as District */}
           <div className="space-y-2">
             <Label htmlFor="city">Thana/PS</Label>
-            <Input
-              id="city"
-              placeholder="Enter your city"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="rounded-md border-gray-300 w-full"
-            />
+            <Select value={city || ''} onValueChange={setCity}>
+              <SelectTrigger id="city" className="rounded-md border-gray-300 w-full">
+                <SelectValue
+                  placeholder={district ? 'Select thana/PS' : 'Select district first'}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                {thanaOptions.map((thana) => (
+                  <SelectItem key={thana} value={thana}>
+                    {thana}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
