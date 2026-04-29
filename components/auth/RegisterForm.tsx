@@ -21,14 +21,21 @@ import { setToken } from '@/action/token';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 const registerSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  email: z.string().email('Please enter a valid email address'),
+  fullName: z
+    .string()
+    .min(1, 'Full name is required')
+    .min(2, 'Enter at least 2 characters for your full name.'),
   phone: z
     .string()
+    .min(1, 'Phone number is required')
     .regex(
       /^(\+880|880|0)?1[3-9]\d{8}$/,
       'Please enter a valid Bangladeshi phone number',
     ),
+  email: z.union([
+    z.literal(''),
+    z.string().email('Please enter a valid email address'),
+  ]),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
@@ -50,8 +57,8 @@ export default function RegisterForm({ method }: { method: 'page' | 'modal' }) {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       fullName: '',
-      email: '',
       phone: '',
+      email: '',
       password: '',
     },
   });
@@ -104,53 +111,54 @@ export default function RegisterForm({ method }: { method: 'page' | 'modal' }) {
           )}
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-foreground">
-                  Email Address
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="you@company.com"
-                      className="pl-10"
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium text-foreground">
+                Phone Number
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="+880 1XXX-XXXXXX"
+                    className="pl-10"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm font-medium text-foreground">
-                  Phone Number
-                </FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="+880 1XXX-XXXXXX"
-                      className="pl-10"
-                      {...field}
-                    />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-sm font-medium text-foreground">
+                Email Address{' '}
+                <span className="font-normal text-muted-foreground">
+                  (optional)
+                </span>
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="you@company.com"
+                    className="pl-10"
+                    {...field}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <div className="grid grid-cols-1 gap-4">
           <FormField
@@ -166,7 +174,7 @@ export default function RegisterForm({ method }: { method: 'page' | 'modal' }) {
                     <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Min 8 characters"
+                      placeholder="Min 6 characters"
                       className="pl-10 pr-10"
                       {...field}
                     />
