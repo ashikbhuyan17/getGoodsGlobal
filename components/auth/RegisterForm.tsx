@@ -141,9 +141,6 @@ export default function RegisterForm({ method }: { method: 'page' | 'modal' }) {
             <FormItem>
               <FormLabel className="text-sm font-medium text-foreground">
                 Email Address{' '}
-                <span className="font-normal text-muted-foreground">
-                  (optional)
-                </span>
               </FormLabel>
               <FormControl>
                 <div className="relative">

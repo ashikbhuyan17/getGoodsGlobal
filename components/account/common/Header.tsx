@@ -20,7 +20,8 @@ import { fetcher } from '@/lib/fetcher';
 interface UserData {
   data?: {
     name?: string;
-    email?: string;
+    email?: string | null;
+    phone?: string | null;
     points?: number;
     image?: string;
   };
@@ -90,7 +91,9 @@ export default function Header() {
                   {user?.data?.name || 'User'}
                 </p>
                 <p className="text-sm mt-0.5">
-                  {user?.data?.email || 'user@example.com'}
+                  {user?.data?.email ||
+                    user?.data?.phone ||
+                    '—'}
                 </p>
                 {/* Points Badge */}
                 {/* <div className="mt-2 inline-flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-md">
