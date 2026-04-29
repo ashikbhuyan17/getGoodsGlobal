@@ -32,7 +32,7 @@ import {
   isImageFileSizeValid,
   getImageFileTooLargeMessage,
 } from '@/lib/fileUpload';
-import { User, Upload, Eye } from 'lucide-react';
+import { User, Upload, Eye, Loader2 } from 'lucide-react';
 
 function firstValidationError(errors: unknown): string | undefined {
   if (!errors || typeof errors !== 'object') return undefined;
@@ -73,16 +73,19 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
   });
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!name.trim()) newErrors.name = 'Name is required';
-    if (!district.trim()) newErrors.district = 'District is required';
-    if (!city.trim()) newErrors.city = 'City is required';
-    if (!address.trim()) newErrors.address = 'Address is required';
-    setErrors(newErrors);
+    setErrors({
+      name: newErrors.name || '',
+      district: '',
+      city: '',
+      address: '',
+    });
     return Object.keys(newErrors).length === 0;
   };
 
@@ -107,28 +110,35 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
 
     const savedImage = existingProfileImagePath(user);
 
-    // Multipart like new upload: existing file is re-fetched on server and sent as `image` Blob + filename.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res: any = await submitUserSettingsWithFields({
-      name,
-      email,
-      phone: emergencyNumber,
-      emergency_number: emergencyNumber,
-      district,
-      city,
-      address,
-      ...(savedImage ? { existingImageRelativePath: savedImage } : {}),
-    });
+    setIsUpdating(true);
+    try {
+      // Multipart like new upload: existing file is re-fetched on server and sent as `image` Blob + filename.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const res: any = await submitUserSettingsWithFields({
+        name,
+        email,
+        phone: emergencyNumber,
+        emergency_number: emergencyNumber,
+        district,
+        city,
+        address,
+        ...(savedImage ? { existingImageRelativePath: savedImage } : {}),
+      });
 
-    if (res?.status) {
-      toast.success(res?.message ?? 'Profile updated');
-      router.refresh();
-    } else {
-      toast.error(
-        res?.message ||
-          firstValidationError(res?.errors) ||
-          'Failed to update profile',
-      );
+      if (res?.status) {
+        toast.success(res?.message ?? 'Profile updated');
+        router.refresh();
+      } else {
+        toast.error(
+          res?.message ||
+            firstValidationError(res?.errors) ||
+            'Failed to update profile',
+        );
+      }
+    } catch {
+      toast.error('Failed to update profile');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -152,9 +162,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
       return;
     }
     if (!validate()) {
-      toast.error(
-        'Please fill required fields (name, district, city, address) before uploading a photo',
-      );
+      toast.error('Please enter your name before uploading a photo');
       e.target.value = '';
       return;
     }
@@ -276,7 +284,11 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
       </div>
 
       {/* Form: District & City same width, Address full width */}
-      <form onSubmit={handleUpdate} className="space-y-6">
+      <form
+        onSubmit={handleUpdate}
+        className="space-y-6"
+        aria-busy={isUpdating}
+      >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Name */}
           <div className="space-y-2">
@@ -324,9 +336,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* District - same width as City */}
           <div className="space-y-2">
-            <Label htmlFor="district">
-              <span className="text-red-500">*</span> District
-            </Label>
+            <Label htmlFor="district">District</Label>
             <Select value={district || ''} onValueChange={setDistrict}>
               <SelectTrigger
                 id="district"
@@ -342,16 +352,11 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
                 ))}
               </SelectContent>
             </Select>
-            {errors.district && (
-              <p className="text-red-500 text-sm">{errors.district}</p>
-            )}
           </div>
 
           {/* City - same width as District */}
           <div className="space-y-2">
-            <Label htmlFor="city">
-              <span className="text-red-500">*</span> Thana/PS
-            </Label>
+            <Label htmlFor="city">Thana/PS</Label>
             <Input
               id="city"
               placeholder="Enter your city"
@@ -359,17 +364,12 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
               onChange={(e) => setCity(e.target.value)}
               className="rounded-md border-gray-300 w-full"
             />
-            {errors.city && (
-              <p className="text-red-500 text-sm">{errors.city}</p>
-            )}
           </div>
         </div>
 
         {/* Address - full width */}
         <div className="space-y-2 w-full">
-          <Label htmlFor="address">
-            <span className="text-red-500">*</span> Address
-          </Label>
+          <Label htmlFor="address">Address</Label>
           <Textarea
             id="address"
             placeholder="Enter full address"
@@ -377,16 +377,21 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
             onChange={(e) => setAddress(e.target.value)}
             className="min-h-25 w-full resize-y rounded-md border-gray-300"
           />
-          {errors.address && (
-            <p className="text-red-500 text-sm">{errors.address}</p>
-          )}
         </div>
 
         <Button
           type="submit"
+          disabled={isUpdating || isUploading}
           className="w-full rounded-md py-3 text-base font-medium text-white"
         >
-          Update
+          {isUpdating ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Updating…
+            </>
+          ) : (
+            'Update'
+          )}
         </Button>
       </form>
     </div>

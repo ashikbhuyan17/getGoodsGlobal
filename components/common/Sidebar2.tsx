@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import Image from "next/image";
-import { ChevronRight, MessageSquare, Headphones } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Image from 'next/image';
+import { ChevronRight, MessageSquare, Headphones } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // Types matching API response
 interface SubCategory {
@@ -29,13 +29,17 @@ interface Category {
   subcategories: SubCategory[];
 }
 
+// Treat API status as active whether it comes as number 1 or string "1"
+function isActiveStatus(status: unknown): boolean {
+  return Number(status) === 1;
+}
+
 // Helper function to get image URL
 const getImageUrl = (imagePath: string | null | undefined): string => {
-  if (!imagePath) return "/placeholder-product.png";
-  if (imagePath.startsWith("http")) return imagePath;
+  if (!imagePath) return '/placeholder-product.png';
+  if (imagePath.startsWith('http')) return imagePath;
   return `${process.env.NEXT_PUBLIC_IMG_URL}/${imagePath}`;
 };
-
 
 // Footer Component
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -105,11 +109,9 @@ export default function Sidebar2({
   const pathname = usePathname();
   // Initialize with server-fetched categories if available
   const getInitialCategories = (): Category[] => {
-    const data = initialCategories?.data;
-    if (Array.isArray(data)) {
-      return data.filter((cat: Category) => cat?.status === "1");
-    }
-    return [];
+    const raw = initialCategories?.data ?? initialCategories;
+    const data = Array.isArray(raw) ? raw : [];
+    return data.filter((cat: Category) => isActiveStatus(cat?.status));
   };
 
   const [categories] = useState<Category[]>(getInitialCategories);
@@ -134,14 +136,16 @@ export default function Sidebar2({
     categories.forEach((category) => {
       const subCategories = category.subcategories || [];
       subCategories.forEach((subCategory) => {
-        if (pathname === `/category/${category.slug}/subcategory/${subCategory.slug}`) {
+        if (
+          pathname ===
+          `/category/${category.slug}/subcategory/${subCategory.slug}`
+        ) {
           setOpenCategoryId(String(category.id));
           setSelectedSubCategoryId(String(subCategory.id));
         }
       });
     });
   }, [pathname, categories]);
-
 
   const handleCategoryClick = (categoryId: string) => {
     // If clicking the same category, close it
@@ -159,17 +163,20 @@ export default function Sidebar2({
     onCategoryClick?.(categoryId);
   };
 
-  const handleSubCategoryClick = (categoryId: string, subCategoryId: string) => {
+  const handleSubCategoryClick = (
+    categoryId: string,
+    subCategoryId: string,
+  ) => {
     setSelectedSubCategoryId(subCategoryId);
 
     // Call custom handler if provided
     onSubCategoryClick?.(categoryId, subCategoryId);
   };
 
-  const Wrapper = embedded ? "div" : "nav";
+  const Wrapper = embedded ? 'div' : 'nav';
   const wrapperClass = embedded
-    ? "h-full w-full bg-[#FFFFFF] text-foreground flex flex-col overflow-y-auto"
-    : "fixed top-0 left-0 h-full w-56 bg-[#FFFFFF] border-r border-gray-200 text-foreground flex flex-col z-50";
+    ? 'h-full w-full bg-[#FFFFFF] text-foreground flex flex-col overflow-y-auto'
+    : 'fixed top-0 left-0 h-full w-56 bg-[#FFFFFF] border-r border-gray-200 text-foreground flex flex-col z-50';
 
   return (
     <Wrapper className={wrapperClass}>
@@ -184,7 +191,8 @@ export default function Sidebar2({
             {categories.map((category) => {
               const isOpen = openCategoryId === String(category.id);
               const subCategories = category.subcategories || [];
-              const isCategoryActive = pathname === `/category/${category.slug}`;
+              const isCategoryActive =
+                pathname === `/category/${category.slug}`;
               const categoryImageUrl = getImageUrl(category.image);
 
               return (
@@ -210,10 +218,10 @@ export default function Sidebar2({
                       </div>
                       <span
                         className={cn(
-                          "text-sm font-medium",
+                          'text-sm font-medium',
                           isCategoryActive
-                            ? "text-teal-700 font-semibold"
-                            : "text-gray-900"
+                            ? 'text-teal-700 font-semibold'
+                            : 'text-gray-900',
                         )}
                       >
                         {category.name}
@@ -223,12 +231,16 @@ export default function Sidebar2({
                       <button
                         onClick={() => handleCategoryClick(String(category.id))}
                         className="px-2 py-3 hover:bg-gray-50 transition-colors"
-                        aria-label={isOpen ? `Collapse ${category.name} subcategories` : `Expand ${category.name} subcategories`}
+                        aria-label={
+                          isOpen
+                            ? `Collapse ${category.name} subcategories`
+                            : `Expand ${category.name} subcategories`
+                        }
                       >
                         <ChevronRight
                           className={cn(
-                            "w-4 h-4 text-gray-400 transition-transform",
-                            isOpen && "transform rotate-90"
+                            'w-4 h-4 text-gray-400 transition-transform',
+                            isOpen && 'transform rotate-90',
                           )}
                         />
                       </button>
@@ -243,12 +255,13 @@ export default function Sidebar2({
 
                       <ul className="pl-8 pb-2">
                         {subCategories
-                          .filter((sub) => sub.status === "1")
+                          .filter((sub) => isActiveStatus(sub.status))
                           .map((subCategory) => {
                             const isSelected =
                               selectedSubCategoryId === String(subCategory.id);
                             const isSubCategoryActive =
-                              pathname === `/category/${category.slug}/subcategory/${subCategory.slug}`;
+                              pathname ===
+                              `/category/${category.slug}/subcategory/${subCategory.slug}`;
                             return (
                               <li key={subCategory.id}>
                                 <Link
@@ -256,15 +269,15 @@ export default function Sidebar2({
                                   onClick={() => {
                                     handleSubCategoryClick(
                                       String(category.id),
-                                      String(subCategory.id)
+                                      String(subCategory.id),
                                     );
                                     onClose?.();
                                   }}
                                   className={cn(
-                                    "w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50 block",
-                                    (isSelected || isSubCategoryActive)
-                                      ? "text-teal-600 font-semibold"
-                                      : "text-gray-900"
+                                    'w-full text-left px-4 py-2 text-sm transition-colors hover:bg-gray-50 block',
+                                    isSelected || isSubCategoryActive
+                                      ? 'text-teal-600 font-semibold'
+                                      : 'text-gray-900',
                                   )}
                                 >
                                   {subCategory.subcategoryName}

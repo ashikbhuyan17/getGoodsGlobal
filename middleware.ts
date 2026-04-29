@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { fetcher } from "./lib/fetcher";
+import { isAuthenticatedProfile } from "./lib/isAuthenticatedProfile";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -9,7 +10,7 @@ export async function middleware(request: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userProfile: any = await fetcher("/user-profile");
 
-    const status = userProfile?.data?.email ? true : false;
+    const status = isAuthenticatedProfile(userProfile);
 
     if (status === true) {
       if (pathname === "/signin") {

@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetcher } from '@/lib/fetcher';
+import { isAuthenticatedProfile } from '@/lib/isAuthenticatedProfile';
 
 function SigninBtn() {
   const pathname = usePathname();
@@ -17,7 +18,7 @@ function SigninBtn() {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const userData: any = await fetcher('/user-profile');
-      if (userData?.data?.email) {
+      if (isAuthenticatedProfile(userData)) {
         setUser(userData);
       } else {
         setUser(null);
@@ -43,7 +44,7 @@ function SigninBtn() {
   }, [pathname]);
 
   const handlePush = () => {
-    if (user?.data?.email) {
+    if (isAuthenticatedProfile(user)) {
       router.push('/account');
     } else {
       if (pathname === '/signin') {
@@ -106,7 +107,7 @@ function SigninBtn() {
             {user.data.name}
           </p>
           <p className="text-xs font-semibold  max-w-[120px]">
-            {user.data.email}
+            {user.data.email || user.data.phone}
           </p>
         </div>
       )}

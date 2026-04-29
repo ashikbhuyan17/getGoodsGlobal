@@ -11,6 +11,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { fetcher } from '@/lib/fetcher';
+import { isAuthenticatedProfile } from '@/lib/isAuthenticatedProfile';
 import BottomNavAuthTile from './BottomNavAuthTile';
 import MobileCategorySheet from './MobileCategorySheet';
 import {
@@ -133,7 +134,7 @@ export default async function BottomNav({
   const cartCount = cartProducts?.data?.length ?? 0;
   const wishlistCount =
     wishlist?.status === 'error' || !wishlist?.data ? 0 : wishlist.data.length;
-  const isLoggedIn = Boolean(userProfile?.data?.email);
+  const isLoggedIn = isAuthenticatedProfile(userProfile);
 
   return (
     <nav
