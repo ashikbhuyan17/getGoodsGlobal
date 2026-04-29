@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "../ui/textarea";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '../ui/textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { BANGLADESH_DISTRICTS } from "@/lib/constants/districts";
+} from '@/components/ui/select';
+import { BANGLADESH_DISTRICTS } from '@/lib/constants/districts';
 
 export default function OrderForm({
   formData,
@@ -69,13 +69,17 @@ export default function OrderForm({
             District <span className="text-red-500">*</span>
           </Label>
           <Select
-            value={formData?.district || ""}
+            value={formData?.district || ''}
             onValueChange={(value) =>
               setFormData({ ...formData, district: value })
             }
             required
           >
-            <SelectTrigger className="w-full" id="district" aria-required="true">
+            <SelectTrigger
+              className="w-full"
+              id="district"
+              aria-required="true"
+            >
               <SelectValue placeholder="Select district" />
             </SelectTrigger>
             <SelectContent>
@@ -91,13 +95,11 @@ export default function OrderForm({
         {/* City */}
         <div className="flex flex-col space-y-1">
           <Label htmlFor="city">
-            City <span className="text-red-500">*</span>
+            Thana/PS <span className="text-red-500">*</span>
           </Label>
           <Input
-            value={formData?.city || ""}
-            onChange={(e) =>
-              setFormData({ ...formData, city: e.target.value })
-            }
+            value={formData?.city || ''}
+            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
             id="city"
             placeholder="Enter city name"
             required

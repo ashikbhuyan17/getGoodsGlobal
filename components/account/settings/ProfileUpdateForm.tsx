@@ -350,7 +350,7 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
           {/* City - same width as District */}
           <div className="space-y-2">
             <Label htmlFor="city">
-              <span className="text-red-500">*</span> City
+              <span className="text-red-500">*</span> Thana/PS
             </Label>
             <Input
               id="city"
