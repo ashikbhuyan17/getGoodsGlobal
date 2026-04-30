@@ -54,12 +54,16 @@ export default function Header() {
     return pathname?.startsWith(url);
   };
 
+  const nameStr =
+    typeof user?.data?.name === 'string' ? user.data.name.trim() : '';
   const userInitials =
-    user?.data?.name
-      ?.split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase() || 'U';
+    nameStr.length > 0
+      ? nameStr
+          .split(/\s+/)
+          .map((n) => n[0])
+          .join('')
+          .toUpperCase()
+      : 'U';
 
   const imagePath =
     typeof user?.data?.image === 'string' ? user.data.image.trim() : '';
