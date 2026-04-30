@@ -11,6 +11,7 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function HeroSlider({ slides }: { slides: any }) {
+  const slideList = Array.isArray(slides?.data) ? slides.data : [];
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: false }),
   );
@@ -26,7 +27,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
       >
         <CarouselContent className="-ml-0">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {slides?.data?.map((slide: any, i: number) => (
+          {slideList.map((slide: any, i: number) => (
             <CarouselItem
               onClick={() => window.open(slide?.link, '_blank')}
               key={i}
