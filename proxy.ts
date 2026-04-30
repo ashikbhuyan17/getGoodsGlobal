@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { fetcher } from "./lib/fetcher";
 import { isAuthenticatedProfile } from "./lib/isAuthenticatedProfile";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   try {
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
     response.headers.set("x-pathname", pathname);
     return response;
   } catch (error) {
-    console.error("Middleware error:", error);
+    console.error("Proxy error:", error);
     const response = NextResponse.next();
     response.headers.set("x-pathname", pathname);
     return response;
