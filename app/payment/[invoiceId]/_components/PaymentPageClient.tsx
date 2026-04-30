@@ -48,6 +48,11 @@ export default function PaymentPageClient({
               ? `${process.env.NEXT_PUBLIC_IMG_URL}/${bank.image}`
               : '/bank-placeholder.png',
             accountName: bank.account_name,
+            codAccountName:
+              bank.cod_acount_name != null &&
+              String(bank.cod_acount_name).trim() !== ''
+                ? String(bank.cod_acount_name).trim()
+                : null,
             accountNumber: bank.account_number,
             branch: bank.branch ? String(bank.branch).trim() : '',
             routingNo: bank.routing_number
@@ -57,7 +62,6 @@ export default function PaymentPageClient({
             cod: bank.cod != null && bank.cod !== '' ? String(bank.cod) : null,
           }))
       : [];
-
   const [selectedPayment, setSelectedPayment] = useState<string>(
     paymentAccounts.length > 0 ? String(paymentAccounts[0].id) : '',
   );
@@ -69,6 +73,15 @@ export default function PaymentPageClient({
     (acc: any) => acc.id === selectedPayment,
   );
 
+  const isCodSelected = selectedAccount?.id === COD_PAYMENT_METHOD_ID;
+  /** When COD is selected, show/submit MFS name from API (`cod_acount_name`) if present. */
+  const displayAccountName =
+    isCodSelected &&
+    selectedAccount?.codAccountName != null &&
+    selectedAccount.codAccountName !== ''
+      ? selectedAccount.codAccountName
+      : (selectedAccount?.accountName ?? '');
+
   // Cash Payment Fee/Charge = percentage fee (from bank cod %)
   const codPercent =
     selectedAccount?.cod != null && selectedAccount?.cod !== ''
@@ -76,7 +89,6 @@ export default function PaymentPageClient({
       : 0;
   const cashPaymentFeeNum = subTotal * (codPercent / 100);
   const totalAmount = subTotal + cashPaymentFeeNum;
-  const isCodSelected = selectedAccount?.id === COD_PAYMENT_METHOD_ID;
   // Advance percentage (from payment API). Used only when COD method is selected.
   const advancePercent = isCodSelected ? Math.max(0, Number(advanced) || 0) : 0;
   const isCodAdvanceEnabled = isCodSelected && codPercent > 0;
@@ -275,7 +287,7 @@ export default function PaymentPageClient({
               <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
                 <div className="px-4 py-3 border-b">
                   <h3 className="text-base font-semibold text-gray-900">
-                    {selectedAccount.accountName} Details
+                    {displayAccountName} Details
                   </h3>
                 </div>
                 <div className="divide-y">
@@ -284,7 +296,7 @@ export default function PaymentPageClient({
                       Account Name
                     </div>
                     <div className="col-span-8 md:col-span-9 px-4 py-2 text-sm text-gray-900">
-                      {selectedAccount.accountName}
+                      {displayAccountName}
                     </div>
                   </div>
                   <div className="grid grid-cols-12 border-b">
@@ -420,9 +432,7 @@ export default function PaymentPageClient({
       </div>
 
       {/* Mobile: fixed bottom pay bar (same idea as checkout “Place Order”) */}
-      <div
-        className="pointer-events-none fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] lg:hidden"
-      >
+      <div className="pointer-events-none fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))] lg:hidden">
         <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
           <div className="flex items-center justify-between gap-2 px-0.5">
             <span className="text-xs text-gray-600">
