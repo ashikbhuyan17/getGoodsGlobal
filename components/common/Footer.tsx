@@ -100,36 +100,43 @@ export default async function Footer() {
                     {contact?.data?.address}
                   </p>
                 </div>
-                <Link
-                  href={`mailto:${contact?.data?.email}`}
-                  className="flex items-center gap-3 group"
-                >
-                  <Mail className="w-5 h-5 text-primary shrink-0" />
-                  <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
-                    {contact?.data?.email}
-                  </span>
-                </Link>
-                <Link
-                  href={`tel:${contact?.data?.phone}`}
-                  className="flex items-center gap-3 group"
-                >
-                  <Phone className="w-5 h-5 text-primary shrink-0" />
-                  <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
-                    {contact?.data?.phone}
-                  </span>
-                </Link>
-                <Link
-                  href={contact?.data?.maplink}
-                  target="_blank"
-                  className="flex items-center gap-3 group text-left"
-                >
-                  <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center shrink-0">
-                    <MapPin className="w-3 h-3 text-white" />
-                  </div>
-                  <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
-                    Find us on map
-                  </span>
-                </Link>
+                {contact?.data?.email && (
+                  <Link
+                    href={`mailto:${contact.data.email}`}
+                    className="flex items-center gap-3 group"
+                  >
+                    <Mail className="w-5 h-5 text-primary shrink-0" />
+                    <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
+                      {contact.data.email}
+                    </span>
+                  </Link>
+                )}
+
+                {contact?.data?.phone && (
+                  <Link
+                    href={`tel:${contact.data.phone}`}
+                    className="flex items-center gap-3 group"
+                  >
+                    <Phone className="w-5 h-5 text-primary shrink-0" />
+                    <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
+                      {contact.data.phone}
+                    </span>
+                  </Link>
+                )}
+                {contact?.data?.maplink != null && (
+                  <Link
+                    href={contact?.data?.maplink}
+                    target="_blank"
+                    className="flex items-center gap-3 group text-left"
+                  >
+                    <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center shrink-0">
+                      <MapPin className="w-3 h-3 text-white" />
+                    </div>
+                    <span className="text-gray-600 text-sm group-hover:text-primary transition-colors">
+                      Find us on map
+                    </span>
+                  </Link>
+                )}
               </div>
             </div>
 
