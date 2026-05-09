@@ -10,7 +10,7 @@ import {
 } from '@/lib/productNormalizer';
 import { notFound } from 'next/navigation';
 
-async function ProductPage({ params }: { params: { slug: string } }) {
+async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   // Parallel fetch: product, wishlist, shipping

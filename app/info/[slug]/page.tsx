@@ -2,7 +2,7 @@ import { decodeSlug } from "@/lib/decodeSlug";
 import { fetcher } from "@/lib/fetcher";
 import { notFound } from "next/navigation";
 
-async function InfoPage({ params }: { params: { slug: string } }) {
+async function InfoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

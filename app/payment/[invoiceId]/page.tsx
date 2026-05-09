@@ -2,7 +2,7 @@ import { fetcher } from '@/lib/fetcher';
 import { notFound } from 'next/navigation';
 import PaymentPageClient from './_components/PaymentPageClient';
 
-export const PAYMENT_CACHE = 60;
+export const revalidate = 60;
 
 type PaymentItem = {
   amount?: number;

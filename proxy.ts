@@ -1,16 +1,49 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { fetcher } from "./lib/fetcher";
-import { isAuthenticatedProfile } from "./lib/isAuthenticatedProfile";
+
+function isProtectedPath(pathname: string): boolean {
+  return (
+    pathname.startsWith("/account") ||
+    pathname === "/wishlist" ||
+    pathname === "/cart" ||
+    pathname === "/checkout"
+  );
+}
+
+async function isAuthenticatedFromApi(
+  request: NextRequest,
+): Promise<boolean> {
+  const token = request.cookies.get("token")?.value;
+  if (!token) return false;
+
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+    if (!apiUrl) return false;
+
+    const res = await fetch(`${apiUrl}/user-profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!res.ok) return false;
+    const profile = await res.json();
+    const data = profile?.data;
+    const hasId = data?.id !== undefined && data?.id !== null && `${data.id}` !== "";
+    return Boolean(hasId || data?.email || data?.phone);
+  } catch (error) {
+    console.error("Auth profile check failed:", error);
+    return false;
+  }
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const userProfile: any = await fetcher("/user-profile");
-
-    const status = isAuthenticatedProfile(userProfile);
+    const status = await isAuthenticatedFromApi(request);
 
     if (status === true) {
       if (pathname === "/signin") {
@@ -23,17 +56,10 @@ export async function proxy(request: NextRequest) {
       }
     }
 
-    if (status === false) {
-      if (
-        pathname.startsWith("/account") ||
-        pathname === "/wishlist" ||
-        pathname === "/cart" ||
-        pathname === "/checkout"
-      ) {
-        const signinUrl = new URL("/signin", request.url);
-        signinUrl.searchParams.set("redirect", pathname);
-        return NextResponse.redirect(signinUrl);
-      }
+    if (status === false && isProtectedPath(pathname)) {
+      const signinUrl = new URL("/signin", request.url);
+      signinUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(signinUrl);
     }
 
     const response = NextResponse.next();
@@ -41,6 +67,11 @@ export async function proxy(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("Proxy error:", error);
+    if (isProtectedPath(pathname)) {
+      const signinUrl = new URL("/signin", request.url);
+      signinUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(signinUrl);
+    }
     const response = NextResponse.next();
     response.headers.set("x-pathname", pathname);
     return response;

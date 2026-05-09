@@ -4,7 +4,7 @@ import React from "react";
 async function SearchPage({
   searchParams,
 }: {
-  searchParams: { search_query: string };
+  searchParams: Promise<{ search_query: string }>;
 }) {
   const { search_query } = await searchParams;
 

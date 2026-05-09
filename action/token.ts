@@ -14,3 +14,15 @@ export const setToken = async (token: string) => {
     console.log("Token Error:", error);
   }
 };
+
+export const deleteToken = async () => {
+  try {
+    const cookiesStore = await cookies();
+    cookiesStore.delete({
+      name: "token",
+      path: "/",
+    });
+  } catch (error) {
+    console.log("Delete token error:", error);
+  }
+};

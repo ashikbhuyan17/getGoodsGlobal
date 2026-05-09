@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { Badge } from '@/components/ui/badge';
 
 interface TicketDetailsCardProps {
   ticketId: string;
@@ -15,19 +15,13 @@ export default function TicketDetailsCard({
 }: TicketDetailsCardProps) {
   const getStatusBadgeColor = (status: string) => {
     const statusLower = status.toLowerCase();
-    if (statusLower === "closed") {
-      return "bg-gray-900 text-white";
+    if (statusLower === 'closed') {
+      return 'bg-gray-900 text-white';
     }
-    return "bg-red-600 text-white";
+    return 'bg-red-600 text-white';
   };
 
-  const Row = ({
-    label,
-    value,
-  }: {
-    label: string;
-    value: React.ReactNode;
-  }) => (
+  const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
     <div className="grid grid-cols-12 border-b last:border-b-0">
       <div className="col-span-4 md:col-span-3 bg-gray-50 px-4 py-3 text-sm text-gray-600 font-medium">
         {label}
@@ -47,21 +41,21 @@ export default function TicketDetailsCard({
       </div>
 
       <div className="divide-y">
-        <Row label="Ticket ID" value={ticketId || "N/A"} />
-        <Row label="Category" value={category || "N/A"} />
+        <Row label="Ticket ID" value={ticketId || 'N/A'} />
+        <Row label="Category" value={category || 'N/A'} />
         <Row
           label="Status"
           value={
             <Badge
               className={`text-xs px-3 py-1 rounded-full ${getStatusBadgeColor(
-                status
+                status,
               )}`}
             >
-              {status || "N/A"}
+              {status || 'N/A'}
             </Badge>
           }
         />
-        <Row label="Manager" value={manager || "N/A"} />
+        {/* <Row label="Manager" value={manager || "N/A"} /> */}
       </div>
     </div>
   );

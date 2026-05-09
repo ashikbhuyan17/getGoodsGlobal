@@ -6,8 +6,8 @@ async function ShopPage({
   params,
   searchParams,
 }: {
-  params: { slug: string };
-  searchParams: { max?: string; min?: string };
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ max?: string; min?: string }>;
 }) {
   const { slug } = await params;
   const { max, min } = await searchParams;
