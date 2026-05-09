@@ -116,9 +116,10 @@ export default async function ProductDescription({
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="spec">
-        <div className="border border-gray-200 rounded-sm p-4">
+      <TabsContent value="spec" className="w-full">
+        <div className="w-full rounded-sm border border-gray-200 p-4">
           <div
+            className="w-full max-w-full overflow-x-auto wrap-break-word [&_img]:h-auto [&_img]:max-w-full [&_img]:object-contain [&_table]:w-full [&_iframe]:max-w-full"
             dangerouslySetInnerHTML={{
               __html: p?.short_des ?? '',
             }}
@@ -126,9 +127,10 @@ export default async function ProductDescription({
         </div>
       </TabsContent>
 
-      <TabsContent value="desc">
-        <div className="border border-gray-200 rounded-sm p-4">
+      <TabsContent value="desc" className="w-full">
+        <div className="w-full rounded-sm border border-gray-200 p-4">
           <div
+            className="w-full max-w-full overflow-x-auto wrap-break-word [&_img]:h-auto [&_img]:max-w-full [&_img]:object-contain [&_table]:w-full [&_iframe]:max-w-full"
             dangerouslySetInnerHTML={{
               __html: p?.description ?? '',
             }}
