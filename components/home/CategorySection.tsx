@@ -1,9 +1,10 @@
 import { fetcher } from '@/lib/fetcher';
+import { REVALIDATE_CATALOG } from '@/lib/utils';
 import HomeCategory from './HomeCategory';
 
 export default async function CategorySection() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const categories: any = await fetcher('/categories');
+  const categories: any = await fetcher('/categories', {}, REVALIDATE_CATALOG, false);
 
   return (
     <section className="rounded-sm">

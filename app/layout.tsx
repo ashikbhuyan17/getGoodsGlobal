@@ -4,6 +4,7 @@ import './globals.css';
 // import Sidebar from "@/components/common/Sidebar";
 import Header from '@/components/common/Header';
 import { fetcher } from '@/lib/fetcher';
+import { REVALIDATE_CATALOG } from '@/lib/utils';
 import { Toaster } from 'sonner';
 import BottomNav from '@/components/common/BottomNav';
 import Sidebar2 from '@/components/common/Sidebar2';
@@ -23,9 +24,6 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic';
 
-// Cache layout data for 60s - reduces re-fetch on every navigation
-const REVALIDATE_LAYOUT = 60;
-
 export default async function RootLayout({
   children,
   modal,
@@ -34,9 +32,9 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }>) {
   const [settings, contact, menuCategoriesRes] = await Promise.all([
-    fetcher(`/settings`, {}, REVALIDATE_LAYOUT),
-    fetcher(`/contact`, {}, REVALIDATE_LAYOUT),
-    fetcher('/menu-categories', {}, REVALIDATE_LAYOUT).catch(() => null),
+    fetcher(`/settings`, {}, REVALIDATE_CATALOG, false),
+    fetcher(`/contact`, {}, REVALIDATE_CATALOG, false),
+    fetcher('/menu-categories', {}, REVALIDATE_CATALOG, false).catch(() => null),
   ]);
   const menuCategories = menuCategoriesRes ?? null;
   return (

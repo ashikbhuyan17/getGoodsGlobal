@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button } from '../ui/button';
 import QuantityUpdateBtn from '../common/QuantityUpdateBtn';
 import { useProductStore } from '@/stores/useProductStore';
-import { getActiveBulkTier, formatPriceInt } from '@/lib/utils';
+import { cn, getActiveBulkTier, formatPriceInt } from '@/lib/utils';
 
 function SizeCard({
   size,
@@ -14,6 +14,7 @@ function SizeCard({
   SalePrice,
   max,
   displayLabel,
+  specLayout,
   bulkQuantities,
   totalQuantity,
 }: {
@@ -25,6 +26,8 @@ function SizeCard({
   max?: number;
   /** Optional: show in UI instead of size (e.g. specification). API always receives size. */
   displayLabel?: string;
+  /** Wider first column when showing long specification text. */
+  specLayout?: boolean;
   /** When set, use bulk tier price instead of variant price. */
   bulkQuantities?: {
     data?: {
@@ -75,12 +78,42 @@ function SizeCard({
     setVariant(String(colorId), String(size), newQty, priceForVariant);
   };
 
+  const labelText = String(displayLabel ?? size ?? '');
+  const specLines = displayLabel
+    ? labelText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+    : null;
+
   return (
-    <div className="grid grid-cols-3 items-center gap-x-1 gap-y-1 py-2.5 sm:py-3 px-0.5 sm:px-1 min-w-0">
-      {/* Size Column - displayLabel for UI, size used for variant/API */}
-      <p className="min-w-0 truncate text-left text-sm text-gray-800">
-        {displayLabel ?? size}
-      </p>
+    <div
+      className={cn(
+        'grid items-start gap-x-1 gap-y-1 px-0.5 py-2.5 min-w-0 sm:px-1 sm:py-3',
+        specLayout
+          ? 'grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]'
+          : 'grid-cols-3',
+      )}
+    >
+      {/* Size / specification — full value, line by line (no ellipsis) */}
+      <div className="min-w-0 text-left text-sm leading-relaxed text-gray-800">
+        {specLines && specLines.length > 1 ? (
+          <ul className="m-0 list-none space-y-1 p-0">
+            {specLines.map((line, index) => (
+              <li
+                key={`${line}-${index}`}
+                className="wrap-break-word whitespace-normal"
+              >
+                {line}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <span className="wrap-break-word whitespace-pre-wrap">
+            {labelText}
+          </span>
+        )}
+      </div>
 
       {/* Price Column */}
       <div className="flex min-w-0 flex-col items-center gap-0.5 sm:gap-1">

@@ -1,6 +1,12 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+/** 3 min — category, subcategory, menu, layout (changes rarely) */
+export const REVALIDATE_CATALOG = 180;
+
+/** 1 min — product lists (price/stock may update sooner) */
+export const REVALIDATE_PRODUCTS = 60;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }

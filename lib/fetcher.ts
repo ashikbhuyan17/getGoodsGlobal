@@ -43,11 +43,16 @@ export async function fetcher<T>(
       if (token) headers['Authorization'] = `Bearer ${token}`; // ✅ property modify allowed with const
     }
 
+    const noStore = options.cache === 'no-store';
+
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${slug}`, {
       ...options,
       headers,
-      ...(revalidate ? { next: { revalidate } } : {}),
-      ...(options.cache === 'no-store' ? { cache: 'no-store' } : {}),
+      ...(noStore
+        ? { cache: 'no-store' as const }
+        : revalidate
+          ? { next: { revalidate } }
+          : {}),
     });
 
     return res.json() as Promise<T>;

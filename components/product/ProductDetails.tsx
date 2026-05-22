@@ -97,35 +97,43 @@ export default function ProductDetails({
           ))}
         </div>
         <div className="w-full order-1 lg:order-2">
-          <div className="relative h-[250px] xl:h-[220px]  2xl:h-[400px] w-full ">
+          <div className="relative flex min-h-[220px] w-full max-h-[400px] items-center justify-center rounded-lg bg-gray-50/80 sm:min-h-[260px] xl:min-h-[280px] 2xl:max-h-[420px]">
             <Dialog>
               <DialogTrigger asChild>
-                <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
+                <button
+                  type="button"
+                  className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center gap-1 bg-black/40 text-sm text-white opacity-0 transition-all duration-300 hover:opacity-100"
+                  aria-label="Preview product image"
+                >
                   <Eye size={15} /> <span>Preview</span>
-                </div>
+                </button>
               </DialogTrigger>
 
-              <DialogContent className="aspect-square  max-2xl:w-[400px]">
+              <DialogContent className="max-h-[90vh] w-[min(92vw,640px)] max-w-[92vw] p-4 sm:max-w-lg">
                 <DialogTitle className="sr-only">
                   Image preview: {p?.name}
                 </DialogTitle>
                 <DialogDescription className="sr-only">
                   Preview of product image
                 </DialogDescription>
-                <Image
-                  src={image}
-                  alt={p?.name}
-                  fill
-                  className="rounded-lg object-cover"
-                />
+                <div className="relative mx-auto h-[min(70vh,560px)] w-full min-h-[240px]">
+                  <Image
+                    src={image}
+                    alt={p?.name}
+                    fill
+                    className="rounded-lg object-contain"
+                    sizes="(max-width: 768px) 92vw, 640px"
+                  />
+                </div>
               </DialogContent>
             </Dialog>
             <Image
               src={image}
               alt={p?.name ?? 'Product'}
-              width={250}
-              height={250}
-              className="rounded-lg shadow-md object-fill  sm:object-contain lg:object-cover w-full h-full p-1"
+              width={800}
+              height={800}
+              className="max-h-[400px] w-auto max-w-full rounded-lg object-contain p-2 shadow-md"
+              sizes="(max-width: 1280px) 100vw, 50vw"
             />
           </div>
         </div>
@@ -265,11 +273,18 @@ export default function ProductDetails({
                 ))}
               </div>
             </div>
-            <ScrollArea className="h-56 min-w-0 max-w-full max-lg:w-full ">
-              <div className="mt-4 min-w-0 border-2 border-[#EEEEEE] rounded-md overflow-hidden">
-                <div className="grid min-w-0 grid-cols-3 gap-1 p-1 py-2 sm:gap-3">
+            <ScrollArea className="max-h-96 min-w-0 max-w-full max-lg:w-full">
+              <div className="mt-4 min-w-0 rounded-md border-2 border-[#EEEEEE] overflow-hidden">
+                <div
+                  className={cn(
+                    'grid min-w-0 gap-1 p-1 py-2 sm:gap-3',
+                    hasSpecification
+                      ? 'grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]'
+                      : 'grid-cols-3',
+                  )}
+                >
                   <div className="min-w-0 text-start">
-                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-start  font-medium sm:px-3 sm:py-2 text-sm">
+                    <span className="block w-full rounded-md bg-[#F5F5F5] px-1.5 py-1.5 text-start font-medium text-sm leading-snug whitespace-normal sm:px-3 sm:py-2">
                       {hasSpecification ? 'Specification' : 'Size'}
                     </span>
                   </div>
@@ -293,6 +308,7 @@ export default function ProductDetails({
                     displayLabel={
                       hasSpecification ? String(specification) : undefined
                     }
+                    specLayout={hasSpecification}
                     price={size?.SalePrice}
                     SalePrice={size?.SalePrice}
                     RegularPrice={size?.RegularPrice}

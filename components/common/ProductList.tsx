@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import PaginationComponent from "./Pagination";
-import { fetcher } from "@/lib/fetcher";
+import { fetcher } from '@/lib/fetcher';
+import { REVALIDATE_PRODUCTS } from '@/lib/utils';
 import ProductCard from "./ProductCard";
 import { Package, Search } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -32,7 +33,7 @@ async function ProductList({
   /** When listing subcategory products, pass category slug for correct Clear Filters link */
   categorySlug?: string | null;
 }) {
-  const products: any = await fetcher(slug);
+  const products: any = await fetcher(slug, {}, REVALIDATE_PRODUCTS, false);
 
   // Handle error response (server down, invalid JSON, etc.)
   // If API fails, treat as empty array so empty state shows
