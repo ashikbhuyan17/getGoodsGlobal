@@ -68,7 +68,7 @@ export default async function RootLayout({
         </div>
         <BottomNav menuCategories={menuCategories} />
         <Header settings={settings} />
-        <main className="transition-all justify-center md:mx-auto mt-16 md:mt-20 md:ml-56 w-full">
+        <main className="box-border min-w-0 flex-1 w-full max-w-full overflow-x-hidden pt-16 transition-all justify-center md:pt-20 md:pl-56">
           {children}
           {modal}
           <Toaster position="bottom-right" richColors />

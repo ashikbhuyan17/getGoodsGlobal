@@ -29,8 +29,8 @@ export default async function Header({
   const cartCount = cartProducts?.data?.length ?? 0;
 
   return (
-    <header className="bg-[#219F9B] text-primary-foreground z-40 px-4 py-[16px] md:py-[13px] md:px-6 fixed top-0 w-full md:w-[calc(100%-14rem)] md:ml-56">
-      <div className="mx-auto flex items-center justify-between gap-4">
+    <header className="fixed top-0 left-0 z-40 flex h-16 w-full items-center bg-[#219F9B] px-4 text-primary-foreground md:left-56 md:h-20 md:w-[calc(100%-14rem)] md:px-6">
+      <div className="mx-auto flex h-full w-full items-center justify-between gap-4">
         {/* Logo */}
         <div className="flex  items-center gap-2 whitespace-nowrap md:w-2/12">
           <Link href="/" prefetch aria-label="Go to homepage">

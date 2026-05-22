@@ -92,7 +92,7 @@ function GallerySection({ galleryData }: GallerySectionProps) {
   }, [galleryData, activeCategory]);
 
   return (
-    <div className="bg-white px-4 py-4 pb-6 rounded-sm border-border max-w-[94vw] select-none">
+    <div className="w-full min-w-0 max-w-full overflow-hidden bg-white px-4 py-4 pb-6 rounded-sm border-border select-none">
       {/* Category Filter Navigation */}
       <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
         {categories.map((category) => {

@@ -23,9 +23,9 @@ export default async function Home() {
   ]);
 
   return (
-    <div>
+    <div className="w-full min-w-0 max-w-full overflow-x-hidden">
       <HeroSlider slides={slides} />
-      <div className="px-2 space-y-2 lg:space-y-3 pt-2 lg:pt-3">
+      <div className="w-full min-w-0 max-w-full overflow-x-hidden px-2 space-y-2 lg:space-y-3 pt-2 lg:pt-3">
         {/* <FeatureSection /> */}
         <GallerySection
           galleryData={galleryData as GallerySectionProps['galleryData']}
@@ -45,7 +45,7 @@ export default async function Home() {
           ))}
           
         </div> */}
-        <div className="space-y-2 lg:space-y-3">
+        <div className="w-full min-w-0 max-w-full space-y-2 lg:space-y-3">
           {(frontCategory as { data?: any[] })?.data
             ?.filter(
               (cat) => Array.isArray(cat?.products) && cat.products.length > 0,
