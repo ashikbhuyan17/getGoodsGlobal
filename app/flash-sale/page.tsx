@@ -1,4 +1,6 @@
 import { fetcher } from '@/lib/fetcher';
+import { REVALIDATE_PRODUCTS } from '@/lib/utils';
+import FlashSaleInfoBar from './_components/FlashSaleInfoBar';
 import FlashSaleProductGrid from './_components/FlashSaleProductGrid';
 import FlashSaleLoadMore from './_components/FlashSaleLoadMore';
 import type { ProductItem } from './_components/FlashSaleProductGrid';
@@ -26,7 +28,12 @@ export default async function FlashSalePage({
 
   const responses = await Promise.all(
     Array.from({ length: loadedPages }, (_, i) =>
-      fetcher<FlashSaleRes>(`/flash-sale?page=${i + 1}`),
+      fetcher<FlashSaleRes>(
+        `/flash-sale?page=${i + 1}`,
+        {},
+        REVALIDATE_PRODUCTS,
+        false,
+      ),
     ),
   );
 
@@ -37,13 +44,10 @@ export default async function FlashSalePage({
   const currentPage = loadedPages;
 
   return (
-    <div className="min-h-screen pb-20">
-      <div className="px-2 py-6">
-        <div className="mb-4">
-          <h1 className="text-xl font-bold text-gray-900">Flash Sale</h1>
-          <p className="text-sm text-orange-500 font-medium">On Sale Now</p>
-        </div>
-        <div className="bg-white px-2 py-4 rounded">
+    <div className="min-h-screen space-y-5 pb-20 max-lg:pb-16">
+      <FlashSaleInfoBar />
+      <div className="px-2">
+        <div className="rounded-sm bg-white px-2 py-4">
           <FlashSaleProductGrid products={products} />
           <FlashSaleLoadMore currentPage={currentPage} lastPage={lastPage} />
         </div>
