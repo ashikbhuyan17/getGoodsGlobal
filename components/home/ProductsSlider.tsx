@@ -1,12 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
 } from '@/components/ui/carousel';
+import { CarouselCapsuleNav } from '@/components/common/CarouselCapsuleNav';
 import ProductCard from '../common/ProductCard';
 import Image from 'next/image';
 
@@ -21,9 +22,10 @@ function ProductsSlider({
   products: any;
 }) {
   const productList = Array.isArray(products) ? products : [];
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
 
   return (
-    <section className="w-full min-w-0 max-w-full overflow-hidden bg-white px-2 sm:px-4 py-2 pb-4 rounded-sm border-border select-none">
+    <section className="w-full min-w-0 max-w-full bg-white px-2 sm:px-4 py-2 pb-4 rounded-sm border-border select-none">
       <div className="flex min-w-0 items-center gap-2 text-primary font-bold text-lg mx-1 sm:mx-2 my-4">
         <Image
           src={`${process.env.NEXT_PUBLIC_IMG_URL}/${image}`}
@@ -35,8 +37,9 @@ function ProductsSlider({
         <h2 className="truncate">{title}</h2>
       </div>
 
-      <div className="relative w-full min-w-0 max-w-full overflow-hidden">
+      <div className="group relative w-full min-w-0 max-w-full overflow-hidden">
         <Carousel
+          setApi={setCarouselApi}
           opts={{
             align: 'start',
             loop: false,
@@ -62,20 +65,15 @@ function ProductsSlider({
               </CarouselItem>
             ))}
           </CarouselContent>
-
-          {productList.length > 5 && (
-            <>
-              <CarouselPrevious
-                variant="default"
-                className="left-1! -translate-y-1/2! top-1/2 z-20 size-9 rounded-full border-0 shadow-md"
-              />
-              <CarouselNext
-                variant="default"
-                className="right-1! left-auto! -translate-y-1/2! top-1/2 z-20 size-9 rounded-full border-0 shadow-md"
-              />
-            </>
-          )}
         </Carousel>
+
+        {productList.length > 3 && (
+          <CarouselCapsuleNav
+            api={carouselApi}
+            prevLabel="Previous products"
+            nextLabel="Next products"
+          />
+        )}
       </div>
     </section>
   );

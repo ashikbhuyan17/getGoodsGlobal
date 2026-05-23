@@ -3,14 +3,14 @@
 import { useState, useMemo } from 'react';
 import {
   Carousel,
+  type CarouselApi,
   CarouselContent,
   CarouselItem,
-  CarouselPrevious,
-  CarouselNext,
 } from '@/components/ui/carousel';
 import VideoCard from './VideoCard';
 import { Button } from '@/components/ui/button';
 import { Images, ArrowRight } from 'lucide-react';
+import { CarouselCapsuleNav } from '@/components/common/CarouselCapsuleNav';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -46,6 +46,7 @@ export interface GallerySectionProps {
 }
 
 function GallerySection({ galleryData }: GallerySectionProps) {
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   // Get categories from API (API already sends filtered data)
   const categories = useMemo(() => {
     if (!galleryData?.data || !Array.isArray(galleryData.data)) {
@@ -137,8 +138,9 @@ function GallerySection({ galleryData }: GallerySectionProps) {
       </div>
 
       {/* Video Carousel */}
-      <div className="relative">
+      <div className="group relative overflow-hidden">
         <Carousel
+          setApi={setCarouselApi}
           opts={{
             align: 'start',
             loop: false,
@@ -168,13 +170,15 @@ function GallerySection({ galleryData }: GallerySectionProps) {
               </div>
             )}
           </CarouselContent>
-          {filteredBanners.length > 0 && (
-            <>
-              <CarouselPrevious className="left-0 md:-left-12" />
-              <CarouselNext className="right-0 md:-right-12" />
-            </>
-          )}
         </Carousel>
+
+        {filteredBanners.length > 1 && (
+          <CarouselCapsuleNav
+            api={carouselApi}
+            prevLabel="Previous videos"
+            nextLabel="Next videos"
+          />
+        )}
       </div>
     </div>
   );
