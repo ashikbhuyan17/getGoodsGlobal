@@ -21,6 +21,7 @@ export default async function Home() {
     fetcher('/front-category-products', { cache: 'no-store' }),
     fetcher('/galleryslider', {}, HOME_CACHE).catch(() => null),
   ]);
+  console.log('🚀 ~ Home ~ frontCategory:', frontCategory);
 
   return (
     <div className="w-full min-w-0 max-w-full overflow-x-hidden">
