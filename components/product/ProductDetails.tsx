@@ -99,6 +99,7 @@ export default function ProductDetails({
         </div>
         <div className="w-full order-1 lg:order-2">
           <div className="relative flex w-full min-h-[220px] max-h-[min(78vw,420px)] items-center justify-center sm:min-h-[260px] xl:min-h-[300px] xl:max-h-[440px]">
+
             <Dialog>
               <DialogTrigger asChild>
                 <button
@@ -110,21 +111,21 @@ export default function ProductDetails({
                 </button>
               </DialogTrigger>
 
-              <DialogContent className="flex max-h-[92vh] w-[min(96vw,720px)] max-w-[96vw] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
-                <div className="overflow-y-auto p-4 ">
-                  <div className="relative mx-auto h-[min(68vh,560px)] w-full min-h-[220px] max-w-full ">
-                    <Image
-                      src={image}
-                      alt={p?.name ?? 'Product'}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 768px) 96vw, 720px"
-                      priority
-                    />
-                  </div>
+              <DialogContent className="w-[min(96vw,520px)] max-w-[96vw] gap-0 overflow-hidden p-[2px] sm:max-w-lg">
+                <div className="flex max-h-[80vh] items-center justify-center bg-white p-3">
+                  <Image
+                    src={image}
+                    alt={p?.name ?? 'Product'}
+                    width={500}
+                    height={500}
+                    className="h-auto max-h-[75vh] w-auto max-w-full object-contain"
+                    sizes="(max-width: 768px) 96vw, 520px"
+                    priority
+                  />
                 </div>
               </DialogContent>
             </Dialog>
+
             <Image
               src={image}
               alt={p?.name ?? 'Product'}
@@ -133,6 +134,7 @@ export default function ProductDetails({
               className="h-auto max-h-[min(78vw,420px)] w-auto max-w-full object-contain xl:max-h-[440px]"
               sizes="(max-width: 1280px) 100vw, 50vw"
             />
+
           </div>
         </div>
       </div>
@@ -264,7 +266,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                          'border-2 border-primary',
+                        'border-2 border-primary',
                       )}
                     />
                   </div>
