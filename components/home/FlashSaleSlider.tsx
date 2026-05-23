@@ -46,13 +46,9 @@ export default function FlashSaleSlider({
   return (
     <section className="w-full min-w-0 max-w-full overflow-hidden rounded-sm border border-gray-200 bg-white px-2 py-2 pb-4 sm:px-4 select-none">
       <div className="mb-3 flex min-w-0 items-center justify-between gap-3 px-1 sm:mb-4 sm:px-2">
-        <div className="min-w-0">
-          <h2 className="text-base font-bold text-gray-900 sm:text-xl">
-            Flash Sale
-          </h2>
-          <p className="text-xs font-medium text-orange-500 sm:text-sm">
-            On Sale Now
-          </p>
+        <div className="min-w-0 text-primary">
+          <h2 className="truncate text-base font-bold sm:text-lg">Flash Sale</h2>
+         
         </div>
         <Link
           href="/flash-sale"

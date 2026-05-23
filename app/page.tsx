@@ -54,6 +54,7 @@ export default async function Home() {
               <ProductsSlider
                 title={cat?.name}
                 image={cat?.image}
+                categorySlug={cat?.slug}
                 key={cat?.id}
                 products={cat?.products}
               />
