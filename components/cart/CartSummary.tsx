@@ -141,7 +141,7 @@ export default function CartSummary({
       return false;
     }
 
-    if (requiresShippingSelection && (!shippingCharge || shippingCharge <= 0)) {
+    if (requiresShippingSelection && shippingChargeID == null) {
       toast.error('Please select a shipping method');
       return false;
     }
