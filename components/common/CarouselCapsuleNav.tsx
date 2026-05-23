@@ -5,7 +5,7 @@ import type { CarouselApi } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 
 const navBtnClass =
-  'absolute top-1/2 z-30 flex h-7 w-9 items-center justify-center rounded-full border-0 bg-white/80 text-gray-700 shadow-md backdrop-blur-[2px] transition-[opacity,background-color] duration-200 hover:bg-white hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 pointer-events-none group-hover:pointer-events-auto max-md:pointer-events-auto [&_svg]:size-3.5';
+  'absolute top-1/2 z-30 flex h-7 w-9 items-center justify-center rounded-full border-0 bg-black/25 text-white shadow-none backdrop-blur-[2px] transition-[opacity,background-color] duration-200 hover:bg-black/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 pointer-events-none group-hover:pointer-events-auto [&_svg]:size-3.5';
 
 type CarouselCapsuleNavProps = {
   api: CarouselApi | undefined;
@@ -21,10 +21,9 @@ export function CarouselCapsuleNav({
   return (
     <div
       className={cn(
-        'pointer-events-none absolute inset-0 z-20 overflow-hidden',
+        'pointer-events-none absolute inset-0 z-20 hidden overflow-hidden',
         'opacity-0 transition-opacity duration-200',
-        'group-hover:opacity-100',
-        'max-md:opacity-100',
+        'md:block md:group-hover:opacity-100 md:group-focus-within:opacity-100',
       )}
     >
       <button
