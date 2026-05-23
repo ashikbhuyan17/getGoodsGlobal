@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ChevronRight } from 'lucide-react';
 import {
   Carousel,
   type CarouselApi,
@@ -48,9 +49,10 @@ function ProductsSlider({
           <Link
             href={categoryHref}
             scroll
-            className="shrink-0 text-xs font-medium text-primary underline-offset-2 hover:underline sm:text-sm"
+            className="inline-flex shrink-0 items-center gap-0.5 text-sm font-bold text-primary underline-offset-2 hover:underline sm:text-base"
           >
             Shop More
+            <ChevronRight className="size-4 shrink-0" strokeWidth={2.5} />
           </Link>
         ) : null}
       </div>
