@@ -20,14 +20,14 @@ export default async function ProductInfoBar({
         <div className="min-w-0">
           <h2 className="text-sm font-medium text-black truncate">{p?.name}</h2>
 
-          <div className="flex items-center gap-3 mt-1">
+          {/* <div className="flex items-center gap-3 mt-1">
             <div className="flex items-center text-yellow-400">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-4 h-4 fill-yellow-400" />
               ))}
             </div>
             <span className="text-sm font-semibold text-black">5/5</span>
-          </div>
+          </div> */}
         </div>
       </div>
 
