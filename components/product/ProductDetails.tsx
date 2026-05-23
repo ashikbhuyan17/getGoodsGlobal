@@ -10,6 +10,7 @@ import { Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogDescription,
   DialogTrigger,
@@ -97,7 +98,7 @@ export default function ProductDetails({
           ))}
         </div>
         <div className="w-full order-1 lg:order-2">
-          <div className="relative flex min-h-[220px] w-full max-h-[400px] items-center justify-center rounded-lg bg-gray-50/80 sm:min-h-[260px] xl:min-h-[280px] 2xl:max-h-[420px]">
+          <div className="relative flex w-full min-h-[220px] max-h-[min(78vw,420px)] items-center justify-center sm:min-h-[260px] xl:min-h-[300px] xl:max-h-[440px]">
             <Dialog>
               <DialogTrigger asChild>
                 <button
@@ -109,21 +110,18 @@ export default function ProductDetails({
                 </button>
               </DialogTrigger>
 
-              <DialogContent className="max-h-[90vh] w-[min(92vw,640px)] max-w-[92vw] p-4 sm:max-w-lg">
-                <DialogTitle className="sr-only">
-                  Image preview: {p?.name}
-                </DialogTitle>
-                <DialogDescription className="sr-only">
-                  Preview of product image
-                </DialogDescription>
-                <div className="relative mx-auto h-[min(70vh,560px)] w-full min-h-[240px]">
-                  <Image
-                    src={image}
-                    alt={p?.name}
-                    fill
-                    className="rounded-lg object-contain"
-                    sizes="(max-width: 768px) 92vw, 640px"
-                  />
+              <DialogContent className="flex max-h-[92vh] w-[min(96vw,720px)] max-w-[96vw] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
+                <div className="overflow-y-auto p-4 ">
+                  <div className="relative mx-auto h-[min(68vh,560px)] w-full min-h-[220px] max-w-full ">
+                    <Image
+                      src={image}
+                      alt={p?.name ?? 'Product'}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 768px) 96vw, 720px"
+                      priority
+                    />
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
@@ -132,7 +130,7 @@ export default function ProductDetails({
               alt={p?.name ?? 'Product'}
               width={800}
               height={800}
-              className="max-h-[400px] w-auto max-w-full rounded-lg object-contain p-2 shadow-md"
+              className="h-auto max-h-[min(78vw,420px)] w-auto max-w-full object-contain xl:max-h-[440px]"
               sizes="(max-width: 1280px) 100vw, 50vw"
             />
           </div>

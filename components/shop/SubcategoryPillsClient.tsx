@@ -27,6 +27,7 @@ interface SubcategoryPillsClientProps {
 
 const PILL_GAP = 8;
 const MORE_BUTTON_MIN_WIDTH = 88;
+const MIN_VISIBLE_PILLS = 4;
 
 function normalizeSlug(slug: string) {
   return decodeURIComponent(slug || '');
@@ -124,28 +125,45 @@ export function SubcategoryPillsClient({
       moreMeasureRef.current?.offsetWidth ?? MORE_BUTTON_MIN_WIDTH;
     const children = Array.from(measure.children) as HTMLElement[];
 
-    let used = 0;
+    const rowWidth = (pillCount: number, withMore: boolean) => {
+      let used = 0;
+      for (let i = 0; i < pillCount; i++) {
+        const child = children[i];
+        if (!child) return Infinity;
+        used += child.offsetWidth + (i > 0 ? PILL_GAP : 0);
+      }
+      if (withMore && pillCount < subcategories.length) {
+        used += PILL_GAP + moreWidth;
+      }
+      return used;
+    };
+
     let count = 0;
-
-    for (let i = 0; i < subcategories.length; i++) {
-      const child = children[i];
-      if (!child) continue;
-
-      const itemWidth = child.offsetWidth + (i > 0 ? PILL_GAP : 0);
-      const hiddenAfter = subcategories.length - (i + 1);
-      const reserveMore = hiddenAfter > 0 ? moreWidth + PILL_GAP : 0;
-
-      if (used + itemWidth + reserveMore > available) break;
-
-      used += itemWidth;
-      count++;
+    for (let n = 1; n <= subcategories.length; n++) {
+      if (rowWidth(n, n < subcategories.length) <= available) {
+        count = n;
+      }
     }
 
-    setVisibleCount((prev) => {
-      const next = count === 0 && subcategories.length > 0 ? 1 : count;
-      return prev === next ? prev : next;
-    });
-  }, [subcategories, visibleCount]);
+    if (count === 0 && subcategories.length > 0) {
+      count = 1;
+    }
+
+    const hasOverflow = count < subcategories.length;
+    if (hasOverflow) {
+      const minVisible = Math.min(MIN_VISIBLE_PILLS, subcategories.length);
+      if (count < minVisible) {
+        for (let n = minVisible; n >= 1; n--) {
+          if (rowWidth(n, true) <= available) {
+            count = n;
+            break;
+          }
+        }
+      }
+    }
+
+    setVisibleCount((prev) => (prev === count ? prev : count));
+  }, [subcategories]);
 
   useLayoutEffect(() => {
     recalculate();
@@ -188,7 +206,7 @@ export function SubcategoryPillsClient({
         })}
       </div>
 
-      {overflow.length > 0 && (
+      {subcategories.length > MIN_VISIBLE_PILLS && (
         <button
           ref={moreMeasureRef}
           type="button"
@@ -196,31 +214,31 @@ export function SubcategoryPillsClient({
           aria-hidden
           className={cn(moreBtnClass, 'pointer-events-none invisible absolute')}
         >
-          <MoreButtonLabel count={overflow.length} />
+          <MoreButtonLabel
+            count={Math.max(1, subcategories.length - MIN_VISIBLE_PILLS)}
+          />
         </button>
       )}
 
-      <div className="flex w-full min-w-0 items-center gap-2">
-        <div className="relative min-w-0 flex-1">
+      <div className="flex w-full min-w-0 items-center justify-start gap-2 overflow-hidden">
+        <div className="relative flex min-w-0 max-w-full shrink items-center gap-2 overflow-hidden">
           {showMore && (
             <div
-              className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-linear-to-l from-muted/30 to-transparent"
+              className="pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-linear-to-l from-muted/30 to-transparent"
               aria-hidden
             />
           )}
-          <div className="flex min-w-0 items-center gap-2 overflow-hidden">
-            {visible.map((sub) => {
-              const isActive = normalizeSlug(sub.slug) === activeSlug;
-              return (
-                <SubcategoryPillLink
-                  key={sub.id}
-                  categorySlug={categorySlug}
-                  sub={sub}
-                  isActive={isActive}
-                />
-              );
-            })}
-          </div>
+          {visible.map((sub) => {
+            const isActive = normalizeSlug(sub.slug) === activeSlug;
+            return (
+              <SubcategoryPillLink
+                key={sub.id}
+                categorySlug={categorySlug}
+                sub={sub}
+                isActive={isActive}
+              />
+            );
+          })}
         </div>
 
         {showMore && (

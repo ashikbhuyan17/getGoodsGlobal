@@ -18,7 +18,7 @@ async function ShopPage({
         <InfoBar slug={slug} />
       </div>
       <div className="px-2">
-        <div className="bg-white rounded-sm border-border p-4 space-y-3">
+        <div className="bg-white rounded-sm border-border p-2 sm:p-4 space-y-3">
           <SubcategoryPills categorySlug={slug} />
           <ProductList
             max={Number(max) || 99999999}
