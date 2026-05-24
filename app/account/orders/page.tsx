@@ -8,6 +8,7 @@ import OrdersTopBar from '@/components/account/orders/OrdersTopBar';
 import { Database } from 'lucide-react';
 import OrderChatButton from '@/components/account/orders/OrderChatButton';
 import InvoiceDownloadButton from '@/components/account/orders/InvoiceDownloadButton';
+import { getOrderStatusStyle } from '@/lib/orderStatusStyle';
 
 function buildOrdersSlug(status?: string, keyword?: string): string {
   const params = new URLSearchParams();
@@ -43,16 +44,7 @@ export default async function OrderPage({
 
   const formatStatus = (status: string | number) => {
     const label = statusMap[String(status)] ?? 'Unknown';
-    const colorMap: Record<string, string> = {
-      '1': 'text-yellow-700 bg-yellow-100',
-      '2': 'text-blue-700 bg-blue-100',
-      '3': 'text-green-700 bg-green-100',
-      '6': 'text-green-700 bg-green-100',
-      '9': 'text-green-700 bg-green-100',
-      '4': 'text-red-700 bg-red-100',
-      '22': 'text-blue-700 bg-blue-100',
-    };
-    const color = colorMap[String(status)] ?? 'text-gray-500 bg-gray-100';
+    const color = getOrderStatusStyle(label);
     return { label, color };
   };
 
