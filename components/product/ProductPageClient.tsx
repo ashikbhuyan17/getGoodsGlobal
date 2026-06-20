@@ -9,11 +9,9 @@ import { useProductStore } from '@/stores/useProductStore';
 function ProductPageClient({
   product,
   bulkQuantities,
-  isInWishlist,
   shippingOptions,
 }: {
   product: any;
-  isInWishlist: any;
   bulkQuantities?: any;
   shippingOptions?: any[];
 }) {
@@ -39,7 +37,6 @@ function ProductPageClient({
       </div>
       <div className="col-span-8 lg:col-span-2 2xl:col-span-3">
         <ProductSummary
-          isInWishlist={isInWishlist}
           bulkQuantities={bulkQuantities}
           productId={product?.data?.product?.id}
         />

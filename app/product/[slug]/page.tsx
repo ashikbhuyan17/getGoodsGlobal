@@ -2,22 +2,40 @@ import ProductDescription from '@/components/product/ProductDescription';
 import ProductInfoBar from '@/components/product/ProductInfoBar';
 import ProductPageClient from '@/components/product/ProductPageClient';
 import ProductSuggestions from '@/components/product/ProductSuggestions';
-// import SellerRatingCard from "@/components/product/SellerRatingCard";
 import { fetcher } from '@/lib/fetcher';
 import {
   normalizeProductResponse,
   isProductResponseSuccess,
 } from '@/lib/productNormalizer';
+import { REVALIDATE_CATALOG, REVALIDATE_PRODUCTS } from '@/lib/utils';
+import { unstable_cache } from 'next/cache';
 import { notFound } from 'next/navigation';
+
+export const revalidate = 60;
 
 async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  // Parallel fetch: product, wishlist, shipping
-  const [rawProduct, wishlist, shippingArea] = await Promise.all([
-    fetcher(`/product-details/${slug}`),
-    fetcher('/wishlists'),
-    fetcher('/shipping-area'),
+  const getProductDetails = unstable_cache(
+    async () =>
+      fetcher(`/product-details/${slug}`, {}, REVALIDATE_PRODUCTS, false),
+    ['product-details', slug],
+    { revalidate: REVALIDATE_PRODUCTS },
+  );
+
+  const getShippingArea = unstable_cache(
+    async () =>
+      fetcher('/shipping-area', {}, REVALIDATE_CATALOG, false).catch(() => ({
+        status: false,
+        data: [],
+      })),
+    ['shipping-area'],
+    { revalidate: REVALIDATE_CATALOG },
+  );
+
+  const [rawProduct, shippingArea] = await Promise.all([
+    getProductDetails(),
+    getShippingArea(),
   ]);
 
   const product = normalizeProductResponse(rawProduct);
@@ -25,17 +43,15 @@ async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
 
   if (!isProductResponseSuccess(rawProduct) || !product) notFound();
 
-  // bulkQuantities depends on product (cache 60s)
   const bulkQuantities =
     p?.order_by == 1
-      ? await fetcher(`/product-bulkquantities/${p?.id}`, {}, 60)
+      ? await fetcher(
+          `/product-bulkquantities/${p?.id}`,
+          {},
+          REVALIDATE_PRODUCTS,
+          false,
+        )
       : undefined;
-
-  const isInWishlist = (
-    wishlist as { data?: { product?: { id?: number } }[] }
-  )?.data?.find(
-    (item: { product?: { id?: number } }) => item?.product?.id === p?.id,
-  );
 
   const shippingOptions =
     product?.data?.shippingCharge ??
@@ -48,7 +64,6 @@ async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
         <ProductPageClient
           bulkQuantities={bulkQuantities}
           product={product}
-          isInWishlist={isInWishlist}
           shippingOptions={shippingOptions}
         />
         <div className="w-full grid grid-cols-8 gap-4 rounded-sm mt-4">

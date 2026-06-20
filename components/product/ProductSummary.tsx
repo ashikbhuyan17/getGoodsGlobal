@@ -9,11 +9,9 @@ import { useProductStore } from "@/stores/useProductStore";
 
 export default function ProductSummary({
   productId,
-  isInWishlist,
   bulkQuantities,
 }: {
   productId: any;
-  isInWishlist: any;
   bulkQuantities?: any;
 }) {
   const shippingOptions = useProductStore((s) => s.shippingOptions);
@@ -50,7 +48,7 @@ export default function ProductSummary({
         bulkQuantities={bulkQuantities}
         quantity={quantity}
       />
-      <ActionButtons isInWishlist={isInWishlist} productId={productId} />
+      <ActionButtons productId={productId} />
     </Card>
   );
 }

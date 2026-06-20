@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
@@ -14,14 +14,13 @@ import { useProductStore } from '@/stores/useProductStore';
 import { revalidateClient } from '@/action/revalidateClient';
 
 export default function ActionButtons({
-  isInWishlist,
   productId,
 }: {
-  isInWishlist: any;
   productId: any;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const [isWishlistLoading, setIsWishlistLoading] = useState(false);
   const [isAddToCartLoading, setIsAddToCartLoading] = useState(false);
   const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
@@ -33,6 +32,29 @@ export default function ActionButtons({
   const totalQuantity = useProductStore((s) => s.totalQuantity());
   const shippingArea = useProductStore((s) => s.shippingArea);
   const shippingOptions = useProductStore((s) => s.shippingOptions);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadWishlistState() {
+      try {
+        const res: any = await fetcher('/wishlists');
+        const found = res?.data?.find(
+          (item: { product?: { id?: number } }) =>
+            item?.product?.id === Number(productId),
+        );
+        if (!cancelled) setIsInWishlist(Boolean(found));
+      } catch {
+        if (!cancelled) setIsInWishlist(false);
+      }
+    }
+
+    if (productId) loadWishlistState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [productId]);
 
   const buildCartDetails = () =>
     variants
@@ -180,7 +202,7 @@ export default function ActionButtons({
       });
 
       if (res?.status === true) {
-        router.refresh();
+        setIsInWishlist((prev) => !prev);
       } else {
         toast.error('Failed to update wishlist.');
       }
