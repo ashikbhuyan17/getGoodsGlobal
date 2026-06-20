@@ -89,6 +89,7 @@ export default function ActionButtons({
 
       if (isSuccess) {
         await revalidateClient('/cart');
+        router.prefetch('/cart');
         setShowAddToCartModal(true);
       } else {
         toast.error(res?.message || 'Failed to add to cart.');

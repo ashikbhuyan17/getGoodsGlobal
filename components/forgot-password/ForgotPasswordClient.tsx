@@ -16,6 +16,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { fetcher } from "@/lib/fetcher";
+import {
+  RESET_LOGIN_KEY,
+  startOtpCooldown,
+} from "@/lib/resetPasswordStorage";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -55,8 +59,12 @@ export default function ForgotPasswordClient() {
     });
 
     if (res?.status === true) {
-      toast.success("OTP sent. Check your email or phone.");
-      router.push("/reset-password");
+      sessionStorage.setItem(RESET_LOGIN_KEY, data.email);
+      startOtpCooldown();
+      toast.success('OTP sent. Check your email or phone.');
+      router.push(
+        `/reset-password?login=${encodeURIComponent(data.email)}`,
+      );
     } else {
       toast.error(res?.message || "Something went wrong");
     }

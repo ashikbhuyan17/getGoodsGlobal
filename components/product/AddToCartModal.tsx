@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
@@ -20,6 +22,10 @@ export default function AddToCartModal({ open, onClose }: AddToCartModalProps) {
   const router = useRouter();
   const reset = useProductStore((s) => s.reset);
 
+  useEffect(() => {
+    if (open) router.prefetch('/cart');
+  }, [open, router]);
+
   const handleContinueShopping = () => {
     reset();
     onClose();
@@ -27,8 +33,6 @@ export default function AddToCartModal({ open, onClose }: AddToCartModalProps) {
 
   const handleGoToCart = () => {
     reset();
-    onClose();
-    router.push('/cart');
   };
 
   return (
@@ -50,8 +54,10 @@ export default function AddToCartModal({ open, onClose }: AddToCartModalProps) {
           >
             Continue Shopping
           </Button>
-          <Button onClick={handleGoToCart} className="">
-            Go to Cart
+          <Button asChild>
+            <Link href="/cart" prefetch onClick={handleGoToCart}>
+              Go to Cart
+            </Link>
           </Button>
         </div>
       </DialogContent>

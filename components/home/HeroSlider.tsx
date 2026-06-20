@@ -19,6 +19,8 @@ export default function HeroSlider({ slides }: { slides: any }) {
     Autoplay({ delay: 4000, stopOnInteraction: false }),
   );
 
+  if (!slideList.length) return null;
+
   return (
     <section className="group relative w-full overflow-hidden">
       <Carousel
@@ -32,21 +34,25 @@ export default function HeroSlider({ slides }: { slides: any }) {
         <CarouselContent className="ml-0">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {slideList.map((slide: any, i: number) => (
-            <CarouselItem
-              onClick={() => window.open(slide?.link, '_blank')}
-              key={i}
-              className="pl-0"
-            >
-              <div className="relative w-full aspect-video md:aspect-16/6 lg:aspect-16/5">
+            <CarouselItem key={i} className="basis-full pl-0">
+              <button
+                type="button"
+                className="relative block w-full cursor-pointer border-0 bg-transparent p-0"
+                onClick={() => {
+                  if (slide?.link) window.open(slide.link, '_blank');
+                }}
+                aria-label={`View slide ${slide?.id ?? i + 1}`}
+              >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
-                  alt={`Slide ${slide?.id}`}
-                  fill
+                  alt={`Slide ${slide?.id ?? i + 1}`}
+                  width={1920}
+                  height={600}
                   priority={i === 0}
-                  className="object-cover object-center cursor-pointer"
+                  className="block h-auto w-full object-contain object-center"
                   sizes="100vw"
                 />
-              </div>
+              </button>
             </CarouselItem>
           ))}
         </CarouselContent>
