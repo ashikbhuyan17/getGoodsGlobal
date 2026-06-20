@@ -2,67 +2,20 @@ import Link from "next/link";
 import { Mail, Phone, MapPin } from "lucide-react";
 import Image from "next/image";
 import { fetcher } from "@/lib/fetcher";
+import { REVALIDATE_CATALOG } from "@/lib/utils";
 
 export default async function Footer() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const social: any = await fetcher("/social-media");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings: any = await fetcher("/settings");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pages: any = await fetcher("/pages");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const contact: any = await fetcher("/contact");
+  const [social, settings, pages, contact]: any[] = await Promise.all([
+    fetcher("/social-media", {}, REVALIDATE_CATALOG, false),
+    fetcher("/settings", {}, REVALIDATE_CATALOG, false),
+    fetcher("/pages", {}, REVALIDATE_CATALOG, false),
+    fetcher("/contact", {}, REVALIDATE_CATALOG, false),
+  ]);
 
   return (
     <footer className="bg-white border-t border-gray-200 rounded-sm mt-4">
-      {/* <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-center text-2xl font-bold text-gray-900 mb-8">
-            Explore Sky Brands... Think to the Sky.
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            <div className="bg-blue-50 rounded-lg p-6 flex items-center justify-center h-24">
-              <Image
-                alt=""
-                src="https://skybuybd.com/_next/static/media/logo.2d8160b9.svg"
-                width={1200}
-                height={1200}
-                className="w-40"
-              />
-            </div>
-
-            <div className="bg-blue-50 rounded-lg p-6 flex items-center justify-center h-24">
-              <Image
-                alt=""
-                src="https://skybuybd.com/_next/static/media/skyone.192d7933.png"
-                width={1200}
-                height={1200}
-                className="w-40"
-              />
-            </div>
-
-            <div className="bg-blue-50 rounded-lg p-6 flex items-center justify-center h-24">
-              <Image
-                alt=""
-                src="https://skybuybd.com/_next/static/media/sky-track.3d4e773f.png"
-                width={1200}
-                height={1200}
-                className="w-40"
-              />
-            </div>
-
-            <div className="bg-blue-50 rounded-lg p-6 flex items-center justify-center h-24">
-              <Image
-                alt=""
-                src="https://skybuybd.com/_next/static/media/skyexpress.3f90a79f.svg"
-                width={1200}
-                height={1200}
-                className="w-40"
-              />
-            </div>
-          </div>
-        </div>
-      </div> */}
+     
 
       {/* Main Footer Content */}
       <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

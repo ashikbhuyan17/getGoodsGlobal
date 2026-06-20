@@ -7,10 +7,12 @@ import { fetcher } from '@/lib/fetcher';
 import { REVALIDATE_CATALOG } from '@/lib/utils';
 import { Toaster } from 'sonner';
 import BottomNav from '@/components/common/BottomNav';
+import DeferredFontAwesome from '@/components/common/DeferredFontAwesome';
 import Sidebar2 from '@/components/common/Sidebar2';
 
 const jost = Jost({
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -22,7 +24,7 @@ export const metadata: Metadata = {
     'GetGoods — discover products, easy ordering, and reliable delivery.',
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 180;
 
 export default async function RootLayout({
   children,
@@ -39,19 +41,11 @@ export default async function RootLayout({
   const menuCategories = menuCategoriesRes ?? null;
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-          integrity="sha512-..."
-          crossOrigin="anonymous"
-          referrerPolicy="no-referrer"
-        />
-      </head>
       <body
         className={`${jost.className} flex bg-background overflow-x-hidden`}
         suppressHydrationWarning
       >
+        <DeferredFontAwesome />
         <div className="hidden md:flex">
           {/* <Sidebar
             contact={contact}
@@ -64,7 +58,11 @@ export default async function RootLayout({
             initialCategories={menuCategories}
           />
         </div>
-        <BottomNav menuCategories={menuCategories} />
+        <BottomNav
+          menuCategories={menuCategories}
+          settings={settings}
+          contact={contact}
+        />
         <Header settings={settings} />
         <main className="box-border min-w-0 flex-1 w-full max-w-full overflow-x-hidden pt-16 transition-all justify-center md:pt-20 md:pl-56">
           {children}

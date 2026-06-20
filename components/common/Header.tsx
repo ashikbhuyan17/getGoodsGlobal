@@ -1,38 +1,21 @@
-import { ShoppingBag, Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { fetcher } from '@/lib/fetcher';
+import { Suspense } from 'react';
 import SearchBar from './SearchBar';
-import SigninBtn from './SigninBtn';
+import HeaderNavActions from './HeaderNavActions';
 
-export default async function Header({
+export default function Header({
   settings,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: any;
 }) {
   const data = settings;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let wishlist: any = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let cartProducts: any = null;
-  try {
-    [wishlist, cartProducts] = await Promise.all([
-      fetcher('/wishlists'),
-      fetcher('/cart-products'),
-    ]);
-  } catch {
-    // Handle error gracefully
-  }
-  const wishlistCount =
-    wishlist?.status === 'error' || !wishlist?.data ? 0 : wishlist.data.length;
-  const cartCount = cartProducts?.data?.length ?? 0;
 
   return (
     <header className="fixed top-0 left-0 z-40 flex h-16 w-full items-center bg-[#219F9B] px-4 text-primary-foreground md:left-56 md:h-20 md:w-[calc(100%-14rem)] md:px-6">
       <div className="mx-auto flex h-full w-full items-center justify-between gap-4">
-        {/* Logo */}
-        <div className="flex  items-center gap-2 whitespace-nowrap md:w-2/12">
+        <div className="flex items-center gap-2 whitespace-nowrap md:w-2/12">
           <Link href="/" prefetch aria-label="Go to homepage">
             <Image
               alt="Logo"
@@ -41,51 +24,22 @@ export default async function Header({
               height={64}
               className="h-10 w-auto max-w-[180px] object-contain md:h-12 md:max-w-[200px]"
               priority
+              sizes="(max-width: 768px) 140px, 180px"
             />
           </Link>
         </div>
 
-        {/* Search Bar */}
         <div className="flex flex-1 items-center gap-3 md:max-w-2/6">
-          <SearchBar />
+          <Suspense
+            fallback={
+              <div className="h-10 w-full max-w-xl animate-pulse rounded-full bg-white/20" />
+            }
+          >
+            <SearchBar />
+          </Suspense>
         </div>
 
-        {/* Right Icons */}
-        <div className="hidden md:flex items-center justify-end gap-1 md:gap-3 md:w-2/6 md:pr-10">
-          <Link
-            prefetch
-            href="/cart"
-            aria-label={
-              cartCount > 0 ? `View cart (${cartCount} items)` : 'View cart'
-            }
-            className="relative flex md:h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100"
-          >
-            <ShoppingBag className="h-5 w-5" />
-            {cartCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                {cartCount > 99 ? '99+' : cartCount}
-              </span>
-            )}
-          </Link>
-          <Link
-            prefetch
-            href="/wishlist"
-            aria-label={
-              wishlistCount > 0
-                ? `View wishlist (${wishlistCount} items)`
-                : 'View wishlist'
-            }
-            className="relative flex md:h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100"
-          >
-            <Heart className="h-5 w-5" />
-            {wishlistCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
-                {wishlistCount > 99 ? '99+' : wishlistCount}
-              </span>
-            )}
-          </Link>
-          <SigninBtn />
-        </div>
+        <HeaderNavActions />
       </div>
     </header>
   );

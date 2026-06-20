@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import CartOrderGroup from '@/components/cart/CartOrderGroup';
 import CartItemRow from '@/components/cart/CartItemRow';
 import CartSummary from '@/components/cart/CartSummary';
 import { toast } from 'sonner';
-import { cartOrderProducts } from '@/lib/fetcher';
 
 interface CartPageClientProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -75,42 +74,33 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
     return selectedCount === 0 && cartProducts?.data?.length > 0;
   }, [selectedItems, cartProducts?.data?.length]);
 
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [removeLoading, setRemoveLoading] = useState(false);
   const router = useRouter();
 
-  const handleCheckoutClick = async () => {
+  const selectedCartIds = useMemo(() => {
+    const data = (cartProducts?.data ?? []) as { id: string }[];
+    return data
+      .filter((p) => selectedItems[p.id])
+      .map((p) => String(p.id));
+  }, [cartProducts?.data, selectedItems]);
+
+  useEffect(() => {
+    if (selectedCartIds.length === 0) return;
+    router.prefetch(`/checkout?cart_ids=${selectedCartIds.join(',')}`);
+  }, [router, selectedCartIds]);
+
+  const handleCheckoutClick = useCallback(() => {
     if (allDeselected) {
       toast.error('Please select at least one item from your cart to proceed.');
       return;
     }
-    const data = (cartProducts?.data ?? []) as { id: string }[];
-    const selectedCartIds = data
-      .filter((p) => selectedItems[p.id])
-      .map((p) => String(p.id));
     if (!selectedCartIds.length) {
       toast.error('Please select at least one item from your cart to proceed.');
       return;
     }
-    setCheckoutLoading(true);
-    try {
-      const result = await cartOrderProducts(selectedCartIds);
-      const success =
-        result?.status === true ||
-        result?.status === 'success' ||
-        (result?.message &&
-          String(result.message).toLowerCase().includes('success'));
-      if (success) {
-        router.push(`/checkout?cart_ids=${selectedCartIds.join(',')}`);
-      } else {
-        toast.error(result?.message || 'Failed to proceed to checkout.');
-      }
-    } catch {
-      toast.error('Failed to proceed to checkout.');
-    } finally {
-      setCheckoutLoading(false);
-    }
-  };
+
+    router.push(`/checkout?cart_ids=${selectedCartIds.join(',')}`);
+  }, [allDeselected, router, selectedCartIds]);
 
   return (
     <>
@@ -164,7 +154,6 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
         totalQuantity={selectedSummary.quantity}
         allDeselected={allDeselected}
         onCheckoutClick={handleCheckoutClick}
-        isCheckoutLoading={checkoutLoading}
         priceSummary={cartProducts?.priceSummary}
       />
     </>
