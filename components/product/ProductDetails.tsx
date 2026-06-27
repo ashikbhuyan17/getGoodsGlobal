@@ -58,9 +58,9 @@ export default function ProductDetails({
   useProductStore((s) => s.variants);
 
   return (
-    <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between border-border">
+    <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between items-start border-border">
       {/* Left Section - Image Gallery */}
-      <div className="flex gap-2 w-full flex-col xl:flex-row">
+      <div className="flex gap-2 w-full flex-col xl:flex-row xl:w-auto xl:shrink-0">
         <div className="flex lg:flex-col gap-2 order-2 lg:order-1">
           <div
             onClick={() =>
@@ -97,7 +97,7 @@ export default function ProductDetails({
           ))}
         </div>
         <div className="w-full order-1 lg:order-2 flex justify-center">
-          <div className="group relative aspect-square w-full max-w-[350px] overflow-hidden rounded-md border sm:max-w-[400px] xl:max-w-[550px]">
+          <div className="group relative aspect-square w-full max-w-[350px] overflow-hidden rounded-md border sm:max-w-[400px] xl:max-w-[500px]">
             <Dialog>
               <DialogTrigger asChild>
                 <button
@@ -111,7 +111,7 @@ export default function ProductDetails({
 
               <DialogContent
                 showCloseButton={false}
-                className="w-[350px] max-w-[95vw] gap-0 overflow-hidden border-0 p-0 sm:w-[400px] xl:w-[550px] xl:max-w-[90vw]"
+                className="w-[350px] max-w-[95vw] gap-0 overflow-hidden border-0 p-0 sm:w-[400px] xl:w-[500px] xl:max-w-[90vw]"
               >
                 <DialogClose className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-black/5 transition hover:bg-gray-100 focus:outline-none">
                   <X size={16} />
@@ -121,10 +121,10 @@ export default function ProductDetails({
                   <Image
                     src={image}
                     alt={p?.name ?? 'Product'}
-                    width={550}
-                    height={550}
+                    width={500}
+                    height={500}
                     className="h-full w-full object-contain"
-                    sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 550px"
+                    sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 500px"
                     priority
                   />
                 </div>
@@ -134,10 +134,10 @@ export default function ProductDetails({
             <Image
               src={image}
               alt={p?.name ?? 'Product'}
-              width={550}
-              height={550}
+              width={500}
+              height={500}
               className="h-full w-full object-contain"
-              sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 550px"
+              sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 500px"
             />
           </div>
         </div>
