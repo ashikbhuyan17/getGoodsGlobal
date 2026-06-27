@@ -157,7 +157,7 @@ export default function LiveChat({
   };
 
   return (
-    <div className="bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col h-[calc(100vh-200px)] min-h-[600px]">
+    <div className="bg-white border border-gray-200 shadow-sm rounded-lg flex flex-col h-[calc(100vh-160px)] min-h-[300px] sm:h-[calc(100vh-200px)] sm:min-h-[600px]">
       {/* Live Chat Header */}
       <div className="bg-teal-600 text-white p-4 rounded-t-lg">
         <h3 className="text-lg font-semibold mb-1">Live Chat</h3>

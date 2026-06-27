@@ -10,11 +10,10 @@ import { Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  DialogClose,
   DialogTrigger,
 } from '../ui/dialog';
+import { X } from 'lucide-react';
 import SizeCard from './SizeCard';
 import FlashSaleBanner from './FlashSaleBanner';
 import { useProductStore } from '@/stores/useProductStore';
@@ -97,9 +96,8 @@ export default function ProductDetails({
             </div>
           ))}
         </div>
-        <div className="w-full order-1 lg:order-2">
-          <div className="relative flex w-full min-h-[220px] max-h-[min(78vw,420px)] items-center justify-center sm:min-h-[260px] xl:min-h-[300px] xl:max-h-[440px]">
-
+        <div className="w-full order-1 lg:order-2 flex justify-center">
+          <div className="group relative aspect-square w-full max-w-[350px] overflow-hidden rounded-md border sm:max-w-[400px] xl:max-w-[550px]">
             <Dialog>
               <DialogTrigger asChild>
                 <button
@@ -111,15 +109,22 @@ export default function ProductDetails({
                 </button>
               </DialogTrigger>
 
-              <DialogContent className="w-[min(96vw,520px)] max-w-[96vw] gap-0 overflow-hidden p-[2px] sm:max-w-lg">
-                <div className="flex max-h-[80vh] items-center justify-center bg-white p-3">
+              <DialogContent
+                showCloseButton={false}
+                className="w-[350px] max-w-[95vw] gap-0 overflow-hidden border-0 p-0 sm:w-[400px] xl:w-[550px] xl:max-w-[90vw]"
+              >
+                <DialogClose className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-black/5 transition hover:bg-gray-100 focus:outline-none">
+                  <X size={16} />
+                  <span className="sr-only">Close</span>
+                </DialogClose>
+                <div className="relative aspect-square w-full bg-white">
                   <Image
                     src={image}
                     alt={p?.name ?? 'Product'}
-                    width={500}
-                    height={500}
-                    className="h-auto max-h-[75vh] w-auto max-w-full object-contain"
-                    sizes="(max-width: 768px) 96vw, 520px"
+                    width={550}
+                    height={550}
+                    className="h-full w-full object-contain"
+                    sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 550px"
                     priority
                   />
                 </div>
@@ -129,12 +134,11 @@ export default function ProductDetails({
             <Image
               src={image}
               alt={p?.name ?? 'Product'}
-              width={800}
-              height={800}
-              className="h-auto max-h-[min(78vw,420px)] w-auto max-w-full object-contain xl:max-h-[440px]"
-              sizes="(max-width: 1280px) 100vw, 50vw"
+              width={550}
+              height={550}
+              className="h-full w-full object-contain"
+              sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 550px"
             />
-
           </div>
         </div>
       </div>
@@ -266,7 +270,7 @@ export default function ProductDetails({
                       className={cn(
                         'object-cover p-0.5 rounded-md',
                         selectedColor?.id === color?.color?.id &&
-                        'border-2 border-primary',
+                          'border-2 border-primary',
                       )}
                     />
                   </div>

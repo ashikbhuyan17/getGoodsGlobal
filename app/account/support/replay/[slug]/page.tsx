@@ -35,8 +35,6 @@ export default async function TicketDetailPage({
 
   const chatData = replayRes?.data || [];
 
-
-
   const category = ticketFromList?.type
     ? String(ticketFromList.type)
     : 'General';
@@ -61,7 +59,7 @@ export default async function TicketDetailPage({
   }));
 
   return (
-    <div className="">
+    <div className="pb-16">
       <TicketInfoBar ticketId={ticketId} />
 
       <div className="py-3 px-2">
@@ -73,8 +71,6 @@ export default async function TicketDetailPage({
               status={status}
               manager={managerName}
             />
-
-
           </div>
 
           <div className="space-y-6">

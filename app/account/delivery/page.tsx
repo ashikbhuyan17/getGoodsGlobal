@@ -115,7 +115,7 @@ export default async function DeliveryPage({
                         <td className="py-3 px-4">৳{due}</td>
                         <td className="py-3 px-4">
                           <div className="flex gap-2">
-                            {paidAmount < amount && (
+                            {paidAmount <= 0 && amount > 0 && (
                               <Link href={`/payment/${invoiceId}`}>
                                 <Button
                                   size="sm"
