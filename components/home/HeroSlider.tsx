@@ -37,7 +37,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
             <CarouselItem key={i} className="basis-full pl-0">
               <button
                 type="button"
-                className="relative block h-[200px] min-h-[200px] w-full cursor-pointer overflow-hidden border-0 bg-transparent p-0 lg:aspect-[1920/670] lg:h-auto"
+                className="relative block h-[max(200px,calc(100vw*670/1920))] w-full touch-manipulation cursor-pointer overflow-hidden border-0 bg-transparent p-0 active:scale-100"
                 onClick={() => {
                   if (slide?.link) window.open(slide.link, '_blank');
                 }}
@@ -46,10 +46,11 @@ export default function HeroSlider({ slides }: { slides: any }) {
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
                   alt={`Slide ${slide?.id ?? i + 1}`}
-                  width={1920}
-                  height={670}
+                  fill
                   priority={i === 0}
-                  className="block h-full w-full object-cover object-center"
+                  placeholder="empty"
+                  draggable={false}
+                  className="object-cover object-center transition-none select-none"
                   sizes="100vw"
                 />
               </button>
