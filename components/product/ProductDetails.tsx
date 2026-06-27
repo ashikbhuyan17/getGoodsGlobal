@@ -97,7 +97,7 @@ export default function ProductDetails({
           ))}
         </div>
         <div className="w-full order-1 lg:order-2 flex justify-center">
-          <div className="group relative aspect-square w-full max-w-[350px] overflow-hidden rounded-md border sm:max-w-[400px] xl:max-w-[500px]">
+          <div className="group relative aspect-square w-full max-w-[350px] overflow-hidden rounded-md border sm:max-w-[400px] xl:max-w-[400px]">
             <Dialog>
               <DialogTrigger asChild>
                 <button
@@ -111,7 +111,7 @@ export default function ProductDetails({
 
               <DialogContent
                 showCloseButton={false}
-                className="w-[350px] max-w-[95vw] gap-0 overflow-hidden border-0 p-0 sm:w-[400px] xl:w-[500px] xl:max-w-[90vw]"
+                className="w-[350px] max-w-[95vw] gap-0 overflow-hidden border-0 p-0 sm:w-[400px] xl:max-w-[90vw]"
               >
                 <DialogClose className="absolute right-2 top-2 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white text-gray-700 shadow-md ring-1 ring-black/5 transition hover:bg-gray-100 focus:outline-none">
                   <X size={16} />
@@ -121,10 +121,10 @@ export default function ProductDetails({
                   <Image
                     src={image}
                     alt={p?.name ?? 'Product'}
-                    width={500}
-                    height={500}
+                    width={400}
+                    height={400}
                     className="h-full w-full object-contain"
-                    sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 500px"
+                    sizes="(max-width: 640px) 350px, 400px"
                     priority
                   />
                 </div>
@@ -134,10 +134,10 @@ export default function ProductDetails({
             <Image
               src={image}
               alt={p?.name ?? 'Product'}
-              width={500}
-              height={500}
+              width={400}
+              height={400}
               className="h-full w-full object-contain"
-              sizes="(max-width: 640px) 350px, (max-width: 1280px) 400px, 500px"
+              sizes="(max-width: 640px) 350px, 400px"
             />
           </div>
         </div>
