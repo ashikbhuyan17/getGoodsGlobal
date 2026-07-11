@@ -6,12 +6,14 @@ import OrderForm from '@/components/checkout/OrderForm';
 import ShippingMethodSection, {
   type ShippingOption,
 } from '@/components/checkout/ShippingMethodSection';
+import { type LocationData } from '@/lib/locations';
 import { useState, useMemo } from 'react';
 function CheckoutClient({
   cartProducts,
   user,
   isBuyNow = false,
   shippingOptions = [],
+  locations,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   cartProducts: any;
@@ -19,6 +21,7 @@ function CheckoutClient({
   user: any;
   isBuyNow?: boolean;
   shippingOptions?: ShippingOption[];
+  locations: LocationData;
 }) {
   const [formData, setFormData] = useState({
     name: user?.data?.name,
@@ -74,7 +77,7 @@ function CheckoutClient({
   return (
     <div className="mx-auto grid min-w-0 grid-cols-1 gap-8 px-1 md:px-4 lg:grid-cols-3">
       <div className="lg:col-span-2 space-y-6">
-        <OrderForm formData={formData} setFormData={setFormData} />
+        <OrderForm formData={formData} setFormData={setFormData} locations={locations} />
         <ShippingMethodSection
           options={shippingOptions}
           selectedId={selectedShipping?.id ?? null}

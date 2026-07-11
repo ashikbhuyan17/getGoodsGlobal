@@ -197,7 +197,33 @@ export async function submitUserSettingsForm(
   }
 }
 
-/** Text fields + optional existing image path. Re-fetches the image server-side and appends it as `image` (Blob + filename), same multipart shape as a new file upload. Falls back to string path if fetch fails. */
+/** User settings text fields only (no image re-upload). Use for profile form Update. */
+export async function submitUserSettingsTextFields(fields: {
+  name: string;
+  email: string;
+  phone: string;
+  emergency_number: string;
+  district: string;
+  city: string;
+  address: string;
+}): Promise<{
+  status?: boolean | string;
+  message?: string;
+  data?: unknown;
+  errors?: unknown;
+}> {
+  const formData = new FormData();
+  formData.append('name', fields.name);
+  formData.append('email', fields.email);
+  formData.append('phone', fields.phone);
+  formData.append('emergency_number', fields.emergency_number);
+  formData.append('district', fields.district);
+  formData.append('city', fields.city);
+  formData.append('address', fields.address);
+  return submitUserSettingsForm(formData);
+}
+
+/** User settings with optional existing image path. Re-fetches the image server-side and appends it as `image` (Blob + filename), same multipart shape as a new file upload. Falls back to string path if fetch fails. */
 export async function submitUserSettingsWithFields(fields: {
   name: string;
   email: string;

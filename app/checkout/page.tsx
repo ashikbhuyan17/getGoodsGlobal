@@ -1,4 +1,5 @@
 import { fetcher } from '@/lib/fetcher';
+import { fetchLocations } from '@/lib/locations';
 import CheckoutClient from '@/components/checkout/CheckoutClient';
 
 type SearchParams = { buyNow?: string; cart_ids?: string };
@@ -28,9 +29,10 @@ async function CheckoutPage({
     cartProducts = { data: [], status: 'success' };
   }
 
-  const [user, shippingArea] = await Promise.all([
+  const [user, shippingArea, locations] = await Promise.all([
     fetcher('/user-profile'),
     fetcher('/shipping-area').catch(() => ({ status: false, data: [] })),
+    fetchLocations(),
   ]);
 
   const shippingOptions =
@@ -52,6 +54,7 @@ async function CheckoutPage({
         cartProducts={cartProducts}
         isBuyNow={isBuyNow}
         shippingOptions={shippingOptions}
+        locations={locations}
       />
     </div>
   );

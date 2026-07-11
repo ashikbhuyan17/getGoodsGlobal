@@ -24,13 +24,11 @@ import {
 } from '@/components/ui/select';
 import {
   submitUserSettingsForm,
-  submitUserSettingsWithFields,
+  submitUserSettingsTextFields,
 } from '@/lib/fetcher';
 import { toast } from 'sonner';
-import {
-  BD_DISTRICT_NAMES,
-  getThanaPsByDistrict,
-} from '@/lib/constants/bd-locations';
+import { useDistrictThana } from '@/hooks/useDistrictThana';
+import { type LocationData } from '@/lib/locations';
 import {
   isImageFileSizeValid,
   getImageFileTooLargeMessage,
@@ -57,7 +55,14 @@ function existingProfileImagePath(user: unknown): string {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function ProfileUpdateForm({ user }: { user: any }) {
+export default function ProfileUpdateForm({
+  user,
+  locations,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  user: any;
+  locations: LocationData;
+}) {
   const pr = profileRecord(user);
   const [name, setName] = useState(String(pr.name ?? ''));
   const [email, setEmail] = useState(String(pr.email ?? ''));
@@ -79,7 +84,15 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const thanaOptions = useMemo(() => getThanaPsByDistrict(district), [district]);
+  const { districts, thanaOptions, loading: locationsLoading } =
+    useDistrictThana(district, locations);
+
+  const cityOptions = useMemo(() => {
+    if (city && !thanaOptions.includes(city)) {
+      return [city, ...thanaOptions];
+    }
+    return thanaOptions;
+  }, [city, thanaOptions]);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -112,13 +125,11 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
     e.preventDefault();
     if (!validate()) return;
 
-    const savedImage = existingProfileImagePath(user);
-
     setIsUpdating(true);
     try {
-      // Multipart like new upload: existing file is re-fetched on server and sent as `image` Blob + filename.
+      // Text-only update — skip re-downloading/re-uploading profile image (photo has its own upload flow).
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const res: any = await submitUserSettingsWithFields({
+      const res: any = await submitUserSettingsTextFields({
         name,
         email,
         phone: emergencyNumber,
@@ -126,7 +137,6 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
         district,
         city,
         address,
-        ...(savedImage ? { existingImageRelativePath: savedImage } : {}),
       });
 
       if (res?.status) {
@@ -350,17 +360,22 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
                   setCity('');
                 }
               }}
+              disabled={locationsLoading}
             >
               <SelectTrigger
                 id="district"
                 className="rounded-md border-gray-300 w-full"
               >
-                <SelectValue placeholder="Select district" />
+                <SelectValue
+                  placeholder={
+                    locationsLoading ? 'Loading districts...' : 'Select district'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                {BD_DISTRICT_NAMES.map((d) => (
-                  <SelectItem key={d} value={d}>
-                    {d}
+                {districts.map((d) => (
+                  <SelectItem key={d.id} value={d.districtName}>
+                    {d.districtName}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -370,14 +385,24 @@ export default function ProfileUpdateForm({ user }: { user: any }) {
           {/* City - same width as District */}
           <div className="space-y-2">
             <Label htmlFor="city">Thana/PS</Label>
-            <Select value={city || ''} onValueChange={setCity}>
+            <Select
+              value={city || ''}
+              onValueChange={setCity}
+              disabled={locationsLoading || !district}
+            >
               <SelectTrigger id="city" className="rounded-md border-gray-300 w-full">
                 <SelectValue
-                  placeholder={district ? 'Select thana/PS' : 'Select district first'}
+                  placeholder={
+                    locationsLoading
+                      ? 'Loading thana...'
+                      : district
+                        ? 'Select thana/PS'
+                        : 'Select district first'
+                  }
                 />
               </SelectTrigger>
               <SelectContent>
-                {thanaOptions.map((thana) => (
+                {cityOptions.map((thana) => (
                   <SelectItem key={thana} value={thana}>
                     {thana}
                   </SelectItem>

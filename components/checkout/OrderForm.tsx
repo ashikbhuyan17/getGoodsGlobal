@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '../ui/textarea';
@@ -10,11 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BD_DISTRICT_NAMES, getThanaPsByDistrict } from '@/lib/constants/bd-locations';
+import { useDistrictThana } from '@/hooks/useDistrictThana';
+import { type LocationData } from '@/lib/locations';
 
 export default function OrderForm({
   formData,
   setFormData,
+  locations,
 }: {
   formData: {
     name: string;
@@ -27,8 +30,20 @@ export default function OrderForm({
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormData: any;
+  locations: LocationData;
 }) {
-  const thanaOptions = getThanaPsByDistrict(formData?.district || '');
+  const { districts, thanaOptions, loading: locationsLoading } = useDistrictThana(
+    formData?.district || '',
+    locations,
+  );
+
+  const cityOptions = useMemo(() => {
+    const city = formData?.city || '';
+    if (city && !thanaOptions.includes(city)) {
+      return [city, ...thanaOptions];
+    }
+    return thanaOptions;
+  }, [formData?.city, thanaOptions]);
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
@@ -80,6 +95,7 @@ export default function OrderForm({
                 city: isSameDistrict ? formData?.city || '' : '',
               });
             }}
+            disabled={locationsLoading}
             required
           >
             <SelectTrigger
@@ -87,12 +103,16 @@ export default function OrderForm({
               id="district"
               aria-required="true"
             >
-              <SelectValue placeholder="Select district" />
+              <SelectValue
+                placeholder={
+                  locationsLoading ? 'Loading districts...' : 'Select district'
+                }
+              />
             </SelectTrigger>
             <SelectContent>
-              {BD_DISTRICT_NAMES.map((district) => (
-                <SelectItem key={district} value={district}>
-                  {district}
+              {districts.map((district) => (
+                <SelectItem key={district.id} value={district.districtName}>
+                  {district.districtName}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -107,17 +127,22 @@ export default function OrderForm({
           <Select
             value={formData?.city || ''}
             onValueChange={(value) => setFormData({ ...formData, city: value })}
+            disabled={locationsLoading || !formData?.district}
             required
           >
             <SelectTrigger className="w-full" id="city" aria-required="true">
               <SelectValue
                 placeholder={
-                  formData?.district ? 'Select thana/PS' : 'Select district first'
+                  locationsLoading
+                    ? 'Loading thana...'
+                    : formData?.district
+                      ? 'Select thana/PS'
+                      : 'Select district first'
                 }
               />
             </SelectTrigger>
             <SelectContent>
-              {thanaOptions.map((thana) => (
+              {cityOptions.map((thana) => (
                 <SelectItem key={thana} value={thana}>
                   {thana}
                 </SelectItem>
