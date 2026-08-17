@@ -60,7 +60,7 @@ async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   return (
     <main>
       <ProductInfoBar product={product} slug={slug} />
-      <div className="flex flex-col gap-2 px-2 pb-24 lg:pb-2">
+      <div className="flex flex-col gap-2 px-2 pb-20 lg:pb-2">
         <ProductPageClient
           bulkQuantities={bulkQuantities}
           product={product}

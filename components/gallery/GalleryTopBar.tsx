@@ -17,7 +17,7 @@ export default function GalleryTopBar() {
           <ArrowLeft className="w-4 h-4" />
         </Link>
       </Button>
-      <h1 className="text-lg font-bold text-gray-800">Sky Gallery</h1>
+      <h1 className="text-lg font-bold text-gray-800">Gallery</h1>
     </div>
   );
 }

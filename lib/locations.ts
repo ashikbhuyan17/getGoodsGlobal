@@ -32,10 +32,20 @@ export async function fetchLocations(): Promise<LocationData> {
     return {
       districts:
         districtRes?.status && Array.isArray(districtRes.data)
-          ? districtRes.data
+          ? [...districtRes.data].sort((a, b) =>
+              a.districtName.localeCompare(b.districtName, 'en', {
+                sensitivity: 'base',
+              }),
+            )
           : [],
       thanas:
-        thanaRes?.status && Array.isArray(thanaRes.data) ? thanaRes.data : [],
+        thanaRes?.status && Array.isArray(thanaRes.data)
+          ? [...thanaRes.data].sort((a, b) =>
+              a.thanaName.localeCompare(b.thanaName, 'en', {
+                sensitivity: 'base',
+              }),
+            )
+          : [],
     };
   } catch {
     return { districts: [], thanas: [] };
@@ -60,5 +70,5 @@ export function getThanaNamesByDistrict(
     )
     .map((thana) => thana.thanaName)
     .filter(Boolean)
-    .sort((a, b) => a.localeCompare(b, 'en'));
+    .sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
 }

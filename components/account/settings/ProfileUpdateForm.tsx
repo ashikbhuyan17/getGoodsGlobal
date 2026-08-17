@@ -15,13 +15,7 @@ import {
   DialogDescription,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { FormPicker } from '@/components/ui/form-picker';
 import {
   submitUserSettingsForm,
   submitUserSettingsTextFields,
@@ -351,7 +345,8 @@ export default function ProfileUpdateForm({
           {/* District - same width as City */}
           <div className="space-y-2">
             <Label htmlFor="district">District</Label>
-            <Select
+            <FormPicker
+              id="district"
               value={district || ''}
               onValueChange={(value) => {
                 const isSameDistrict = district === value;
@@ -360,55 +355,41 @@ export default function ProfileUpdateForm({
                   setCity('');
                 }
               }}
+              options={districts.map((d) => ({
+                value: d.districtName,
+                label: d.districtName,
+              }))}
+              placeholder={
+                locationsLoading ? 'Loading districts...' : 'Select district'
+              }
+              searchPlaceholder="Search district..."
               disabled={locationsLoading}
-            >
-              <SelectTrigger
-                id="district"
-                className="rounded-md border-gray-300 w-full"
-              >
-                <SelectValue
-                  placeholder={
-                    locationsLoading ? 'Loading districts...' : 'Select district'
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {districts.map((d) => (
-                  <SelectItem key={d.id} value={d.districtName}>
-                    {d.districtName}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              className="rounded-md border-gray-300"
+            />
           </div>
 
           {/* City - same width as District */}
           <div className="space-y-2">
             <Label htmlFor="city">Thana/PS</Label>
-            <Select
+            <FormPicker
+              id="city"
               value={city || ''}
               onValueChange={setCity}
+              options={cityOptions.map((thana) => ({
+                value: thana,
+                label: thana,
+              }))}
+              placeholder={
+                locationsLoading
+                  ? 'Loading thana...'
+                  : district
+                    ? 'Select thana/PS'
+                    : 'Select district first'
+              }
+              searchPlaceholder="Search thana..."
               disabled={locationsLoading || !district}
-            >
-              <SelectTrigger id="city" className="rounded-md border-gray-300 w-full">
-                <SelectValue
-                  placeholder={
-                    locationsLoading
-                      ? 'Loading thana...'
-                      : district
-                        ? 'Select thana/PS'
-                        : 'Select district first'
-                  }
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {cityOptions.map((thana) => (
-                  <SelectItem key={thana} value={thana}>
-                    {thana}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              className="rounded-md border-gray-300"
+            />
           </div>
         </div>
 

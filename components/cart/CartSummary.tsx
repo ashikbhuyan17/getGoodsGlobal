@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { fetcher } from '@/lib/fetcher';
 import { Loader2 } from 'lucide-react';
@@ -10,9 +10,36 @@ import { toast } from 'sonner';
 import TermsModal from '@/components/checkout/TermsModal';
 import { formatPriceInt } from '@/lib/utils';
 
-/** Below lg: sticky CTA. max-md: above BottomNav; md–lg: flush bottom (nav hidden). */
-const MOBILE_CTA_BAR_PIN =
-  'fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]';
+function MobileCtaBar({
+  label,
+  amount,
+  children,
+}: {
+  label: string;
+  amount: number;
+  children: ReactNode;
+}) {
+  return (
+    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] w-full px-0 sm:px-[10%] lg:hidden">
+      <div
+        className="pointer-events-auto w-full border-t border-neutral-200/80 bg-white shadow-[0_-6px_20px_rgba(15,23,42,0.06)] sm:rounded-t-lg sm:border-x"
+        style={{
+          paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom, 0px))',
+        }}
+      >
+        <div className="w-full space-y-1.5 px-[10px] py-2">
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-[13px] text-neutral-500">{label}</span>
+            <span className="text-sm font-semibold tabular-nums text-neutral-900">
+              ৳{formatPriceInt(amount)}
+            </span>
+          </div>
+          <div className="w-full">{children}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function CartSummary({
   page = 'cart',
@@ -222,13 +249,13 @@ export default function CartSummary({
   };
 
   return (
-    <div className="bg-white rounded-lg lg:mb-0 max-lg:pb-4">
+    <div className="bg-white rounded-lg">
       <h2 className="text-base font-bold text-center p-2 lg:p-4">
         Cart Summary
       </h2>
       <p className="border-t border-gray-200"></p>
 
-      <div className="p-2 lg:p-6 space-y-2">
+      <div className="space-y-2 p-2 pb-0 lg:p-6">
         {page === 'checkout' ? (
           <div className="space-y-3">
             <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
@@ -359,27 +386,16 @@ export default function CartSummary({
 
               {/* Mobile: hide floating bar while Terms modal is open */}
               {!showTermsModal && (
-                <div
-                  className={`lg:hidden pointer-events-none ${MOBILE_CTA_BAR_PIN}`}
-                >
-                  <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
-                    <div className="flex items-center justify-between gap-2 px-0.5">
-                      <span className="text-xs text-gray-600">
-                        Total payable
-                      </span>
-                      <span className="text-sm font-bold tabular-nums text-gray-900">
-                        ৳{formatPriceInt(finalPrice)}
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={handlePlaceOrderClick}
-                      className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90"
-                    >
-                      Place Order & Pay
-                    </Button>
-                  </div>
-                </div>
+                <MobileCtaBar label="Total payable" amount={finalPrice}>
+                  <Button
+                    type="button"
+                    onClick={handlePlaceOrderClick}
+                    size="sm"
+                    className="h-9 w-full rounded-lg text-[13px] font-medium"
+                  >
+                    Place Order & Pay
+                  </Button>
+                </MobileCtaBar>
               )}
 
               <TermsModal
@@ -408,33 +424,24 @@ export default function CartSummary({
                 </Button>
               </div>
 
-              <div
-                className={`pointer-events-none lg:hidden ${MOBILE_CTA_BAR_PIN}`}
-              >
-                <div className="pointer-events-auto mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
-                  <div className="flex items-center justify-between gap-2 px-0.5">
-                    <span className="text-xs text-gray-600">Subtotal</span>
-                    <span className="text-sm font-bold tabular-nums text-gray-900">
-                      ৳{formatPriceInt(finalPrice)}
-                    </span>
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={onCheckoutClick}
-                    disabled={isCheckoutLoading || allDeselected}
-                    className="h-10 w-full bg-primary text-sm font-semibold shadow-sm hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {isCheckoutLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Please wait...
-                      </>
-                    ) : (
-                      'Go to Checkout'
-                    )}
-                  </Button>
-                </div>
-              </div>
+              <MobileCtaBar label="Subtotal" amount={finalPrice}>
+                <Button
+                  type="button"
+                  onClick={onCheckoutClick}
+                  disabled={isCheckoutLoading || allDeselected}
+                  size="sm"
+                  className="h-9 w-full rounded-lg text-[13px] font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isCheckoutLoading ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Please wait...
+                    </>
+                  ) : (
+                    'Go to Checkout'
+                  )}
+                </Button>
+              </MobileCtaBar>
             </>
           )
 

@@ -123,13 +123,20 @@ function CheckoutSummarySkeleton() {
         <SkeletonBar className="hidden h-12 w-full rounded-md lg:block" />
       </div>
 
-      <div className="pointer-events-none fixed inset-x-0 z-60 px-2 pt-1 max-md:bottom-[calc(4rem+env(safe-area-inset-bottom,0px))] md:bottom-0 md:hidden md:pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]">
-        <div className="pointer-events-none mx-auto max-w-3xl space-y-2 rounded-xl border border-gray-200/90 bg-white/95 p-2 shadow-lg">
-          <div className="flex items-center justify-between gap-2 px-0.5">
-            <SkeletonBar className="h-3.5 w-24" />
-            <SkeletonBar className="h-4 w-20" />
+      <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] w-full px-0 sm:px-[10%] lg:hidden">
+        <div
+          className="pointer-events-none w-full border-t border-neutral-200/80 bg-white shadow-[0_-6px_20px_rgba(15,23,42,0.06)] sm:rounded-t-lg sm:border-x"
+          style={{
+            paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom, 0px))',
+          }}
+        >
+          <div className="w-full space-y-1.5 px-[10px] py-2">
+            <div className="flex items-center justify-between gap-3">
+              <SkeletonBar className="h-3.5 w-20" />
+              <SkeletonBar className="h-4 w-16" />
+            </div>
+            <SkeletonBar className="h-9 w-full rounded-lg" />
           </div>
-          <SkeletonBar className="h-10 w-full rounded-md" />
         </div>
       </div>
     </aside>
@@ -138,7 +145,7 @@ function CheckoutSummarySkeleton() {
 
 export default function CheckoutLoadingSkeleton() {
   return (
-    <div className="min-h-screen min-w-0 px-2 pb-36 pt-8 lg:pb-8">
+    <div className="min-h-screen min-w-0 px-2 pb-20 pt-8 lg:pb-8">
       <div className="mx-auto grid min-w-0 grid-cols-1 gap-8 px-1 md:px-4 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <OrderFormSkeleton />

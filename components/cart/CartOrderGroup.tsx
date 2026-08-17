@@ -78,111 +78,94 @@ export default function CartOrderGroup({
   return (
     <div
       className={cn(
-        "rounded-lg p-6 space-y-4 transition-colors",
+        "rounded-lg p-3 space-y-3 transition-colors sm:p-4 lg:p-6 lg:space-y-4",
         isSelected || page !== "cart"
           ? "bg-white"
           : "bg-gray-100 opacity-60"
       )}
     >
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        {/* Selection Indicator */}
+      {/* Header: mobile wraps title below image+delete; lg keeps a single row */}
+      <div className="flex flex-wrap items-start gap-2 lg:flex-nowrap lg:items-center lg:gap-4">
         {page === "cart" && (
           <button
             onClick={handleSelectClick}
             className={cn(
-              "shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer",
+              "mt-0.5 shrink-0 w-5 h-5 rounded-full flex items-center justify-center transition-colors cursor-pointer lg:mt-0 lg:w-6 lg:h-6",
               isSelected
                 ? "bg-teal-600 hover:bg-teal-700"
                 : "bg-gray-200 border-2 border-gray-300 hover:bg-gray-300"
             )}
             aria-label={isSelected ? "Deselect item" : "Select item"}
           >
-            {isSelected && <Check className="w-4 h-4 text-white" />}
+            {isSelected && <Check className="w-3.5 h-3.5 text-white lg:w-4 lg:h-4" />}
           </button>
         )}
-        
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <div className="flex gap-4 flex-1 items-center">
-              {/* <Image
+
+        <div className="relative size-14 shrink-0 sm:size-16">
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center gap-1 bg-black/40 text-sm text-white opacity-0 transition-all duration-300 hover:opacity-100">
+                <Eye size={15} /> <span>Preview</span>
+              </div>
+            </DialogTrigger>
+
+            <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
+              <DialogTitle className="sr-only">Image preview: {title}</DialogTitle>
+              <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
+              <Image
                 src={image}
-                width={96}
-                height={96}
                 alt={title}
-                className="w-24 h-24 rounded object-cover"
-              /> */}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </DialogContent>
+          </Dialog>
+          {productHref ? (
+            <Link href={productHref} aria-label={`Open ${title}`}>
+              <Image
+                src={image}
+                alt={title}
+                width={64}
+                height={64}
+                className="h-full w-full rounded object-cover shadow-md"
+              />
+            </Link>
+          ) : (
+            <Image
+              src={image}
+              alt={title}
+              width={64}
+              height={64}
+              className="h-full w-full rounded object-cover shadow-md"
+            />
+          )}
+        </div>
 
-              <div className="w-16 h-16 shrink-0">
-                <div className="relative w-16 h-16">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
-                        <Eye size={15} /> <span>Preview</span>
-                      </div>
-                    </DialogTrigger>
+        {page === "cart" && (
+          <button
+            onClick={handleDelete}
+            className="ml-auto shrink-0 p-1 text-red-500 hover:text-red-700 lg:order-last lg:ml-0"
+            aria-label="Remove from cart"
+          >
+            <Trash2 size={18} className="lg:size-5" />
+          </button>
+        )}
 
-                    <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
-                      <DialogTitle className="sr-only">Image preview: {title}</DialogTitle>
-                      <DialogDescription className="sr-only">Preview of {title}</DialogDescription>
-                      <Image
-                        src={image}
-                        alt={title}
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    </DialogContent>
-                  </Dialog>
-                  {productHref ? (
-                    <Link href={productHref} aria-label={`Open ${title}`}>
-                      <Image
-                        src={image}
-                        alt={title}
-                        width={64}
-                        height={64}
-                        className="w-full h-full rounded shadow-md object-cover"
-                      />
-                    </Link>
-                  ) : (
-                    <Image
-                      src={image}
-                      alt={title}
-                      width={64}
-                      height={64}
-                      className="w-full h-full rounded shadow-md object-cover"
-                    />
-                  )}
-                </div>
-              </div>
+        <div className="min-w-0 w-full basis-full lg:w-auto lg:flex-1 lg:basis-0">
+          <p className="text-xs font-medium text-neutral-500 lg:text-sm lg:font-semibold lg:text-foreground">
+            Order ID: #{orderId}
+          </p>
 
-              <div className="flex-1">
-                <p className="text-sm font-semibold">
-                  Order ID: #{orderId}
-                </p>
-
-                {productHref ? (
-                  <Link
-                    href={productHref}
-                    className="text-sm font-semibold hover:text-primary transition-colors"
-                  >
-                    {title}
-                  </Link>
-                ) : (
-                  <p className="text-sm font-semibold">{title}</p>
-                )}
-              </div>
-            </div>
-
-            {page === "cart" && (
-              <button
-                onClick={handleDelete}
-                className="text-red-500 hover:text-red-700"
-                aria-label="Remove from cart"
-              >
-                <Trash2 size={20} />
-              </button>
-            )}
-          </div>
+          {productHref ? (
+            <Link
+              href={productHref}
+              className="mt-0.5 line-clamp-2 text-sm font-semibold hover:text-primary transition-colors"
+            >
+              {title}
+            </Link>
+          ) : (
+            <p className="mt-0.5 line-clamp-2 text-sm font-semibold">{title}</p>
+          )}
         </div>
       </div>
       <div className="border-b"></div>
@@ -191,7 +174,7 @@ export default function CartOrderGroup({
       {children}
 
       {/* Footer */}
-      <div className="flex justify-between items-center pt-4">
+      <div className="flex items-center justify-between pt-2 lg:pt-4">
         <div className="text-xs py-0.5 px-1.5 border border-blue-200 text-[#0958d9] font-medium bg-[#E6F4FF] rounded">
           {totalItems} Items
         </div>

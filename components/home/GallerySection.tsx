@@ -131,7 +131,7 @@ function GallerySection({ galleryData }: GallerySectionProps) {
         >
           <Link href="/gallery" prefetch className="flex items-center gap-2">
             <Images className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium">View Sky Gallery</span>
+            <span className="text-sm font-medium">View Gallery</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </Button>

@@ -48,7 +48,7 @@ async function CheckoutPage({
     )?.data ?? [];
 
   return (
-    <div className="min-h-screen min-w-0 px-2 pb-36 pt-8 lg:pb-8">
+    <div className="min-h-screen min-w-0 px-2 pb-20 pt-8 lg:pb-8">
       <CheckoutClient
         user={user}
         cartProducts={cartProducts}

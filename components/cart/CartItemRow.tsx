@@ -31,67 +31,67 @@ export default function CartItemRow({
   const imageSrc = colorImage || '/placeholder-product.png';
 
   return (
-    <div className="flex items-center justify-between py-1 text-sm font-medium">
-      <div className="flex items-center gap-x-3">
-        <div className="w-16 h-16 flex-shrink-0">
-          <div className="relative w-16 h-16">
-            <Dialog>
-              <DialogTrigger asChild>
-                <div className="absolute inset-0 flex items-center justify-center gap-1 text-sm bg-black/40 text-white cursor-pointer opacity-0 hover:opacity-100 transition-all duration-300 z-10">
-                  <Eye size={15} /> <span>Preview</span>
-                </div>
-              </DialogTrigger>
+    <div className="flex items-start gap-2.5 py-1.5 text-sm font-medium">
+      <div className="size-12 shrink-0 sm:size-16">
+        <div className="relative size-12 sm:size-16">
+          <Dialog>
+            <DialogTrigger asChild>
+              <div className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center gap-1 bg-black/40 text-sm text-white opacity-0 transition-all duration-300 hover:opacity-100">
+                <Eye size={15} /> <span>Preview</span>
+              </div>
+            </DialogTrigger>
 
-              <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
-                <DialogTitle className="sr-only">Image preview: {color}</DialogTitle>
-                <DialogDescription className="sr-only">Preview of {color}</DialogDescription>
-                <Image
-                  src={imageSrc}
-                  alt={color}
-                  fill
-                  className="object-cover rounded-lg"
-                />
-              </DialogContent>
-            </Dialog>
-            <Image
-              src={imageSrc}
-              alt={color}
-              width={64}
-              height={64}
-              className="w-full h-full rounded shadow-md object-cover"
-            />
+            <DialogContent className="aspect-square max-2xl:w-[400px] max-2xl:h-[400px]">
+              <DialogTitle className="sr-only">Image preview: {color}</DialogTitle>
+              <DialogDescription className="sr-only">Preview of {color}</DialogDescription>
+              <Image
+                src={imageSrc}
+                alt={color}
+                fill
+                className="object-cover rounded-lg"
+              />
+            </DialogContent>
+          </Dialog>
+          <Image
+            src={imageSrc}
+            alt={color}
+            width={64}
+            height={64}
+            className="h-full w-full rounded object-cover shadow-md"
+          />
+        </div>
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="truncate">Color: {color}</p>
+            {size && <p className="truncate">Size: {size}</p>}
           </div>
-        </div>
-        <div>
-          <p>Color: {color}</p>
-          {size && <p>Size: {size}</p>}
-        </div>
-      </div>
-      <div>
-        {qty} x ৳{price}
-      </div>
-      <div className="flex items-center gap-4">
-        <span>৳{qty * price}</span>
-
-        {page === 'cart' && (
-          <UpdateCartModal
-            id={id}
-            size={size}
-            color={color}
-            qty={qty}
-            price={price}
-            onRemoveLoading={onRemoveLoading}
-          >
-            <button
-              // size="sm"
-              // variant="outline"
-              onClick={onEdit}
-              className="border-primary py-[2px]  rounded text-white  px-2 text-sm bg-primary"
+          {page === 'cart' && (
+            <UpdateCartModal
+              id={id}
+              size={size}
+              color={color}
+              qty={qty}
+              price={price}
+              onRemoveLoading={onRemoveLoading}
             >
-              Edit
-            </button>
-          </UpdateCartModal>
-        )}
+              <button
+                onClick={onEdit}
+                className="shrink-0 rounded bg-primary px-2 py-0.5 text-xs text-white sm:text-sm"
+              >
+                Edit
+              </button>
+            </UpdateCartModal>
+          )}
+        </div>
+        <div className="mt-1 flex items-center justify-between gap-3">
+          <span className="shrink-0 text-neutral-600">
+            {qty} x ৳{price}
+          </span>
+          <span className="shrink-0">৳{qty * price}</span>
+        </div>
       </div>
     </div>
   );

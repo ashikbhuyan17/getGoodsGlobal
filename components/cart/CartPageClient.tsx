@@ -114,7 +114,7 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
           </div>
         </div>
       )}
-      <div className="lg:col-span-2 space-y-6">
+      <div className="lg:col-span-2 space-y-3 lg:space-y-6">
         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {cartProducts?.data?.map((product: any) => (
           <CartOrderGroup

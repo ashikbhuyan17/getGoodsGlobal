@@ -7,6 +7,7 @@ import { fetcher } from '@/lib/fetcher';
 import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
@@ -27,6 +28,7 @@ export default function ActionButtons({
   const [showMinOrderModal, setShowMinOrderModal] = useState(false);
   const [minOrderMessage, setMinOrderMessage] = useState<string>('');
   const [showAddToCartModal, setShowAddToCartModal] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   const variants = useProductStore((s) => s.variants);
   const totalQuantity = useProductStore((s) => s.totalQuantity());
@@ -55,6 +57,10 @@ export default function ActionButtons({
       cancelled = true;
     };
   }, [productId]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const buildCartDetails = () =>
     variants
@@ -211,14 +217,15 @@ export default function ActionButtons({
     }
   };
 
-  const renderWishIcon = () =>
+  const renderWishIcon = (size = 20) =>
     isWishlistLoading ? (
-      <Loader2 className="size-5 animate-spin" />
+      <Loader2 className="size-4 animate-spin" />
     ) : (
       <Heart
-        size={22}
-        className={cn(isInWishlist ? 'text-red-600' : 'text-gray-500')}
-        fill={isInWishlist ? '#e7000b' : 'none'}
+        size={size}
+        strokeWidth={2}
+        className={cn(isInWishlist ? 'text-red-600' : 'text-neutral-500')}
+        fill={isInWishlist ? 'currentColor' : 'none'}
       />
     );
 
@@ -263,54 +270,60 @@ export default function ActionButtons({
         </Button>
       </div>
 
-      {/* Small screens: fixed bottom bar — stays visible while scrolling */}
-      <div
-        className="lg:hidden pointer-events-none fixed inset-x-0 bottom-0 z-50 p-2 pb-0"
-        style={{
-          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom, 0px))',
-        }}
-      >
-        <div className="pointer-events-auto mx-auto flex max-w-3xl items-stretch gap-2 rounded-2xl border border-gray-200/90 bg-white/95 p-2 shadow-lg shadow-black/10 backdrop-blur-md supports-backdrop-filter:bg-white/90">
-          <Button
-            disabled={isWishlistLoading}
-            onClick={handleWishlist}
-            variant="outline"
-            size="lg"
-            className="h-12 w-12 shrink-0 rounded-full border-2 p-0 shadow-sm"
-            aria-label={
-              isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'
-            }
-          >
-            {renderWishIcon()}
-          </Button>
+      {/* Small screens: compact CTA pinned to the viewport (portaled so page overflow cannot clip it) */}
+      {mounted &&
+        createPortal(
+          <div className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] w-full lg:hidden">
+            <div
+              className="pointer-events-auto border-t border-neutral-200/80 bg-white shadow-[0_-6px_20px_rgba(15,23,42,0.06)]"
+              style={{
+                paddingBottom: 'max(0.25rem, env(safe-area-inset-bottom, 0px))',
+              }}
+            >
+              <div className="mx-auto flex w-full max-w-3xl items-center gap-1.5 px-2.5 py-1.5">
+                <Button
+                  disabled={isWishlistLoading}
+                  onClick={handleWishlist}
+                  variant="outline"
+                  size="sm"
+                  className="h-9 w-9 shrink-0 rounded-lg border-neutral-200 p-0"
+                  aria-label={
+                    isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'
+                  }
+                >
+                  {renderWishIcon(18)}
+                </Button>
 
-          <Button
-            disabled={isAddToCartLoading}
-            onClick={handleAddToCart}
-            size="lg"
-            className="h-12 min-w-0 flex-1 text-sm font-semibold shadow-sm"
-          >
-            {isAddToCartLoading ? (
-              <Loader2 className="size-5 animate-spin" />
-            ) : (
-              'Add to Cart'
-            )}
-          </Button>
+                <Button
+                  disabled={isAddToCartLoading}
+                  onClick={handleAddToCart}
+                  size="sm"
+                  className="h-9 min-w-0 flex-1 rounded-lg text-[13px] font-medium"
+                >
+                  {isAddToCartLoading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    'Add to Cart'
+                  )}
+                </Button>
 
-          <Button
-            disabled={isBuyNowLoading}
-            onClick={handleBuyNow}
-            size="lg"
-            className="h-12 min-w-0 flex-1 bg-[#279ACE] text-sm font-semibold shadow-sm transition hover:bg-[#1b8cbf]"
-          >
-            {isBuyNowLoading ? (
-              <Loader2 className="size-5 animate-spin" />
-            ) : (
-              'Buy Now'
-            )}
-          </Button>
-        </div>
-      </div>
+                <Button
+                  disabled={isBuyNowLoading}
+                  onClick={handleBuyNow}
+                  size="sm"
+                  className="h-9 min-w-0 flex-1 rounded-lg bg-[#279ACE] text-[13px] font-medium hover:bg-[#1b8cbf]"
+                >
+                  {isBuyNowLoading ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    'Buy Now'
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       <MinOrderModal
         open={showMinOrderModal}

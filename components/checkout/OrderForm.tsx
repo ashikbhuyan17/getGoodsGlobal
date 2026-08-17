@@ -4,13 +4,7 @@ import { useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '../ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { FormPicker } from '@/components/ui/form-picker';
 import { useDistrictThana } from '@/hooks/useDistrictThana';
 import { type LocationData } from '@/lib/locations';
 
@@ -85,7 +79,8 @@ export default function OrderForm({
           <Label htmlFor="district">
             District <span className="text-red-500">*</span>
           </Label>
-          <Select
+          <FormPicker
+            id="district"
             value={formData?.district || ''}
             onValueChange={(value) => {
               const isSameDistrict = (formData?.district || '') === value;
@@ -95,28 +90,16 @@ export default function OrderForm({
                 city: isSameDistrict ? formData?.city || '' : '',
               });
             }}
+            options={districts.map((district) => ({
+              value: district.districtName,
+              label: district.districtName,
+            }))}
+            placeholder={
+              locationsLoading ? 'Loading districts...' : 'Select district'
+            }
+            searchPlaceholder="Search district..."
             disabled={locationsLoading}
-            required
-          >
-            <SelectTrigger
-              className="w-full"
-              id="district"
-              aria-required="true"
-            >
-              <SelectValue
-                placeholder={
-                  locationsLoading ? 'Loading districts...' : 'Select district'
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {districts.map((district) => (
-                <SelectItem key={district.id} value={district.districtName}>
-                  {district.districtName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         {/* City */}
@@ -124,31 +107,24 @@ export default function OrderForm({
           <Label htmlFor="city">
             Thana/PS <span className="text-red-500">*</span>
           </Label>
-          <Select
+          <FormPicker
+            id="city"
             value={formData?.city || ''}
             onValueChange={(value) => setFormData({ ...formData, city: value })}
+            options={cityOptions.map((thana) => ({
+              value: thana,
+              label: thana,
+            }))}
+            placeholder={
+              locationsLoading
+                ? 'Loading thana...'
+                : formData?.district
+                  ? 'Select thana/PS'
+                  : 'Select district first'
+            }
+            searchPlaceholder="Search thana..."
             disabled={locationsLoading || !formData?.district}
-            required
-          >
-            <SelectTrigger className="w-full" id="city" aria-required="true">
-              <SelectValue
-                placeholder={
-                  locationsLoading
-                    ? 'Loading thana...'
-                    : formData?.district
-                      ? 'Select thana/PS'
-                      : 'Select district first'
-                }
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {cityOptions.map((thana) => (
-                <SelectItem key={thana} value={thana}>
-                  {thana}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          />
         </div>
 
         {/* Address */}

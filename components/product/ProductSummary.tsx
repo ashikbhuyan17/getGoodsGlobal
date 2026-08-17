@@ -26,7 +26,7 @@ export default function ProductSummary({
   const price = priceList();
 
   return (
-    <Card className="px-4 rounded-sm border">
+    <Card className="w-full px-4 rounded-sm border">
       {/* <div className="grid grid-cols-2 gap-3">
         {shippingOptions?.map((item) => (
           <ShippingOptionCard

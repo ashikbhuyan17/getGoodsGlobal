@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Grid2x2,
   Headphones,
@@ -133,7 +134,15 @@ export default function BottomNavClient({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   contact: any;
 }) {
+  const pathname = usePathname();
   const { cartCount, wishlistCount, isLoggedIn } = useNavCounts();
+
+  if (
+    pathname?.startsWith('/product/') ||
+    pathname === '/cart' ||
+    pathname === '/checkout'
+  )
+    return null;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white shadow-md md:hidden">

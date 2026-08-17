@@ -3,7 +3,7 @@
 
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../ui/scroll-area';
 import { Eye } from 'lucide-react';
@@ -48,9 +48,12 @@ export default function ProductDetails({
         : null
       : rawFlashSale;
 
-  const [image, setImage] = useState(
-    `${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`,
-  );
+  const mainImageSrc = `${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`;
+  const [image, setImage] = useState(mainImageSrc);
+
+  useEffect(() => {
+    setImage(mainImageSrc);
+  }, [mainImageSrc]);
 
   const setSelectedColor = useProductStore((s) => s.setSelectedColor);
   const colorQty = useProductStore((s) => s.colorQty);
@@ -58,22 +61,20 @@ export default function ProductDetails({
   useProductStore((s) => s.variants);
 
   return (
-    <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden justify-between items-start border-border">
+    <div className="p-2 flex flex-col xl:flex-row mt-4 gap-4 overflow-x-hidden items-start border-border">
       {/* Left Section - Image Gallery */}
-      <div className="flex gap-2 w-full flex-col xl:flex-row xl:w-auto xl:shrink-0">
-        <div className="flex lg:flex-col gap-2 order-2 lg:order-1">
+      <div className="flex w-full min-w-0 shrink-0 flex-col gap-2 xl:w-[40%] xl:flex-row">
+        <div className="flex lg:flex-col gap-2 order-2 lg:order-1 shrink-0">
           <div
-            onClick={() =>
-              setImage(`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`)
-            }
-            className="w-17 h-17 rounded-md overflow-hidden border cursor-pointer"
+            onClick={() => setImage(mainImageSrc)}
+            className="relative size-16 shrink-0 overflow-hidden rounded-md border cursor-pointer"
           >
             <Image
-              src={`${process.env.NEXT_PUBLIC_IMG_URL}/${p?.image?.image}`}
+              src={mainImageSrc}
               alt={p?.name}
-              width={68}
-              height={68}
-              className="object-cover w-full h-full"
+              fill
+              sizes="64px"
+              className="object-cover"
             />
           </div>
           {JSON.parse(p?.PostImage ?? '[]')?.map((img: string) => (
@@ -84,20 +85,20 @@ export default function ProductDetails({
                   `${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`,
                 )
               }
-              className="w-16 h-16 rounded-md overflow-hidden border cursor-pointer"
+              className="relative size-16 shrink-0 overflow-hidden rounded-md border cursor-pointer"
             >
               <Image
                 src={`${process.env.NEXT_PUBLIC_IMG_URL}/public/images/product/slider/${img}`}
                 alt={p?.name}
-                width={64}
-                height={64}
-                className="object-cover w-full h-full"
+                fill
+                sizes="64px"
+                className="object-cover"
               />
             </div>
           ))}
         </div>
-        <div className="w-full order-1 lg:order-2 flex justify-center">
-          <div className="group relative aspect-square w-full max-w-[350px] overflow-hidden rounded-md border sm:max-w-[400px] xl:max-w-[400px]">
+        <div className="w-full min-w-0 order-1 lg:order-2 flex justify-center">
+          <div className="group relative aspect-square w-full overflow-hidden rounded-md border max-w-[350px] sm:max-w-[400px] xl:max-w-none">
             <Dialog>
               <DialogTrigger asChild>
                 <button
@@ -121,9 +122,8 @@ export default function ProductDetails({
                   <Image
                     src={image}
                     alt={p?.name ?? 'Product'}
-                    width={400}
-                    height={400}
-                    className="h-full w-full object-contain"
+                    fill
+                    className="object-contain"
                     sizes="(max-width: 640px) 350px, 400px"
                     priority
                   />
@@ -132,19 +132,20 @@ export default function ProductDetails({
             </Dialog>
 
             <Image
+              key={image}
               src={image}
               alt={p?.name ?? 'Product'}
-              width={400}
-              height={400}
-              className="h-full w-full object-contain"
-              sizes="(max-width: 640px) 350px, 400px"
+              fill
+              className="object-contain"
+              sizes="(max-width: 1280px) 400px, 40vw"
+              priority
             />
           </div>
         </div>
       </div>
 
       {/* Right Section - Offer and Details */}
-      <div className="w-full">
+      <div className="w-full min-w-0 xl:w-[60%]">
         <Card className="border-none shadow-none p-0">
           <CardContent className="p-0 shadow-none px-2 border-0 space-y-6">
             {bulkQuantities && (

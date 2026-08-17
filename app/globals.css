@@ -116,8 +116,16 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    scrollbar-gutter: stable;
+  }
   body {
     @apply bg-background text-foreground;
+  }
+  /* Radix Select uses react-remove-scroll: stop padding compensation that shifts the page */
+  body[data-scroll-locked] {
+    padding-right: 0 !important;
+    margin-right: 0 !important;
   }
   button {
     @apply cursor-pointer;

@@ -59,7 +59,7 @@ function SigninBtn() {
   if (loading) {
     return (
       <button
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all"
+        className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-primary hover:bg-gray-100 transition-all sm:h-10 sm:w-10"
         disabled
         aria-label="Loading"
       >
@@ -78,11 +78,11 @@ function SigninBtn() {
     <button
       onClick={handlePush}
       aria-label={user?.data?.name ? 'Account menu' : 'Sign in'}
-      className="flex h-10 items-center gap-2 rounded-full"
+      className="flex h-8 items-center gap-2 rounded-full sm:h-10"
     >
       {user?.data?.name ? (
-        <div className="shrink-0 rounded-full bg-white shadow-sm ring-1 ring-gray-200/80 hover:shadow-md transition-all overflow-hidden h-10 w-10">
-          <Avatar className="h-10 w-10">
+        <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-200/80 transition-all hover:shadow-md sm:h-10 sm:w-10">
+          <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
             {headerAvatarSrc ? (
               <AvatarImage
                 src={headerAvatarSrc}
@@ -96,13 +96,13 @@ function SigninBtn() {
           </Avatar>
         </div>
       ) : (
-        <div className="flex h-10 w-10 shrink-0 items-center  rounded-full bg-white text-primary hover:bg-gray-100 transition-all shadow-sm hover:shadow-md  justify-center">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-primary shadow-sm transition-all hover:bg-gray-100 hover:shadow-md sm:h-10 sm:w-10">
           <User className="h-4 w-4 text-primary" />
         </div>
       )}
 
       {user?.data?.name && (
-        <div className="flex flex-col justify-start items-start text-gray-100">
+        <div className="hidden flex-col items-start justify-start text-gray-100 min-[1152px]:flex">
           <p className="text-sm font-semibold max-w-[120px] truncate">
             {user.data.name}
           </p>
