@@ -13,6 +13,7 @@ import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
 import { useProductStore } from '@/stores/useProductStore';
 import { revalidateClient } from '@/action/revalidateClient';
+import { useNavCountsStore } from '@/hooks/useNavCounts';
 
 export default function ActionButtons({
   productId,
@@ -208,7 +209,10 @@ export default function ActionButtons({
       });
 
       if (res?.status === true) {
-        setIsInWishlist((prev) => !prev);
+        const adding = !isInWishlist;
+        setIsInWishlist(adding);
+        useNavCountsStore.getState().bumpWishlist(adding ? 1 : -1);
+        void revalidateClient('/wishlist');
       } else {
         toast.error('Failed to update wishlist.');
       }

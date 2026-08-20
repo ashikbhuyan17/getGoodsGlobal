@@ -9,14 +9,14 @@ import { cn } from '@/lib/utils';
 
 export default function HeaderNavActions() {
   const pathname = usePathname();
-  const isHome = pathname === '/';
+  const isHomeLike = pathname === '/' || pathname.startsWith('/results');
   const { cartCount, wishlistCount } = useNavCounts();
 
   return (
     <div
       className={cn(
         'flex shrink-0 items-center justify-end gap-1.5 sm:gap-3 md:w-2/6 md:pr-10',
-        isHome && 'max-sm:hidden',
+        isHomeLike && 'max-sm:hidden',
       )}
     >
       <Link

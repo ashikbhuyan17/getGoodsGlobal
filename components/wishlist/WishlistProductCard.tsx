@@ -11,6 +11,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { cn, formatPriceInt } from '@/lib/utils';
+import { revalidateClient } from '@/action/revalidateClient';
+import { useNavCountsStore } from '@/hooks/useNavCounts';
 
 interface WishlistProductCardProps {
   id: number;
@@ -60,6 +62,8 @@ export default function WishlistProductCard({
       if (res?.status === true) {
         setIsRemoved(true);
         toast.success('Removed from wishlist');
+        useNavCountsStore.getState().bumpWishlist(-1);
+        void revalidateClient('/wishlist');
         router.refresh();
       } else {
         toast.error('Failed to remove from wishlist');

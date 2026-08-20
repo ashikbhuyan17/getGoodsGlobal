@@ -23,7 +23,7 @@ function SearchBar() {
         value={value}
         type="text"
         placeholder="Search Product"
-        className="w-full bg-white py-2 pl-4 pr-10 text-sm text-gray-900 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-0"
+        className="h-10 w-full bg-white py-2 pl-4 pr-10 text-sm text-gray-900 placeholder-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-0"
       />
       <button
         type="button"

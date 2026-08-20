@@ -37,7 +37,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
             <CarouselItem key={i} className="basis-full pl-0">
               <button
                 type="button"
-                className="relative block h-[max(200px,calc(100vw*670/1920))] w-full touch-manipulation cursor-pointer overflow-hidden border-0 bg-transparent p-0 active:scale-100"
+                className="relative block h-[max(200px,calc(100vw*670/1920))] w-full touch-manipulation cursor-pointer overflow-hidden border-0 bg-transparent p-0 active:scale-100 lg:h-[570px]"
                 onClick={() => {
                   if (slide?.link) window.open(slide.link, '_blank');
                 }}

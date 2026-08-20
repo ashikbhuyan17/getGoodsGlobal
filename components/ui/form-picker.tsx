@@ -97,8 +97,10 @@ export function FormPicker({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
+        side="bottom"
         sideOffset={4}
-        className="z-[100] flex max-h-96 min-h-52 w-[var(--radix-popper-anchor-width)] flex-col overflow-hidden p-0"
+        avoidCollisions={false}
+        className="z-[100] flex h-64 !max-h-64 w-[var(--radix-popper-anchor-width)] flex-col overflow-hidden p-0"
         onCloseAutoFocus={(event) => event.preventDefault()}
         onKeyDown={(event) => {
           if (event.target instanceof HTMLInputElement) {
@@ -107,7 +109,7 @@ export function FormPicker({
         }}
       >
         {searchable && (
-          <div className="sticky top-0 z-10 border-b bg-popover p-2">
+          <div className="shrink-0 border-b bg-popover p-2">
             <div
               className="relative"
               onPointerDown={(event) => {
@@ -132,7 +134,7 @@ export function FormPicker({
             </div>
           </div>
         )}
-        <div className="min-h-40 max-h-72 overflow-y-auto p-1">
+        <div className="min-h-0 flex-1 overflow-y-auto p-1">
           {filteredOptions.length === 0 ? (
             <div className="px-2 py-3 text-sm text-muted-foreground">
               No results found
