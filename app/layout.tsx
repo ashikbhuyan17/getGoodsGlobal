@@ -64,7 +64,7 @@ export default async function RootLayout({
           contact={contact}
         />
         <Header settings={settings} />
-        <main className="box-border min-w-0 flex-1 w-full max-w-full overflow-x-hidden pt-[65px] transition-all justify-center md:pl-56">
+        <main className="box-border min-w-0 flex-1 w-full max-w-full overflow-x-hidden pt-[60px] transition-all justify-center md:pl-56">
           {children}
           {modal}
           <Toaster position="bottom-right" richColors />

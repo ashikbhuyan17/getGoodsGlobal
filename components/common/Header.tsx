@@ -19,10 +19,15 @@ export default function Header({
   const isHomeLike = pathname === '/' || pathname.startsWith('/results');
 
   return (
-    <header className="fixed top-0 left-0 z-40 flex h-[65px] w-full items-center bg-[#219F9B] px-2 text-primary-foreground sm:px-4 md:left-56 md:w-[calc(100%-14rem)] md:px-3 min-[1152px]:px-6">
+    <header className="fixed top-0 left-0 z-40 flex h-[60px] w-full items-center bg-[#219F9B] px-2 text-primary-foreground sm:px-4 md:left-56 md:w-[calc(100%-14rem)] md:px-3 min-[1152px]:px-6">
       <div className="mx-auto flex h-full w-full min-w-0 items-center justify-between gap-2 sm:gap-4">
         <div className="flex shrink-0 items-center md:w-2/12">
-          <Link href="/" prefetch aria-label="Go to homepage" className="flex items-center">
+          <Link
+            href="/"
+            prefetch
+            aria-label="Go to homepage"
+            className="flex items-center"
+          >
             <Image
               alt="Logo"
               src={`${process.env.NEXT_PUBLIC_IMG_URL}/${data?.data?.white_logo}`}

@@ -93,14 +93,20 @@ export function FormPicker({
         <span className={cn('truncate', !selected && 'text-muted-foreground')}>
           {selected?.label ?? placeholder}
         </span>
-        <ChevronDownIcon className="size-4 shrink-0 opacity-50" />
+        <ChevronDownIcon
+          className={cn(
+            'size-4 shrink-0 opacity-50 transition-transform',
+            open && 'rotate-180',
+          )}
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
         side="bottom"
-        sideOffset={4}
-        avoidCollisions={false}
-        className="z-[100] flex h-64 !max-h-64 w-[var(--radix-popper-anchor-width)] flex-col overflow-hidden p-0"
+        sideOffset={6}
+        avoidCollisions
+        collisionPadding={{ top: 68, bottom: 108 }}
+        className="z-120 flex w-(--radix-popper-anchor-width) flex-col overflow-hidden rounded-lg border-border/80 p-0 shadow-lg max-h-[min(14rem,var(--radix-dropdown-menu-content-available-height))]! data-[side=top]:flex-col-reverse"
         onCloseAutoFocus={(event) => event.preventDefault()}
         onKeyDown={(event) => {
           if (event.target instanceof HTMLInputElement) {
@@ -109,7 +115,7 @@ export function FormPicker({
         }}
       >
         {searchable && (
-          <div className="shrink-0 border-b bg-popover p-2">
+          <div className="shrink-0 bg-muted/40 px-2 py-1.5 in-data-[side=top]:border-t in-data-[side=bottom]:border-b">
             <div
               className="relative"
               onPointerDown={(event) => {
@@ -117,14 +123,14 @@ export function FormPicker({
                 searchInputRef.current?.focus();
               }}
             >
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
               <input
                 ref={searchInputRef}
                 type="text"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder={searchPlaceholder}
-                className="h-9 w-full border-0 bg-transparent py-1 pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none ring-0 focus-visible:ring-0"
+                className="h-7 w-full rounded-md border-0 bg-background py-0 pl-7 pr-2 text-sm text-foreground placeholder:text-muted-foreground outline-none ring-0 focus-visible:ring-0"
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck={false}
@@ -134,24 +140,32 @@ export function FormPicker({
             </div>
           </div>
         )}
-        <div className="min-h-0 flex-1 overflow-y-auto p-1">
+        <div className="min-h-0 max-h-[11.25rem] overflow-y-auto overscroll-contain p-1">
           {filteredOptions.length === 0 ? (
-            <div className="px-2 py-3 text-sm text-muted-foreground">
+            <div className="px-3 py-3 text-sm text-muted-foreground">
               No results found
             </div>
           ) : (
-            filteredOptions.map((option) => (
-              <DropdownMenuItem
-                key={option.value}
-                className="flex cursor-pointer items-center justify-between gap-2"
-                onClick={() => handleSelect(option.value)}
-              >
-                <span className="truncate">{option.label}</span>
-                {value === option.value ? (
-                  <CheckIcon className="size-4 shrink-0" />
-                ) : null}
-              </DropdownMenuItem>
-            ))
+            filteredOptions.map((option) => {
+              const isSelected = value === option.value;
+              return (
+                <DropdownMenuItem
+                  key={option.value}
+                  className={cn(
+                    'flex h-9 min-h-9 cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 text-sm transition-colors',
+                    'hover:bg-primary/10 focus:bg-primary/10 data-[highlighted]:bg-primary/10',
+                    isSelected &&
+                      'bg-primary/10 font-medium text-primary hover:bg-primary/15 focus:bg-primary/15 data-[highlighted]:bg-primary/15',
+                  )}
+                  onClick={() => handleSelect(option.value)}
+                >
+                  <span className="truncate">{option.label}</span>
+                  {isSelected ? (
+                    <CheckIcon className="size-4 shrink-0 text-primary" />
+                  ) : null}
+                </DropdownMenuItem>
+              );
+            })
           )}
         </div>
       </DropdownMenuContent>

@@ -22,22 +22,22 @@ export default function HeroSlider({ slides }: { slides: any }) {
   if (!slideList.length) return null;
 
   return (
-    <section className="group relative w-full overflow-hidden">
+    <section className="group relative w-full overflow-hidden max-sm:h-[220px]">
       <Carousel
         setApi={setApi}
         plugins={[plugin.current]}
-        className="w-full"
+        className="w-full max-sm:h-[220px]"
         onMouseEnter={() => plugin.current.stop()}
         opts={{ loop: true }}
         onMouseLeave={() => plugin.current.play()}
       >
-        <CarouselContent className="ml-0">
+        <CarouselContent className="ml-0 max-sm:h-[220px]">
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
           {slideList.map((slide: any, i: number) => (
-            <CarouselItem key={i} className="basis-full pl-0">
+            <CarouselItem key={i} className="basis-full pl-0 max-sm:h-[220px]">
               <button
                 type="button"
-                className="relative block min-h-[200px] w-full aspect-[1920/670] touch-manipulation cursor-pointer overflow-hidden border-0 bg-transparent p-0 active:scale-100 md:min-h-[240px] md:aspect-[1920/560] xl:h-[560px] xl:min-h-[560px] xl:aspect-auto"
+                className="relative block h-[220px] min-h-[220px] w-full overflow-hidden border-0 bg-neutral-100 p-0 aspect-auto touch-manipulation cursor-pointer active:scale-100 sm:h-auto sm:min-h-[200px] sm:max-h-none sm:aspect-[1920/670] md:min-h-[240px] md:aspect-[1920/560] lg:aspect-auto lg:h-[clamp(300px,calc(300px+(100vw-1024px)*100/256),400px)] lg:min-h-[300px] lg:max-h-[400px] xl:h-[clamp(400px,calc(400px+(100vw-1280px)*100/256),500px)] xl:min-h-[400px] xl:max-h-[500px] 2xl:h-[500px] 2xl:min-h-[500px] 2xl:max-h-[500px]"
                 onClick={() => {
                   if (slide?.link) window.open(slide.link, '_blank');
                 }}
@@ -50,7 +50,7 @@ export default function HeroSlider({ slides }: { slides: any }) {
                   priority={i === 0}
                   placeholder="empty"
                   draggable={false}
-                  className="object-cover object-center transition-none select-none"
+                  className="object-cover object-center transition-none select-none lg:object-contain lg:object-top xl:object-cover xl:object-center"
                   sizes="100vw"
                 />
               </button>
