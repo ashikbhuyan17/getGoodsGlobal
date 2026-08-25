@@ -11,33 +11,117 @@ import {
 } from '@/components/ui/carousel';
 import { CarouselCapsuleNav } from '@/components/common/CarouselCapsuleNav';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function HeroSlider({ slides }: { slides: any }) {
-  const slideList = Array.isArray(slides?.data) ? slides.data : [];
+type HeroSlide = {
+  id?: number;
+  image?: string;
+  link?: string;
+  title?: string;
+};
+
+type HeroSlidesResponse = {
+  data?:
+    | HeroSlide[]
+    | {
+        mainslider?: HeroSlide[];
+        mobileslider?: HeroSlide[];
+      };
+};
+
+function parseHeroSlides(slides: HeroSlidesResponse | null | undefined) {
+  const data = slides?.data;
+
+  if (Array.isArray(data)) {
+    return { mainSlides: data, mobileSlides: data };
+  }
+
+  const mainSlides = Array.isArray(data?.mainslider) ? data.mainslider : [];
+  const mobileSlides = Array.isArray(data?.mobileslider)
+    ? data.mobileslider
+    : mainSlides;
+
+  return {
+    mainSlides,
+    mobileSlides: mobileSlides.length ? mobileSlides : mainSlides,
+  };
+}
+
+function MobileHeroSlider({ slideList }: { slideList: HeroSlide[] }) {
   const [api, setApi] = React.useState<CarouselApi>();
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: false }),
   );
 
-  if (!slideList.length) return null;
-
   return (
-    <section className="group relative w-full overflow-hidden max-sm:h-[220px]">
+    <section className="group relative w-full overflow-hidden lg:hidden">
       <Carousel
         setApi={setApi}
         plugins={[plugin.current]}
-        className="w-full max-sm:h-[220px]"
+        className="w-full"
         onMouseEnter={() => plugin.current.stop()}
-        opts={{ loop: true }}
+        opts={{ loop: slideList.length > 1 }}
         onMouseLeave={() => plugin.current.play()}
       >
-        <CarouselContent className="ml-0 max-sm:h-[220px]">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {slideList.map((slide: any, i: number) => (
-            <CarouselItem key={i} className="basis-full pl-0 max-sm:h-[220px]">
+        <CarouselContent className="ml-0">
+          {slideList.map((slide, i) => (
+            <CarouselItem key={slide.id ?? i} className="basis-full pl-0">
               <button
                 type="button"
-                className="relative block h-[220px] min-h-[220px] w-full overflow-hidden border-0 bg-neutral-100 p-0 aspect-auto touch-manipulation cursor-pointer active:scale-100 sm:h-auto sm:min-h-[200px] sm:max-h-none sm:aspect-[1920/670] md:min-h-[240px] md:aspect-[1920/560] lg:aspect-auto lg:h-[clamp(300px,calc(300px+(100vw-1024px)*100/256),400px)] lg:min-h-[300px] lg:max-h-[400px] xl:h-[clamp(400px,calc(400px+(100vw-1280px)*100/256),500px)] xl:min-h-[400px] xl:max-h-[500px] 2xl:h-[500px] 2xl:min-h-[500px] 2xl:max-h-[500px]"
+                className="m-0 block w-full overflow-hidden border-0 bg-transparent p-0 leading-[0] touch-manipulation cursor-pointer active:scale-100"
+                onClick={() => {
+                  if (slide?.link && slide.link !== '#') {
+                    window.open(slide.link, '_blank');
+                  }
+                }}
+                aria-label={`View slide ${slide?.id ?? i + 1}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
+                  alt={slide?.title || `Slide ${slide?.id ?? i + 1}`}
+                  className="block h-auto w-full"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  draggable={false}
+                />
+              </button>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+      </Carousel>
+
+      {slideList.length > 1 && (
+        <CarouselCapsuleNav
+          api={api}
+          prevLabel="Previous slide"
+          nextLabel="Next slide"
+        />
+      )}
+    </section>
+  );
+}
+
+function DesktopHeroSlider({ slideList }: { slideList: HeroSlide[] }) {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const plugin = React.useRef(
+    Autoplay({ delay: 4000, stopOnInteraction: false }),
+  );
+
+  return (
+    <section className="group relative hidden w-full overflow-hidden lg:block">
+      <Carousel
+        setApi={setApi}
+        plugins={[plugin.current]}
+        className="w-full"
+        onMouseEnter={() => plugin.current.stop()}
+        opts={{ loop: slideList.length > 1 }}
+        onMouseLeave={() => plugin.current.play()}
+      >
+        <CarouselContent className="ml-0">
+          {slideList.map((slide, i) => (
+            <CarouselItem key={slide.id ?? i} className="basis-full pl-0">
+              <button
+                type="button"
+                className="relative block w-full overflow-hidden border-0 bg-neutral-100 p-0 touch-manipulation cursor-pointer active:scale-100 lg:aspect-auto lg:h-[clamp(300px,calc(100vw*570/1920),570px)] lg:min-h-[300px] lg:max-h-[570px]"
                 onClick={() => {
                   if (slide?.link) window.open(slide.link, '_blank');
                 }}
@@ -45,12 +129,12 @@ export default function HeroSlider({ slides }: { slides: any }) {
               >
                 <Image
                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
-                  alt={`Slide ${slide?.id ?? i + 1}`}
+                  alt={slide?.title || `Slide ${slide?.id ?? i + 1}`}
                   fill
                   priority={i === 0}
                   placeholder="empty"
                   draggable={false}
-                  className="object-cover object-center transition-none select-none lg:object-contain lg:object-top xl:object-cover xl:object-center"
+                  className="object-cover object-center transition-none select-none"
                   sizes="100vw"
                 />
               </button>
@@ -70,144 +154,23 @@ export default function HeroSlider({ slides }: { slides: any }) {
   );
 }
 
-// 'use client';
+export default function HeroSlider({
+  slides,
+}: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  slides: any;
+}) {
+  const { mainSlides, mobileSlides } = parseHeroSlides(slides);
 
-// import * as React from 'react';
-// import Image from 'next/image';
-// import Autoplay from 'embla-carousel-autoplay';
-// import {
-//   Carousel,
-//   type CarouselApi,
-//   CarouselContent,
-//   CarouselItem,
-// } from '@/components/ui/carousel';
-// import { CarouselCapsuleNav } from '@/components/common/CarouselCapsuleNav';
+  if (!mainSlides.length && !mobileSlides.length) return null;
 
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// export default function HeroSlider({ slides }: { slides: any }) {
-//   const slideList = Array.isArray(slides?.data) ? slides.data : [];
-//   const [api, setApi] = React.useState<CarouselApi>();
-//   const plugin = React.useRef(
-//     Autoplay({ delay: 4000, stopOnInteraction: false }),
-//   );
+  const mobileList = mobileSlides.length ? mobileSlides : mainSlides;
+  const desktopList = mainSlides.length ? mainSlides : mobileSlides;
 
-//   if (!slideList.length) return null;
-
-//   return (
-//     <section className="group relative w-full overflow-hidden">
-//       <Carousel
-//         setApi={setApi}
-//         plugins={[plugin.current]}
-//         className="w-full"
-//         onMouseEnter={() => plugin.current.stop()}
-//         opts={{ loop: true }}
-//         onMouseLeave={() => plugin.current.play()}
-//       >
-//         <CarouselContent className="ml-0">
-//           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-//           {slideList.map((slide: any, i: number) => (
-//             <CarouselItem key={i} className="basis-full pl-0">
-//               <button
-//                 type="button"
-//                 className="relative block h-[240px] w-full cursor-pointer overflow-hidden border-0 bg-transparent p-0 sm:h-[320px] md:h-[400px] lg:h-auto"
-//                 onClick={() => {
-//                   if (slide?.link) window.open(slide.link, '_blank');
-//                 }}
-//                 aria-label={`View slide ${slide?.id ?? i + 1}`}
-//               >
-//                 <Image
-//                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
-//                   alt={`Slide ${slide?.id ?? i + 1}`}
-//                   width={1920}
-//                   height={600}
-//                   priority={i === 0}
-//                   className="block h-full w-full object-fill object-center"
-//                   sizes="100vw"
-//                 />
-//               </button>
-//             </CarouselItem>
-//           ))}
-//         </CarouselContent>
-//       </Carousel>
-
-//       {slideList.length > 1 && (
-//         <CarouselCapsuleNav
-//           api={api}
-//           prevLabel="Previous slide"
-//           nextLabel="Next slide"
-//         />
-//       )}
-//     </section>
-//   );
-// }
-
-// 'use client';
-
-// import * as React from 'react';
-// import Image from 'next/image';
-// import Autoplay from 'embla-carousel-autoplay';
-// import {
-//   Carousel,
-//   type CarouselApi,
-//   CarouselContent,
-//   CarouselItem,
-// } from '@/components/ui/carousel';
-// import { CarouselCapsuleNav } from '@/components/common/CarouselCapsuleNav';
-
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// export default function HeroSlider({ slides }: { slides: any }) {
-//   const slideList = Array.isArray(slides?.data) ? slides.data : [];
-//   const [api, setApi] = React.useState<CarouselApi>();
-//   const plugin = React.useRef(
-//     Autoplay({ delay: 4000, stopOnInteraction: false }),
-//   );
-
-//   if (!slideList.length) return null;
-
-//   return (
-//     <section className="group relative w-full overflow-hidden">
-//       <Carousel
-//         setApi={setApi}
-//         plugins={[plugin.current]}
-//         className="w-full"
-//         onMouseEnter={() => plugin.current.stop()}
-//         opts={{ loop: true }}
-//         onMouseLeave={() => plugin.current.play()}
-//       >
-//         <CarouselContent className="ml-0">
-//           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-//           {slideList.map((slide: any, i: number) => (
-//             <CarouselItem key={i} className="basis-full pl-0">
-//               <button
-//                 type="button"
-//                 className="relative block w-full cursor-pointer border-0 bg-transparent p-0"
-//                 onClick={() => {
-//                   if (slide?.link) window.open(slide.link, '_blank');
-//                 }}
-//                 aria-label={`View slide ${slide?.id ?? i + 1}`}
-//               >
-//                 <Image
-//                   src={`${process.env.NEXT_PUBLIC_IMG_URL}/${slide?.image}`}
-//                   alt={`Slide ${slide?.id ?? i + 1}`}
-//                   width={1920}
-//                   height={600}
-//                   priority={i === 0}
-//                   className="block h-auto w-full object-contain object-center"
-//                   sizes="100vw"
-//                 />
-//               </button>
-//             </CarouselItem>
-//           ))}
-//         </CarouselContent>
-//       </Carousel>
-
-//       {slideList.length > 1 && (
-//         <CarouselCapsuleNav
-//           api={api}
-//           prevLabel="Previous slide"
-//           nextLabel="Next slide"
-//         />
-//       )}
-//     </section>
-//   );
-// }
+  return (
+    <>
+      <MobileHeroSlider slideList={mobileList} />
+      <DesktopHeroSlider slideList={desktopList} />
+    </>
+  );
+}
