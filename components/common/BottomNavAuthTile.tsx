@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { LogIn, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { fetcher } from '@/lib/fetcher';
+import { deleteToken } from '@/action/token';
 import { SheetClose } from '@/components/ui/sheet';
 
 const tileClassName =
@@ -26,15 +27,14 @@ export default function BottomNavAuthTile({ isLoggedIn }: { isLoggedIn: boolean 
   }
 
   const handleSignOut = async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const logoutData: any = await fetcher('/logout', { method: 'POST' });
-    if (logoutData?.status) {
-      router.refresh();
-      router.push('/');
-      setTimeout(() => {
-        window.location.reload();
-      }, 100);
-    }
+    router.replace('/');
+
+    await Promise.allSettled([
+      fetcher('/logout', { method: 'POST' }),
+      deleteToken(),
+    ]);
+
+    router.refresh();
   };
 
   return (
