@@ -1,6 +1,7 @@
 'use server';
 
 import { cookies } from 'next/headers';
+import { deleteToken } from '@/action/token';
 
 // export async function fetcher<T>(
 //   slug: string,
@@ -121,6 +122,7 @@ export async function createTicket(body: {
       },
       body: JSON.stringify(body),
     });
+    if (res.status === 401) await deleteToken();
     return res.json();
   } catch (error) {
     console.log('Create ticket error:', error);
@@ -143,6 +145,7 @@ export async function submitTicketReply(
         body: formData,
       },
     );
+    if (res.status === 401) await deleteToken();
     return res.json();
   } catch (error) {
     console.log('Submit ticket reply error:', error);
@@ -166,6 +169,7 @@ export async function submitPayment(
         body: formData,
       },
     );
+    if (res.status === 401) await deleteToken();
     return res.json();
   } catch (error) {
     console.log('Submit payment error:', error);
@@ -174,9 +178,7 @@ export async function submitPayment(
 }
 
 /** User settings with optional profile image (multipart/form-data). Same POST pattern as submitTicketReply / submitPayment. */
-export async function submitUserSettingsForm(
-  formData: FormData,
-): Promise<{
+export async function submitUserSettingsForm(formData: FormData): Promise<{
   status?: boolean | string;
   message?: string;
   data?: unknown;
@@ -185,11 +187,15 @@ export async function submitUserSettingsForm(
   try {
     const cookiesStore = await cookies();
     const token = cookiesStore.get('token')?.value;
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user-settings`, {
-      method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      body: formData,
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/user-settings`,
+      {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData,
+      },
+    );
+    if (res.status === 401) await deleteToken();
     return res.json();
   } catch (error) {
     console.log('User settings form error:', error);

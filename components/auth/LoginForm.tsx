@@ -60,13 +60,18 @@ export default function LoginForm({ method }: { method: 'page' | 'modal' }) {
     setIsSubmitting(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const logUser: any = await fetcher('/login', {
-      method: 'POST',
-      body: JSON.stringify({
-        login: data.email,
-        password: data.password,
-      }),
-    });
+    const logUser: any = await fetcher(
+      '/login',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          login: data.email,
+          password: data.password,
+        }),
+      },
+      0,
+      false,
+    );
 
     if (logUser?.status) {
       await setToken(logUser?.token);

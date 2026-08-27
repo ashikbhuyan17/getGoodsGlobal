@@ -67,18 +67,24 @@ export default function RegisterForm({ method }: { method: 'page' | 'modal' }) {
     setIsSubmitting(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const regUserData: any = await fetcher('/register', {
-      method: 'POST',
-      body: JSON.stringify({
-        name: data?.fullName,
-        phone: data?.phone,
-        email: data?.email,
-        password: data?.password,
-      }),
-    });
+    const regUserData: any = await fetcher(
+      '/register',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          name: data?.fullName,
+          phone: data?.phone,
+          email: data?.email,
+          password: data?.password,
+        }),
+      },
+      0,
+      false,
+    );
     if (regUserData?.status) {
       await setToken(regUserData?.token);
       toast.success('Your account has been created successfully.');
+      router.refresh();
       const returnUrl: string = isValidRedirect(redirectTo)
         ? (redirectTo as string)
         : '/account';
