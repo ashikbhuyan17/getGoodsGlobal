@@ -1,22 +1,20 @@
-import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
-import Image from "next/image";
-import { fetcher } from "@/lib/fetcher";
-import { REVALIDATE_CATALOG } from "@/lib/utils";
+import Link from 'next/link';
+import { Mail, Phone, MapPin } from 'lucide-react';
+import Image from 'next/image';
+import { fetcher } from '@/lib/fetcher';
+import { REVALIDATE_CATALOG } from '@/lib/utils';
 
 export default async function Footer() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [social, settings, pages, contact]: any[] = await Promise.all([
-    fetcher("/social-media", {}, REVALIDATE_CATALOG, false),
-    fetcher("/settings", {}, REVALIDATE_CATALOG, false),
-    fetcher("/pages", {}, REVALIDATE_CATALOG, false),
-    fetcher("/contact", {}, REVALIDATE_CATALOG, false),
+    fetcher('/social-media', {}, REVALIDATE_CATALOG, false),
+    fetcher('/settings', {}, REVALIDATE_CATALOG, false),
+    fetcher('/pages', {}, REVALIDATE_CATALOG, false),
+    fetcher('/contact', {}, REVALIDATE_CATALOG, false),
   ]);
 
   return (
     <footer className="bg-white border-t border-gray-200 rounded-sm mt-4">
-     
-
       {/* Main Footer Content */}
       <div className="bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -125,7 +123,7 @@ export default async function Footer() {
                     key={item?.title}
                     target="_blank"
                     href={item?.link}
-                    aria-label={`Visit our ${item?.title ?? "social"} page`}
+                    aria-label={`Visit our ${item?.title ?? 'social'} page`}
                   >
                     <i
                       className={`${item?.icon} fa-xl`}
@@ -145,14 +143,15 @@ export default async function Footer() {
       <div className="bg-gray-100 border-t border-gray-200 py-4 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center text-sm text-gray-600">
           <p>
-            {settings?.data?.copyright} | Developed by{" "}
-            <Link
+            {settings?.data?.copyright}
+            {/* | Developed by{' '} */}
+            {/* <Link
               href="https://danpite.tech/"
               target="_blank"
               className="text-primary font-semibold"
             >
               Danpite.Tech
-            </Link>
+            </Link> */}
           </p>
         </div>
       </div>

@@ -15,11 +15,7 @@ import { useProductStore } from '@/stores/useProductStore';
 import { revalidateClient } from '@/action/revalidateClient';
 import { useNavCountsStore } from '@/hooks/useNavCounts';
 
-export default function ActionButtons({
-  productId,
-}: {
-  productId: any;
-}) {
+export default function ActionButtons({ productId }: { productId: any }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -131,57 +127,40 @@ export default function ActionButtons({
   };
 
   const handleBuyNow = async () => {
+    if (isBuyNowLoading) return;
+
     const validated = await checkAuthAndValidate();
     if (!validated) return;
 
     const { cartDetails } = validated;
+
     setIsBuyNowLoading(true);
     try {
-      const addRes: any = await fetcher('/product-add-to-cart', {
+      const res: any = await fetcher('/product-buy-now', {
         method: 'POST',
         body: JSON.stringify({
           product_id: String(productId),
           shippingcharge_id: 1,
-          // shippingcharge_id: shippingArea?.id,
           // shippingfee: Number(shippingArea?.amount ?? 0),
-          total_quantity: String(totalQuantity),
-          cart_details: cartDetails,
-        }),
-      });
-      const addSuccess =
-        addRes?.status === true ||
-        addRes?.status === 'success' ||
-        addRes?.success === true ||
-        (addRes?.message &&
-          String(addRes.message).toLowerCase().includes('success'));
-
-      if (!addSuccess) {
-        toast.error(addRes?.message || 'Failed to add to cart.');
-        return;
-      }
-
-      const buyRes: any = await fetcher('/product-buy-now', {
-        method: 'POST',
-        body: JSON.stringify({
-          product_id: String(productId),
-          shippingcharge_id: String(shippingArea?.id),
-          shippingfee: Number(shippingArea?.amount ?? 0),
           total_quantity: String(totalQuantity),
           buy_details: cartDetails,
         }),
       });
-      const buySuccess =
-        buyRes?.status === true ||
-        buyRes?.status === 'success' ||
-        buyRes?.success === true ||
-        (buyRes?.message &&
-          String(buyRes.message).toLowerCase().includes('success'));
 
-      if (buySuccess) {
-        toast.success(buyRes?.message || 'Proceeding to checkout');
-        window.location.href = '/checkout?buyNow=1';
+      const isSuccess =
+        res?.status === true ||
+        res?.status === 'success' ||
+        res?.success === true ||
+        (res?.message &&
+          String(res.message).toLowerCase().includes('success'));
+
+      if (isSuccess) {
+        await revalidateClient('/checkout');
+        router.prefetch('/checkout?buyNow=1');
+        toast.success(res?.message || 'Proceeding to checkout');
+        router.push('/checkout?buyNow=1');
       } else {
-        toast.error(buyRes?.message || 'Buy now failed. Try again.');
+        toast.error(res?.message || 'Buy now failed. Try again.');
       }
     } catch {
       toast.error('Buy now failed. Try again.');
