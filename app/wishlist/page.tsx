@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export const dynamic = 'force-dynamic';
+
 import { fetcher } from '@/lib/fetcher';
 import WishlistInfoBar from '@/components/wishlist/WishlistInfoBar';
 import WishlistEmptyState from '@/components/wishlist/WishlistEmptyState';

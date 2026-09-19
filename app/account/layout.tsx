@@ -1,4 +1,7 @@
 import React from "react";
+
+export const dynamic = "force-dynamic";
+
 import Header from "@/components/account/common/Header";
 import ConditionalHeaderWrapper from "@/components/account/common/ConditionalHeaderWrapper";
 import { redirect } from "next/navigation";

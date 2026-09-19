@@ -22,6 +22,16 @@ export const setToken = async (token: string) => {
   }
 };
 
+export async function hasAuthCookie(): Promise<boolean> {
+  try {
+    const cookiesStore = await cookies();
+    const token = cookiesStore.get("token")?.value;
+    return Boolean(token?.trim());
+  } catch {
+    return false;
+  }
+}
+
 export const deleteToken = async () => {
   try {
     const cookiesStore = await cookies();

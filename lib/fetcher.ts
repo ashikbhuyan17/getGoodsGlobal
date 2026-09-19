@@ -3,6 +3,15 @@
 import { cookies } from 'next/headers';
 import { deleteToken } from '@/action/token';
 
+async function readAuthToken(): Promise<string | undefined> {
+  try {
+    const cookiesStore = await cookies();
+    return cookiesStore.get('token')?.value;
+  } catch {
+    return undefined;
+  }
+}
+
 // export async function fetcher<T>(
 //   slug: string,
 //   options: RequestInit = {},
@@ -39,9 +48,8 @@ export async function fetcher<T>(
       ...(options.headers as Record<string, string>),
     };
     if (auth) {
-      const cookiesStore = await cookies();
-      const token = await cookiesStore.get('token')?.value;
-      if (token) headers['Authorization'] = `Bearer ${token}`; // ✅ property modify allowed with const
+      const token = await readAuthToken();
+      if (token) headers['Authorization'] = `Bearer ${token}`;
     }
 
     const noStore = options.cache === 'no-store';
@@ -112,8 +120,7 @@ export async function createTicket(body: {
   image?: string;
 }): Promise<{ status?: boolean; message?: string }> {
   try {
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get('token')?.value;
+    const token = await readAuthToken();
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ticket-store`, {
       method: 'POST',
       headers: {
@@ -135,8 +142,7 @@ export async function submitTicketReply(
   formData: FormData,
 ): Promise<{ status?: boolean; message?: string }> {
   try {
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get('token')?.value;
+    const token = await readAuthToken();
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/ticket-replay-submit`,
       {
@@ -159,8 +165,7 @@ export async function submitPayment(
   formData: FormData,
 ): Promise<{ status?: boolean | string; message?: string; data?: unknown }> {
   try {
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get('token')?.value;
+    const token = await readAuthToken();
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/payment/submit/${invoiceId}`,
       {
@@ -185,8 +190,7 @@ export async function submitUserSettingsForm(formData: FormData): Promise<{
   errors?: unknown;
 }> {
   try {
-    const cookiesStore = await cookies();
-    const token = cookiesStore.get('token')?.value;
+    const token = await readAuthToken();
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/user-settings`,
       {

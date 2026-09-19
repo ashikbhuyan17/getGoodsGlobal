@@ -21,7 +21,7 @@ function CheckoutClient({
   user: any;
   isBuyNow?: boolean;
   shippingOptions?: ShippingOption[];
-  locations: LocationData;
+  locations?: LocationData;
 }) {
   const [formData, setFormData] = useState({
     name: user?.data?.name,

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LoginForm from "@/components/auth/LoginForm";
@@ -7,7 +8,7 @@ import { fetcher } from "@/lib/fetcher";
 
 export default async function AuthPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const settings: any = await fetcher("/settings");
+  const settings: any = await fetcher("/settings", {}, 0, false);
 
   return (
     <main className="min-h-screen bg-background flex px-2">
@@ -52,11 +53,15 @@ export default async function AuthPage() {
               </TabsList>
 
               <TabsContent value="login">
-                <LoginForm method="page" />
+                <Suspense fallback={<div className="h-48 animate-pulse rounded-lg bg-muted" />}>
+                  <LoginForm method="page" />
+                </Suspense>
               </TabsContent>
 
               <TabsContent value="register">
-                <RegisterForm method="page" />
+                <Suspense fallback={<div className="h-48 animate-pulse rounded-lg bg-muted" />}>
+                  <RegisterForm method="page" />
+                </Suspense>
               </TabsContent>
             </Tabs>
           </Card>

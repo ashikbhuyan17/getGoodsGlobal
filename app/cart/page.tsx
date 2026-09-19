@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export const dynamic = 'force-dynamic';
+
 import CartEmptyState from '@/components/cart/CartEmptyState';
 import CartInfoBar from '@/components/cart/CartInfoBar';
 import CartPageClient from '@/components/cart/CartPageClient';

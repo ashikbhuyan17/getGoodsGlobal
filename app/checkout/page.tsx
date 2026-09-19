@@ -1,6 +1,7 @@
 import { fetcher } from '@/lib/fetcher';
-import { fetchLocations } from '@/lib/locations';
 import CheckoutClient from '@/components/checkout/CheckoutClient';
+
+export const dynamic = 'force-dynamic';
 
 type SearchParams = { buyNow?: string; cart_ids?: string };
 
@@ -12,27 +13,29 @@ async function CheckoutPage({
   const params = await searchParams;
   const isBuyNow = params?.buyNow === '1';
 
-  // Cart: cart-order-products with selected ids from URL. Buy Now: buy-products. No /cart-products.
-  let cartProducts: { data?: unknown[]; status?: string; message?: string };
-  if (isBuyNow) {
-    cartProducts = await fetcher('/buy-products');
-  } else if (params?.cart_ids?.trim()) {
-    const ids = params.cart_ids
-      .split(',')
-      .map((id) => id.trim())
-      .filter(Boolean);
-    const query = ids
-      .map((id) => `cart_ids[]=${encodeURIComponent(id)}`)
-      .join('&');
-    cartProducts = await fetcher(`/cart-order-products?${query}`);
-  } else {
-    cartProducts = { data: [], status: 'success' };
-  }
+  const cartProductsPromise: Promise<{
+    data?: unknown[];
+    status?: string;
+    message?: string;
+  }> = isBuyNow
+    ? fetcher('/buy-products')
+    : params?.cart_ids?.trim()
+      ? (() => {
+          const ids = params.cart_ids
+            .split(',')
+            .map((id) => id.trim())
+            .filter(Boolean);
+          const query = ids
+            .map((id) => `cart_ids[]=${encodeURIComponent(id)}`)
+            .join('&');
+          return fetcher(`/cart-order-products?${query}`);
+        })()
+      : Promise.resolve({ data: [], status: 'success' });
 
-  const [user, shippingArea, locations] = await Promise.all([
+  const [cartProducts, user, shippingArea] = await Promise.all([
+    cartProductsPromise,
     fetcher('/user-profile'),
     fetcher('/shipping-area').catch(() => ({ status: false, data: [] })),
-    fetchLocations(),
   ]);
 
   const shippingOptions =
@@ -54,7 +57,6 @@ async function CheckoutPage({
         cartProducts={cartProducts}
         isBuyNow={isBuyNow}
         shippingOptions={shippingOptions}
-        locations={locations}
       />
     </div>
   );

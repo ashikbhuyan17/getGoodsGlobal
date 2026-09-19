@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
 import { useProductStore } from '@/stores/useProductStore';
-import { revalidateClient } from '@/action/revalidateClient';
+import { hasAuthCookie } from '@/action/token';
 import { useNavCountsStore } from '@/hooks/useNavCounts';
 
 export default function ActionButtons({ productId }: { productId: any }) {
@@ -68,32 +68,36 @@ export default function ActionButtons({ productId }: { productId: any }) {
         quantity: String(v.quantity),
       }));
 
-  const checkAuthAndValidate = async () => {
-    const user: any = await fetcher('/user-profile');
-    if (!user?.data?.id) {
-      router.push(`/signin?redirect=${encodeURIComponent(pathname || '/')}`);
-      return false;
-    }
+  const validateOrderDetails = () => {
     const cartDetails = buildCartDetails();
     if (totalQuantity < 1 || cartDetails.length === 0) {
       setMinOrderMessage('সর্বনিম্ন 1 টি পণ্য অর্ডার করতে হবে');
       setShowMinOrderModal(true);
-      return false;
+      return null;
     }
     const hasShippingOptions = shippingOptions?.length > 0;
     if (hasShippingOptions && !shippingArea?.id) {
       setMinOrderMessage('দয়া করে শিপিং মেথড সিলেক্ট করুন');
       setShowMinOrderModal(true);
-      return false;
+      return null;
     }
-    return { user, cartDetails };
+    return cartDetails;
+  };
+
+  const redirectToSignin = (afterLoginPath: string) => {
+    router.push(
+      `/signin?redirect=${encodeURIComponent(afterLoginPath)}`,
+    );
   };
 
   const handleAddToCart = async () => {
-    const validated = await checkAuthAndValidate();
-    if (!validated) return;
+    const cartDetails = validateOrderDetails();
+    if (!cartDetails) return;
 
-    const { cartDetails } = validated;
+    if (!(await hasAuthCookie())) {
+      redirectToSignin(pathname || '/');
+      return;
+    }
     setIsAddToCartLoading(true);
     try {
       const res: any = await fetcher('/product-add-to-cart', {
@@ -113,8 +117,6 @@ export default function ActionButtons({ productId }: { productId: any }) {
         (res?.message && String(res.message).toLowerCase().includes('success'));
 
       if (isSuccess) {
-        await revalidateClient('/cart');
-        router.prefetch('/cart');
         setShowAddToCartModal(true);
       } else {
         toast.error(res?.message || 'Failed to add to cart.');
@@ -129,10 +131,14 @@ export default function ActionButtons({ productId }: { productId: any }) {
   const handleBuyNow = async () => {
     if (isBuyNowLoading) return;
 
-    const validated = await checkAuthAndValidate();
-    if (!validated) return;
+    const checkoutPath = '/checkout?buyNow=1';
+    const cartDetails = validateOrderDetails();
+    if (!cartDetails) return;
 
-    const { cartDetails } = validated;
+    if (!(await hasAuthCookie())) {
+      redirectToSignin(checkoutPath);
+      return;
+    }
 
     setIsBuyNowLoading(true);
     try {
@@ -155,13 +161,20 @@ export default function ActionButtons({ productId }: { productId: any }) {
           String(res.message).toLowerCase().includes('success'));
 
       if (isSuccess) {
-        await revalidateClient('/checkout');
-        router.prefetch('/checkout?buyNow=1');
         toast.success(res?.message || 'Proceeding to checkout');
-        router.push('/checkout?buyNow=1');
-      } else {
-        toast.error(res?.message || 'Buy now failed. Try again.');
+        window.location.assign(checkoutPath);
+        return;
       }
+
+      const needsLogin =
+        res?.message &&
+        /unauth|login|token/i.test(String(res.message));
+      if (needsLogin) {
+        redirectToSignin(checkoutPath);
+        return;
+      }
+
+      toast.error(res?.message || 'Buy now failed. Try again.');
     } catch {
       toast.error('Buy now failed. Try again.');
     } finally {
@@ -191,7 +204,6 @@ export default function ActionButtons({ productId }: { productId: any }) {
         const adding = !isInWishlist;
         setIsInWishlist(adding);
         useNavCountsStore.getState().bumpWishlist(adding ? 1 : -1);
-        void revalidateClient('/wishlist');
       } else {
         toast.error('Failed to update wishlist.');
       }

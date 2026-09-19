@@ -40,6 +40,7 @@ export default async function GalleryPage() {
     '/galleryslider',
     {},
     HOME_CACHE,
+    false,
   ).catch(() => null);
   const categories = normalizeGalleryData(raw);
 

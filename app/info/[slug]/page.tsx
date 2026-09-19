@@ -6,7 +6,7 @@ async function InfoPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pages: any = await fetcher("/pages");
+  const pages: any = await fetcher("/pages", {}, 0, false);
 
   const page = pages?.data?.find(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

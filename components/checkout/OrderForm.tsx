@@ -24,7 +24,7 @@ export default function OrderForm({
   };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setFormData: any;
-  locations: LocationData;
+  locations?: LocationData;
 }) {
   const { districts, thanaOptions, loading: locationsLoading } = useDistrictThana(
     formData?.district || '',
