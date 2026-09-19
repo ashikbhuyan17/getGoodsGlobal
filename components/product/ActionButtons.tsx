@@ -13,6 +13,7 @@ import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
 import { useProductStore } from '@/stores/useProductStore';
 import { hasAuthCookie } from '@/action/token';
+import { revalidateClient } from '@/action/revalidateClient';
 import { useNavCountsStore } from '@/hooks/useNavCounts';
 
 export default function ActionButtons({ productId }: { productId: any }) {
@@ -117,6 +118,8 @@ export default function ActionButtons({ productId }: { productId: any }) {
         (res?.message && String(res.message).toLowerCase().includes('success'));
 
       if (isSuccess) {
+        await revalidateClient('/cart');
+        void useNavCountsStore.getState().refresh();
         setShowAddToCartModal(true);
       } else {
         toast.error(res?.message || 'Failed to add to cart.');

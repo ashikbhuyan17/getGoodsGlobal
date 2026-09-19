@@ -14,6 +14,8 @@ interface CartPageClientProps {
 }
 
 export default function CartPageClient({ cartProducts }: CartPageClientProps) {
+  const router = useRouter();
+
   // Initialize all items as selected by default
   const [selectedItems, setSelectedItems] = useState<Record<string, boolean>>(
     () => {
@@ -24,6 +26,20 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
       return initial;
     },
   );
+
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
+
+  useEffect(() => {
+    setSelectedItems((prev) => {
+      const next = { ...prev };
+      cartProducts?.data?.forEach((product: { id: string }) => {
+        if (next[product.id] === undefined) next[product.id] = true;
+      });
+      return next;
+    });
+  }, [cartProducts?.data]);
 
   const handleSelectChange = (productId: string, selected: boolean) => {
     setSelectedItems((prev) => ({
@@ -75,7 +91,6 @@ export default function CartPageClient({ cartProducts }: CartPageClientProps) {
   }, [selectedItems, cartProducts?.data?.length]);
 
   const [removeLoading, setRemoveLoading] = useState(false);
-  const router = useRouter();
 
   const selectedCartIds = useMemo(() => {
     const data = (cartProducts?.data ?? []) as { id: string }[];

@@ -7,7 +7,9 @@ import CartPageClient from '@/components/cart/CartPageClient';
 import { fetcher } from '@/lib/fetcher';
 
 export default async function CartPage() {
-  const cartProducts: any = await fetcher('/cart-products');
+  const cartProducts: any = await fetcher('/cart-products', {
+    cache: 'no-store',
+  });
 
   if (cartProducts?.data?.length === 0) {
     return (
