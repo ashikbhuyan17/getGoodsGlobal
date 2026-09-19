@@ -3,6 +3,7 @@
 import { User } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname, useRouter } from 'next/navigation';
+import { openSignInModal } from '@/lib/openSignIn';
 import { useEffect, useState } from 'react';
 import { fetcher } from '@/lib/fetcher';
 import { isAuthenticatedProfile } from '@/lib/isAuthenticatedProfile';
@@ -50,8 +51,7 @@ function SigninBtn() {
       if (pathname === '/signin') {
         return;
       } else {
-        const signinUrl = `/signin?redirect=${encodeURIComponent(pathname || '/')}`;
-        router.push(signinUrl);
+        openSignInModal(router, pathname || '/');
       }
     }
   };

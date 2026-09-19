@@ -87,8 +87,14 @@ export default function RegisterForm({ method }: { method: 'page' | 'modal' }) {
       router.refresh();
       const returnUrl: string = isValidRedirect(redirectTo)
         ? (redirectTo as string)
-        : '/account';
-      router.push(returnUrl);
+        : method === 'modal'
+          ? '/'
+          : '/account';
+      if (method === 'modal') {
+        router.replace(returnUrl);
+      } else {
+        router.push(returnUrl);
+      }
     } else {
       toast.error(regUserData?.message[0]);
     }

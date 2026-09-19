@@ -12,9 +12,10 @@ import { toast } from 'sonner';
 import MinOrderModal from './MinOrderModal';
 import AddToCartModal from './AddToCartModal';
 import { useProductStore } from '@/stores/useProductStore';
-import { hasAuthCookie } from '@/action/token';
 import { revalidateClient } from '@/action/revalidateClient';
 import { useNavCountsStore } from '@/hooks/useNavCounts';
+import { ensureLoggedIn } from '@/lib/ensureLoggedIn';
+import { openSignInModal } from '@/lib/openSignIn';
 
 export default function ActionButtons({ productId }: { productId: any }) {
   const router = useRouter();
@@ -32,11 +33,13 @@ export default function ActionButtons({ productId }: { productId: any }) {
   const totalQuantity = useProductStore((s) => s.totalQuantity());
   const shippingArea = useProductStore((s) => s.shippingArea);
   const shippingOptions = useProductStore((s) => s.shippingOptions);
+  const isLoggedIn = useNavCountsStore((s) => s.isLoggedIn);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadWishlistState() {
+      if (!isLoggedIn) return;
       try {
         const res: any = await fetcher('/wishlists');
         const found = res?.data?.find(
@@ -49,12 +52,12 @@ export default function ActionButtons({ productId }: { productId: any }) {
       }
     }
 
-    if (productId) loadWishlistState();
+    if (productId && isLoggedIn) loadWishlistState();
 
     return () => {
       cancelled = true;
     };
-  }, [productId]);
+  }, [productId, isLoggedIn]);
 
   useEffect(() => {
     setMounted(true);
@@ -85,20 +88,11 @@ export default function ActionButtons({ productId }: { productId: any }) {
     return cartDetails;
   };
 
-  const redirectToSignin = (afterLoginPath: string) => {
-    router.push(
-      `/signin?redirect=${encodeURIComponent(afterLoginPath)}`,
-    );
-  };
-
   const handleAddToCart = async () => {
     const cartDetails = validateOrderDetails();
     if (!cartDetails) return;
 
-    if (!(await hasAuthCookie())) {
-      redirectToSignin(pathname || '/');
-      return;
-    }
+    if (!(await ensureLoggedIn(router, pathname || '/'))) return;
     setIsAddToCartLoading(true);
     try {
       const res: any = await fetcher('/product-add-to-cart', {
@@ -138,10 +132,7 @@ export default function ActionButtons({ productId }: { productId: any }) {
     const cartDetails = validateOrderDetails();
     if (!cartDetails) return;
 
-    if (!(await hasAuthCookie())) {
-      redirectToSignin(checkoutPath);
-      return;
-    }
+    if (!(await ensureLoggedIn(router, checkoutPath))) return;
 
     setIsBuyNowLoading(true);
     try {
@@ -173,7 +164,7 @@ export default function ActionButtons({ productId }: { productId: any }) {
         res?.message &&
         /unauth|login|token/i.test(String(res.message));
       if (needsLogin) {
-        redirectToSignin(checkoutPath);
+        openSignInModal(router, checkoutPath);
         return;
       }
 
@@ -188,9 +179,12 @@ export default function ActionButtons({ productId }: { productId: any }) {
   const handleWishlist = async () => {
     setIsWishlistLoading(true);
     try {
+      if (!(await ensureLoggedIn(router, pathname || '/'))) return;
+
       const user: any = await fetcher('/user-profile');
-      if (!user?.data?.id) {
-        router.push(`/signin?redirect=${encodeURIComponent(pathname || '/')}`);
+      const userId = user?.data?.id;
+      if (!userId) {
+        openSignInModal(router, pathname || '/');
         return;
       }
 
@@ -199,7 +193,7 @@ export default function ActionButtons({ productId }: { productId: any }) {
         method: 'POST',
         body: JSON.stringify({
           product_id: productId,
-          user_id: user?.data?.id,
+          user_id: userId,
         }),
       });
 

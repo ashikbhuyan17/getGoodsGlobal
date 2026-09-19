@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import AuthGatedLink from '@/components/auth/AuthGatedLink';
 import {
   Grid2x2,
   Headphones,
@@ -163,7 +164,7 @@ export default function BottomNavClient({
         </li>
 
         <li className="flex flex-col items-center">
-          <Link href="/cart" className="relative flex flex-col items-center">
+          <AuthGatedLink href="/cart" className="relative flex flex-col items-center">
             <span className="relative inline-block">
               <ShoppingBag className="h-5 w-5" />
               {cartCount > 0 && (
@@ -173,11 +174,11 @@ export default function BottomNavClient({
               )}
             </span>
             <span>Cart</span>
-          </Link>
+          </AuthGatedLink>
         </li>
 
         <li className="flex flex-col items-center">
-          <Link href="/wishlist" className="relative flex flex-col items-center">
+          <AuthGatedLink href="/wishlist" className="relative flex flex-col items-center">
             <span className="relative inline-block">
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
@@ -187,7 +188,7 @@ export default function BottomNavClient({
               )}
             </span>
             <span>Wishlist</span>
-          </Link>
+          </AuthGatedLink>
         </li>
 
         <li className="flex flex-col items-center">

@@ -82,8 +82,15 @@ export default function LoginForm({ method }: { method: 'page' | 'modal' }) {
 
       const returnUrl: string = isValidRedirect(redirectTo)
         ? (redirectTo as string)
-        : '/account';
-      router.push(returnUrl);
+        : method === 'modal'
+          ? '/'
+          : '/account';
+
+      if (method === 'modal') {
+        router.replace(returnUrl);
+      } else {
+        router.push(returnUrl);
+      }
     } else {
       toast.error(logUser?.message || 'Login failed');
     }

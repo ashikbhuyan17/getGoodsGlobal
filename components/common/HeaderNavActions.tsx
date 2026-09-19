@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Heart, ShoppingBag } from 'lucide-react';
 import { useNavCounts } from '@/hooks/useNavCounts';
+import AuthGatedLink from '@/components/auth/AuthGatedLink';
 import SigninBtn from './SigninBtn';
 import { cn } from '@/lib/utils';
 
@@ -19,8 +19,7 @@ export default function HeaderNavActions() {
         isHomeLike && 'max-sm:hidden',
       )}
     >
-      <Link
-        prefetch
+      <AuthGatedLink
         href="/cart"
         aria-label={
           cartCount > 0 ? `View cart (${cartCount} items)` : 'View cart'
@@ -33,9 +32,8 @@ export default function HeaderNavActions() {
             {cartCount > 99 ? '99+' : cartCount}
           </span>
         )}
-      </Link>
-      <Link
-        prefetch
+      </AuthGatedLink>
+      <AuthGatedLink
         href="/wishlist"
         aria-label={
           wishlistCount > 0
@@ -50,7 +48,7 @@ export default function HeaderNavActions() {
             {wishlistCount > 99 ? '99+' : wishlistCount}
           </span>
         )}
-      </Link>
+      </AuthGatedLink>
       <SigninBtn />
     </div>
   );
