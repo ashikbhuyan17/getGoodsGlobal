@@ -212,8 +212,9 @@ export default function Sidebar2({
                         <Image
                           src={categoryImageUrl}
                           alt={category.name}
-                          fill
-                          className="object-contain rounded"
+                          width={20}
+                          height={20}
+                          className="rounded object-contain"
                         />
                       </div>
                       <span

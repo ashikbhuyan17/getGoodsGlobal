@@ -117,7 +117,8 @@ function GallerySection({ galleryData }: GallerySectionProps) {
                 alt={category.name}
                 width={16}
                 height={16}
-                className="w-4 h-4 object-contain"
+                className="h-4 w-auto shrink-0 object-contain"
+                style={{ height: 'auto', maxHeight: 16 }}
               />
               <span className="text-sm font-medium">{category.name}</span>
             </Button>

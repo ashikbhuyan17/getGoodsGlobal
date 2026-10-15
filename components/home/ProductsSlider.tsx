@@ -41,7 +41,8 @@ function ProductsSlider({
             alt={title}
             width={28}
             height={28}
-            className="shrink-0"
+            className="h-7 w-auto shrink-0 object-contain"
+            style={{ height: 'auto', maxHeight: 28 }}
           />
           <h2 className="truncate">{title}</h2>
         </div>

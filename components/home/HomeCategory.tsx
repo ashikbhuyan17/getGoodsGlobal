@@ -39,6 +39,7 @@ async function HomeCategory({ slug, title }: { slug: string; title: string }) {
                         }
                         alt={item?.subcategoryName}
                         fill
+                        sizes="(max-width: 768px) 45vw, (max-width: 1024px) 22vw, 12vw"
                         className="object-cover"
                       />
                     </div>
