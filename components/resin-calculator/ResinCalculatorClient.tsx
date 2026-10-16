@@ -8,6 +8,11 @@ import { toast } from 'sonner';
 import { fetcher } from '@/lib/fetcher';
 import { cn } from '@/lib/utils';
 import {
+  resinCalculatorCopy,
+  shapeDisplayTitle,
+  shapeSectionHeading,
+} from '@/lib/resin-calculator-copy';
+import {
   type MeasurementUnit,
   type ResinCalculatorResult,
   type ResinRatio,
@@ -17,6 +22,13 @@ import {
   getInputLabel,
   parseCalculatorResult,
 } from '@/lib/resin-calculator';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   buildResinCalculatorSchema,
   type ResinCalculatorFormValues,
@@ -38,40 +50,28 @@ type ResinCalculatorClientProps = {
   bootstrapError?: string;
 };
 
-function shapeToggleLabel(shape: ResinShape): string {
-  if (shape.type === 'rectangle') return 'Rectangle/Square';
-  return shape.title;
-}
-
 function OptionRow({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex w-full rounded-none border border-black">
-      {children}
-    </div>
-  );
+  return <div className="flex w-full flex-wrap gap-2 sm:gap-3">{children}</div>;
 }
 
 function OptionToggle({
   label,
   selected,
   onClick,
-  withLeftBorder,
 }: {
   label: string;
   selected: boolean;
   onClick: () => void;
-  withLeftBorder?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'min-h-[2.75rem] flex-1 rounded-none px-1 py-2.5 text-center text-xs font-normal leading-snug transition-colors sm:min-h-[3.5rem] sm:px-2 sm:py-3 sm:text-base',
-        withLeftBorder && 'border-l border-black',
+        'min-h-9 flex-1 basis-[calc(50%-0.25rem)] rounded-lg border px-2 py-1.5 text-center text-sm font-semibold leading-tight tracking-tight transition-all duration-200 sm:min-h-10 sm:basis-auto sm:px-3 sm:py-2 sm:text-base',
         selected
-          ? 'bg-black text-white'
-          : 'bg-white text-neutral-500 hover:text-neutral-800',
+          ? 'border-primary bg-primary text-primary-foreground shadow-sm hover:bg-primary/90'
+          : 'border-gray-300 bg-white text-gray-900 shadow-sm hover:border-primary/50 hover:bg-teal-50 hover:text-primary',
       )}
     >
       {label}
@@ -79,11 +79,47 @@ function OptionToggle({
   );
 }
 
-const fieldInputClass =
-  'h-11 rounded-none border-neutral-400 text-base shadow-none focus-visible:border-neutral-400 focus-visible:ring-0 focus-visible:ring-offset-0 sm:h-14 sm:text-lg';
+/** Match OptionToggle (shape/ratio) height, type, and border */
+const controlFieldClass =
+  'h-9 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-900 shadow-sm transition-colors duration-200 hover:border-primary/50 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0 sm:h-10 sm:text-base';
 
 const fieldLabelClass =
-  'text-sm font-medium text-neutral-900 sm:text-base';
+  'text-sm font-semibold text-gray-900 sm:text-base';
+
+function CoatingThicknessHint() {
+  return (
+    <div
+      className="rounded-lg border border-primary/15 bg-gradient-to-br from-teal-50/80 to-white px-3 py-2.5 sm:px-4 sm:py-3"
+      role="note"
+    >
+      <p className="text-sm font-semibold text-gray-800">
+        {resinCalculatorCopy.coatingThicknessEn}
+      </p>
+      <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
+        {resinCalculatorCopy.coatingThicknessSub}
+      </p>
+    </div>
+  );
+}
+
+function BilingualPrompt({
+  en,
+  bn,
+  className,
+}: {
+  en: string;
+  bn?: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn('space-y-1 text-center', className)}>
+      <p className="text-sm font-medium text-gray-800 sm:text-base">{en}</p>
+      {bn ? (
+        <p className="text-xs text-muted-foreground sm:text-sm">{bn}</p>
+      ) : null}
+    </div>
+  );
+}
 
 function emptyInputsForShape(shape: ResinShape | null): Record<string, string> {
   const inputs: Record<string, string> = {};
@@ -119,6 +155,11 @@ export default function ResinCalculatorClient({
   const selectedUnit = useMemo(
     () => filteredUnits.find((u) => u.id === unitId) ?? null,
     [filteredUnits, unitId],
+  );
+
+  const selectedRatio = useMemo(
+    () => ratios.find((r) => r.id === ratioId) ?? null,
+    [ratios, ratioId],
   );
 
   const showRatioStep = shapeId != null;
@@ -161,8 +202,15 @@ export default function ResinCalculatorClient({
     setApiError(null);
   };
 
-  const handleUnitSelect = (id: number) => {
+  const handleUnitSelect = (value: string) => {
+    const id = Number(value);
+    if (!Number.isFinite(id)) return;
     setUnitId(id);
+    setResult(null);
+    setApiError(null);
+  };
+
+  const handleRecalculate = () => {
     setResult(null);
     setApiError(null);
   };
@@ -208,7 +256,7 @@ export default function ResinCalculatorClient({
             shape_id: shapeId,
             resin_ratio_id: ratioId,
             measurement_unit_id: unitId,
-            price: Number(values.price),
+            price: values.price.trim() === '' ? 0 : Number(values.price),
             inputs,
           }),
         },
@@ -250,129 +298,94 @@ export default function ResinCalculatorClient({
   };
 
   if (bootstrapError && shapes.length === 0) {
-    return (
-      <p className="text-center text-sm text-red-600">{bootstrapError}</p>
-    );
+    return <p className="text-center text-sm text-red-600">{bootstrapError}</p>;
   }
 
   return (
-    <div className="mx-auto w-full max-w-full space-y-8 px-2 py-6 sm:w-[60vw] sm:space-y-10 sm:px-0 sm:py-12">
-      <header className="text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-black sm:text-3xl">
-          Resin Calculator
-        </h1>
-      </header>
+    <div
+      className={cn(
+        'mx-auto w-full px-3 py-6',
+        'sm:px-4 sm:py-8',
+        'md:max-w-3xl md:px-6',
+        'lg:w-[58vw] lg:max-w-4xl lg:px-0 lg:py-10',
+        'xl:w-[62vw] xl:max-w-5xl',
+      )}
+    >
+      <div className="space-y-8 rounded-2xl border border-gray-200/90 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:space-y-10 sm:p-6 md:p-8">
+        <header className="space-y-2 text-center">
+          <h1 className="text-xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+            {resinCalculatorCopy.title}
+          </h1>
+          <BilingualPrompt
+            en={resinCalculatorCopy.subtitleEn}
+            bn={resinCalculatorCopy.subtitleBn}
+          />
+          <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-primary" />
+        </header>
 
-      <section className="space-y-4 sm:space-y-5">
-        <p className="text-center text-sm text-black sm:text-lg">
-          Please select an option
-        </p>
-        <OptionRow>
-          {shapes.map((shape, index) => (
-            <OptionToggle
-              key={shape.id}
-              label={shapeToggleLabel(shape)}
-              selected={shapeId === shape.id}
-              onClick={() => handleShapeSelect(shape.id)}
-              withLeftBorder={index > 0}
-            />
-          ))}
-        </OptionRow>
-      </section>
-
-      {showRatioStep && (
         <section className="space-y-4 sm:space-y-5">
-          <p className="text-center text-sm leading-snug text-black sm:text-base">
-            Which type of epoxy resin hardener are you using?
-          </p>
+          <BilingualPrompt
+            en={resinCalculatorCopy.selectShapeEn}
+            bn={resinCalculatorCopy.selectShapeBn}
+          />
           <OptionRow>
-            {ratios.map((ratio, index) => (
+            {shapes.map((shape) => (
               <OptionToggle
-                key={ratio.id}
-                label={formatRatioLabel(ratio)}
-                selected={ratioId === ratio.id}
-                onClick={() => handleRatioSelect(ratio.id)}
-                withLeftBorder={index > 0}
+                key={shape.id}
+                label={shapeDisplayTitle(shape.type, shape.title)}
+                selected={shapeId === shape.id}
+                onClick={() => handleShapeSelect(shape.id)}
               />
             ))}
           </OptionRow>
         </section>
-      )}
 
-      {showUnitStep && (
-        <section className="space-y-4 sm:space-y-5">
-          <p className="text-center text-sm leading-snug text-black sm:text-base">
-            Select measurement unit
-          </p>
-          {filteredUnits.length === 0 ? (
-            <p className="text-center text-sm text-neutral-500">
-              No units available for this shape.
-            </p>
-          ) : (
+        {showRatioStep && (
+          <section className="animate-in fade-in space-y-4 duration-300 sm:space-y-5">
+            <BilingualPrompt
+              en={resinCalculatorCopy.ratioQuestionEn}
+              bn={resinCalculatorCopy.ratioQuestionBn}
+            />
             <OptionRow>
-              {filteredUnits.map((unit, index) => (
+              {ratios.map((ratio) => (
                 <OptionToggle
-                  key={unit.id}
-                  label={unit.title}
-                  selected={unitId === unit.id}
-                  onClick={() => handleUnitSelect(unit.id)}
-                  withLeftBorder={index > 0}
+                  key={ratio.id}
+                  label={formatRatioLabel(ratio)}
+                  selected={ratioId === ratio.id}
+                  onClick={() => handleRatioSelect(ratio.id)}
                 />
               ))}
             </OptionRow>
-          )}
-        </section>
-      )}
+          </section>
+        )}
 
-      {showInputsStep && selectedShape && (
-        <section className="w-full space-y-5 sm:space-y-6">
-          <h2 className="text-left text-base font-medium text-black sm:text-lg">
-            {selectedShape.title}
-          </h2>
-
+        {showUnitStep && (
           <Form {...form}>
             <form
-              className="space-y-6"
+              className="space-y-8 sm:space-y-10"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleCalculateClick();
               }}
             >
-              <FormField
-                control={form.control}
-                name="price"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={fieldLabelClass}>Price</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min={0}
-                        step="any"
-                        inputMode="decimal"
-                        placeholder="0.00"
-                        className={fieldInputClass}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {selectedShape.input_list.map((fieldDef) => (
+              <section className="animate-in fade-in space-y-4 duration-300 sm:space-y-5">
+                <div className="space-y-2">
+                  <span className="inline-block rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                    {resinCalculatorCopy.optional}
+                  </span>
+                  <BilingualPrompt
+                    className="text-left"
+                    en={resinCalculatorCopy.priceEn}
+                    bn={resinCalculatorCopy.priceBn}
+                  />
+                </div>
                 <FormField
-                  key={fieldDef.parameter}
                   control={form.control}
-                  name={`inputs.${fieldDef.parameter}` as `inputs.${string}`}
+                  name="price"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={fieldLabelClass}>
-                        {getInputLabel(
-                          fieldDef,
-                          selectedShape.type,
-                          selectedUnit,
-                        )}
+                      <FormLabel className="sr-only">
+                        {resinCalculatorCopy.priceEn}
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -381,7 +394,7 @@ export default function ResinCalculatorClient({
                           step="any"
                           inputMode="decimal"
                           placeholder="0.00"
-                          className={fieldInputClass}
+                          className={controlFieldClass}
                           {...field}
                         />
                       </FormControl>
@@ -389,53 +402,188 @@ export default function ResinCalculatorClient({
                     </FormItem>
                   )}
                 />
-              ))}
+              </section>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-none bg-black text-sm font-medium text-white disabled:opacity-60 sm:h-14 sm:text-base"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" />
-                    Calculating…
-                  </>
+              <section className="animate-in fade-in space-y-4 duration-300 sm:space-y-5">
+                <BilingualPrompt
+                  en={resinCalculatorCopy.measurementUnitEn}
+                  bn={resinCalculatorCopy.measurementUnitBn}
+                />
+                {filteredUnits.length === 0 ? (
+                  <p className="text-center text-sm text-muted-foreground">
+                    No units available for this shape.
+                  </p>
                 ) : (
-                  'Calculate'
+                  <Select
+                    value={unitId != null ? String(unitId) : undefined}
+                    onValueChange={handleUnitSelect}
+                  >
+                    <SelectTrigger
+                      className={cn(
+                        controlFieldClass,
+                        'w-full data-[placeholder]:text-muted-foreground',
+                      )}
+                    >
+                      <SelectValue
+                        placeholder={`${resinCalculatorCopy.measurementUnitPlaceholderEn} (${resinCalculatorCopy.measurementUnitPlaceholderBn})`}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredUnits.map((unit) => (
+                        <SelectItem key={unit.id} value={String(unit.id)}>
+                          {unit.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 )}
-              </button>
+              </section>
+
+              {showInputsStep && selectedShape && (
+                <section className="animate-in fade-in w-full space-y-4 sm:space-y-5">
+                  {(() => {
+                    const heading = shapeSectionHeading(selectedShape.type);
+                    return heading.en ? (
+                      <div className="space-y-1 border-b border-gray-100 pb-3 text-left">
+                        <h2 className="text-base font-semibold text-primary sm:text-lg">
+                          {heading.en}
+                        </h2>
+                        {heading.bn ? (
+                          <p className="text-xs text-muted-foreground sm:text-sm">
+                            ({heading.bn})
+                          </p>
+                        ) : null}
+                      </div>
+                    ) : null;
+                  })()}
+
+                  {selectedShape.input_list.map((fieldDef) => {
+                    const isThickness = fieldDef.mm === 1;
+                    return (
+                      <FormField
+                        key={fieldDef.parameter}
+                        control={form.control}
+                        name={
+                          `inputs.${fieldDef.parameter}` as `inputs.${string}`
+                        }
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            {isThickness ? <CoatingThicknessHint /> : null}
+                            <FormLabel className={fieldLabelClass}>
+                              {getInputLabel(
+                                fieldDef,
+                                selectedShape.type,
+                                selectedUnit,
+                              )}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={0}
+                                step="any"
+                                inputMode="decimal"
+                                placeholder={isThickness ? '1.5' : '0.00'}
+                                className={controlFieldClass}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    );
+                  })}
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex min-h-9 w-full items-center justify-center gap-2 rounded-lg border border-primary bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md disabled:opacity-60 sm:min-h-10 sm:text-base"
+                  >
+                    {submitting ? (
+                      <>
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Calculating…
+                      </>
+                    ) : (
+                      <span className="flex flex-col leading-tight">
+                        <span>{resinCalculatorCopy.calculateEn}</span>
+                        <span className="text-xs font-normal opacity-90">
+                          ({resinCalculatorCopy.calculateBn})
+                        </span>
+                      </span>
+                    )}
+                  </button>
+                </section>
+              )}
             </form>
           </Form>
-        </section>
-      )}
+        )}
 
-      {(result || apiError) && (
-        <section className="w-full space-y-4 border-t border-neutral-200 pt-8">
-          <h2 className="text-left text-lg font-bold text-black">
-            Total resin required
-          </h2>
-          {apiError && !result && (
-            <p className="text-sm text-red-600">{apiError}</p>
-          )}
-          {result && (
-            <div className="space-y-3 text-base">
-              <p>
-                <span className="font-semibold text-black">Resin:</span>{' '}
-                {result.resin}
+        {(result || apiError) && (
+          <section className="animate-in fade-in w-full space-y-4 border-t border-gray-100 pt-8">
+            <BilingualPrompt
+              className="text-left sm:text-center"
+              en={resinCalculatorCopy.resultCardEn}
+              bn={resinCalculatorCopy.resultCardBn}
+            />
+            {apiError && !result && (
+              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+                {apiError}
               </p>
-              <p>
-                <span className="font-semibold text-black">Hardener:</span>{' '}
-                {result.hardener}
-              </p>
-              <p>
-                <span className="font-semibold text-black">Cost:</span>{' '}
-                {result.cost}
-              </p>
-            </div>
-          )}
-        </section>
-      )}
+            )}
+            {result && selectedRatio && (
+              <div className="space-y-4">
+                <p className="text-sm font-medium text-gray-800 sm:text-base">
+                  {resinCalculatorCopy.totalRequiredEn}:{' '}
+                  <span className="font-bold text-primary">
+                    {(result.resin + result.hardener).toFixed(2)}g
+                  </span>{' '}
+                  ({formatRatioLabel(selectedRatio)})
+                </p>
+                <p className="text-sm text-gray-700">
+                  {resinCalculatorCopy.estimatedCostEn}:{' '}
+                  <span className="font-semibold tabular-nums text-primary">
+                    {result.cost}
+                  </span>
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-gray-100 bg-gradient-to-br from-teal-50/60 to-white px-4 py-4 text-center transition-all duration-200 hover:border-primary/30 hover:shadow-md">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      {resinCalculatorCopy.resinLabel}
+                    </p>
+                    <p className="mt-1 text-xl font-bold tabular-nums text-primary sm:text-2xl">
+                      {result.resin}g
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-gray-100 bg-gradient-to-br from-teal-50/60 to-white px-4 py-4 text-center transition-all duration-200 hover:border-primary/30 hover:shadow-md">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      {resinCalculatorCopy.hardenerLabel}
+                    </p>
+                    <p className="mt-1 text-xl font-bold tabular-nums text-primary sm:text-2xl">
+                      {result.hardener}g
+                    </p>
+                  </div>
+                </div>
+                <p className="text-center text-xs text-muted-foreground sm:text-sm">
+                  {resinCalculatorCopy.wastageNote}
+                </p>
+                <button
+                  type="button"
+                  onClick={handleRecalculate}
+                  className="flex h-11 w-full items-center justify-center rounded-lg border border-primary bg-white text-sm font-semibold text-primary transition-all duration-200 hover:bg-teal-50/80 sm:h-12"
+                >
+                  <span className="flex flex-col leading-tight">
+                    <span>{resinCalculatorCopy.recalculateEn}</span>
+                    <span className="text-xs font-normal">
+                      ({resinCalculatorCopy.recalculateBn})
+                    </span>
+                  </span>
+                </button>
+              </div>
+            )}
+          </section>
+        )}
+      </div>
     </div>
   );
 }

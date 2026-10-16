@@ -9,6 +9,14 @@ const positiveNumberString = (label: string) =>
       return Number.isFinite(n) && n > 0;
     }, `Enter a valid ${label.toLowerCase()} greater than 0`);
 
+const optionalPositivePriceString = z
+  .string()
+  .refine((value) => {
+    if (value.trim() === '') return true;
+    const n = Number(value);
+    return Number.isFinite(n) && n >= 0;
+  }, 'Enter a valid price');
+
 export function buildResinCalculatorSchema(
   fields: { parameter: string; title: string }[],
 ) {
@@ -18,7 +26,7 @@ export function buildResinCalculatorSchema(
   }
 
   return z.object({
-    price: positiveNumberString('Price'),
+    price: optionalPositivePriceString,
     inputs: z.object(inputShape),
   });
 }
