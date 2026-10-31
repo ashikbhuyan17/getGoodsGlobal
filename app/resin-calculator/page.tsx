@@ -11,6 +11,8 @@ import {
 } from '@/lib/resin-calculator';
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Resin Calculator',
   description: 'Calculate resin, hardener and cost for your project.',
