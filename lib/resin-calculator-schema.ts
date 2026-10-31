@@ -19,10 +19,15 @@ const optionalPositivePriceString = z
 
 export function buildResinCalculatorSchema(
   fields: { parameter: string; title: string }[],
+  options?: { shapeType?: string; customInputLabel?: string },
 ) {
   const inputShape: Record<string, z.ZodString> = {};
   for (const field of fields) {
-    inputShape[field.parameter] = positiveNumberString(field.title);
+    const label =
+      options?.shapeType === 'custom'
+        ? (options.customInputLabel ?? field.title)
+        : field.title;
+    inputShape[field.parameter] = positiveNumberString(label);
   }
 
   return z.object({

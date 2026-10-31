@@ -112,8 +112,11 @@ export default async function Footer() {
                   <Link
                     href="/resin-calculator"
                     prefetch
-                    className="text-gray-600 text-sm hover:text-primary transition-colors"
+                    className="group text-sm text-gray-600 transition-colors hover:text-primary"
                   >
+                    <span className="font-semibold text-gray-800 group-hover:text-primary">
+                      GetGoods
+                    </span>{' '}
                     Resin Calculator
                   </Link>
                 </li>

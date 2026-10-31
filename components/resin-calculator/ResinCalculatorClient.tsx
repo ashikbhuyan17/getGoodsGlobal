@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
@@ -21,6 +21,7 @@ import {
   formatRatioLabel,
   getInputLabel,
   parseCalculatorResult,
+  roundResultDisplay,
 } from '@/lib/resin-calculator';
 import {
   Select,
@@ -83,8 +84,7 @@ function OptionToggle({
 const controlFieldClass =
   'h-9 rounded-lg border border-gray-300 bg-white text-sm font-medium text-gray-900 shadow-sm transition-colors duration-200 hover:border-primary/50 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:ring-offset-0 sm:h-10 sm:text-base';
 
-const fieldLabelClass =
-  'text-sm font-semibold text-gray-900 sm:text-base';
+const fieldLabelClass = 'text-sm font-semibold text-gray-900 sm:text-base';
 
 function CoatingThicknessHint() {
   return (
@@ -97,6 +97,28 @@ function CoatingThicknessHint() {
       </p>
       <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
         {resinCalculatorCopy.coatingThicknessSub}
+      </p>
+    </div>
+  );
+}
+
+function ResultMetricCard({
+  label,
+  value,
+  suffix = '',
+}: {
+  label: string;
+  value: string;
+  suffix?: string;
+}) {
+  return (
+    <div className="rounded-xl border border-gray-100 bg-gradient-to-br from-teal-50/60 to-white px-4 py-4 text-center transition-all duration-200 hover:border-primary/30 hover:shadow-md">
+      <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        {label}
+      </p>
+      <p className="mt-1 text-xl font-bold tabular-nums text-primary sm:text-2xl">
+        {value}
+        {suffix}
       </p>
     </div>
   );
@@ -141,6 +163,17 @@ export default function ResinCalculatorClient({
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<ResinCalculatorResult | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
+  const calculatorTopRef = useRef<HTMLElement>(null);
+  const pendingScrollToTopRef = useRef(false);
+
+  /** Fixed site header (60px) + back bar + spacing */
+  const scrollToCalculatorTitle = () => {
+    const el = calculatorTopRef.current;
+    if (!el) return;
+    const offset = 140;
+    const top = el.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  };
 
   const selectedShape = useMemo(
     () => shapes.find((s) => s.id === shapeId) ?? null,
@@ -167,8 +200,12 @@ export default function ResinCalculatorClient({
   const showInputsStep = showUnitStep && unitId != null;
 
   const schema = useMemo(
-    () => buildResinCalculatorSchema(selectedShape?.input_list ?? []),
-    [selectedShape?.input_list],
+    () =>
+      buildResinCalculatorSchema(selectedShape?.input_list ?? [], {
+        shapeType: selectedShape?.type,
+        customInputLabel: resinCalculatorCopy.customInputLabel,
+      }),
+    [selectedShape?.input_list, selectedShape?.type],
   );
 
   const form = useForm<ResinCalculatorFormValues>({
@@ -187,6 +224,23 @@ export default function ResinCalculatorClient({
     });
   }, [selectedShape?.id, form, selectedShape]);
 
+  useEffect(() => {
+    if (unitId == null) return;
+    if (!filteredUnits.some((u) => u.id === unitId)) {
+      setUnitId(null);
+    }
+  }, [filteredUnits, unitId]);
+
+  useEffect(() => {
+    if (!pendingScrollToTopRef.current || result !== null) return;
+    pendingScrollToTopRef.current = false;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollToCalculatorTitle();
+      });
+    });
+  }, [result]);
+
   const handleShapeSelect = (id: number) => {
     setShapeId(id);
     setRatioId(null);
@@ -196,6 +250,7 @@ export default function ResinCalculatorClient({
   };
 
   const handleRatioSelect = (id: number) => {
+    if (id === ratioId) return;
     setRatioId(id);
     setUnitId(null);
     setResult(null);
@@ -213,6 +268,7 @@ export default function ResinCalculatorClient({
   const handleRecalculate = () => {
     setResult(null);
     setApiError(null);
+    pendingScrollToTopRef.current = true;
   };
 
   const validateSelections = (): boolean => {
@@ -312,7 +368,10 @@ export default function ResinCalculatorClient({
       )}
     >
       <div className="space-y-8 rounded-2xl border border-gray-200/90 bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:space-y-10 sm:p-6 md:p-8">
-        <header className="space-y-2 text-center">
+        <header
+          ref={calculatorTopRef}
+          className="scroll-mt-[140px] space-y-2 text-center"
+        >
           <h1 className="text-xl font-bold tracking-tight text-gray-900 sm:text-3xl">
             {resinCalculatorCopy.title}
           </h1>
@@ -415,7 +474,12 @@ export default function ResinCalculatorClient({
                   </p>
                 ) : (
                   <Select
-                    value={unitId != null ? String(unitId) : undefined}
+                    key={`measurement-unit-${shapeId ?? 0}-${ratioId ?? 0}`}
+                    value={
+                      unitId != null && filteredUnits.some((u) => u.id === unitId)
+                        ? String(unitId)
+                        : ''
+                    }
                     onValueChange={handleUnitSelect}
                   >
                     <SelectTrigger
@@ -424,9 +488,19 @@ export default function ResinCalculatorClient({
                         'w-full data-[placeholder]:text-muted-foreground',
                       )}
                     >
-                      <SelectValue
-                        placeholder={`${resinCalculatorCopy.measurementUnitPlaceholderEn} (${resinCalculatorCopy.measurementUnitPlaceholderBn})`}
-                      />
+                      <span className="flex min-w-0 flex-1 items-center truncate">
+                        <SelectValue
+                          placeholder={
+                            resinCalculatorCopy.measurementUnitPlaceholderEn
+                          }
+                        />
+                        {unitId == null ? (
+                          <span className="hidden shrink-0 text-muted-foreground sm:inline">
+                            {' '}
+                            ({resinCalculatorCopy.measurementUnitPlaceholderBn})
+                          </span>
+                        ) : null}
+                      </span>
                     </SelectTrigger>
                     <SelectContent>
                       {filteredUnits.map((unit) => (
@@ -467,14 +541,16 @@ export default function ResinCalculatorClient({
                           `inputs.${fieldDef.parameter}` as `inputs.${string}`
                         }
                         render={({ field }) => (
-                          <FormItem className="space-y-3">
-                            {isThickness ? <CoatingThicknessHint /> : null}
+                          <FormItem className="space-y-2">
                             <FormLabel className={fieldLabelClass}>
-                              {getInputLabel(
-                                fieldDef,
-                                selectedShape.type,
-                                selectedUnit,
-                              )}
+                              {isThickness
+                                ? fieldDef.title
+                                : getInputLabel(
+                                    fieldDef,
+                                    selectedShape.type,
+                                    selectedUnit,
+                                    resinCalculatorCopy.customInputLabel,
+                                  )}
                             </FormLabel>
                             <FormControl>
                               <Input
@@ -488,6 +564,7 @@ export default function ResinCalculatorClient({
                               />
                             </FormControl>
                             <FormMessage />
+                            {isThickness ? <CoatingThicknessHint /> : null}
                           </FormItem>
                         )}
                       />
@@ -533,39 +610,31 @@ export default function ResinCalculatorClient({
             )}
             {result && selectedRatio && (
               <div className="space-y-4">
-                <p className="text-sm font-medium text-gray-800 sm:text-base">
-                  {resinCalculatorCopy.totalRequiredEn}:{' '}
-                  <span className="font-bold text-primary">
-                    {(result.resin + result.hardener).toFixed(2)}g
-                  </span>{' '}
-                  ({formatRatioLabel(selectedRatio)})
-                </p>
-                <p className="text-sm text-gray-700">
-                  {resinCalculatorCopy.estimatedCostEn}:{' '}
-                  <span className="font-semibold tabular-nums text-primary">
-                    {result.cost}
-                  </span>
-                </p>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-xl border border-gray-100 bg-gradient-to-br from-teal-50/60 to-white px-4 py-4 text-center transition-all duration-200 hover:border-primary/30 hover:shadow-md">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {resinCalculatorCopy.resinLabel}
-                    </p>
-                    <p className="mt-1 text-xl font-bold tabular-nums text-primary sm:text-2xl">
-                      {result.resin}g
-                    </p>
-                  </div>
-                  <div className="rounded-xl border border-gray-100 bg-gradient-to-br from-teal-50/60 to-white px-4 py-4 text-center transition-all duration-200 hover:border-primary/30 hover:shadow-md">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                      {resinCalculatorCopy.hardenerLabel}
-                    </p>
-                    <p className="mt-1 text-xl font-bold tabular-nums text-primary sm:text-2xl">
-                      {result.hardener}g
-                    </p>
-                  </div>
+                  <ResultMetricCard
+                    label={`${resinCalculatorCopy.totalRequiredEn} (${formatRatioLabel(selectedRatio)})`}
+                    value={String(
+                      roundResultDisplay(result.resin + result.hardener),
+                    )}
+                    suffix="g"
+                  />
+                  <ResultMetricCard
+                    label={resinCalculatorCopy.estimatedCostEn}
+                    value={String(roundResultDisplay(result.cost))}
+                  />
+                  <ResultMetricCard
+                    label={resinCalculatorCopy.resinLabel}
+                    value={String(roundResultDisplay(result.resin))}
+                    suffix="g"
+                  />
+                  <ResultMetricCard
+                    label={resinCalculatorCopy.hardenerLabel}
+                    value={String(roundResultDisplay(result.hardener))}
+                    suffix="g"
+                  />
                 </div>
                 <p className="text-center text-xs text-muted-foreground sm:text-sm">
-                  {resinCalculatorCopy.wastageNote}
+                  {result.wastageNote}
                 </p>
                 <button
                   type="button"

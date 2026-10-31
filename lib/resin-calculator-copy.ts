@@ -23,11 +23,11 @@ export const resinCalculatorCopy = {
   resultCardBn: 'ফলাফল প্রদর্শন',
   recalculateEn: 'Recalculate',
   recalculateBn: 'পুনরায় হিসাব করুন',
-  wastageNote: 'Note: Including 10% wastage',
   resinLabel: 'Resin (A)',
   hardenerLabel: 'Hardener (B)',
   estimatedCostEn: 'Estimated Cost',
   totalRequiredEn: 'Total Resin+Hardener Required',
+  customInputLabel: 'Water weight in gm',
 } as const;
 
 export function shapeDisplayTitle(type: string, apiTitle: string): string {
@@ -48,10 +48,7 @@ export function shapeSectionHeading(type: string): { en: string; bn?: string } {
     case 'circle':
       return { en: 'Circle shape:' };
     case 'custom':
-      return {
-        en: 'Mold capacity (water weight in gm)',
-        bn: 'মোল্ডে পানি ধারণক্ষমতার ভিত্তিতে সর্বমোট ওজন',
-      };
+      return { en: '' };
     default:
       return { en: '' };
   }
