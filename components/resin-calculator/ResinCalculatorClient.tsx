@@ -19,6 +19,7 @@ import {
   type ResinShape,
   filterActiveUnits,
   formatRatioLabel,
+  getCoatingThicknessSubline,
   getInputLabel,
   parseCalculatorResult,
   roundResultDisplay,
@@ -86,7 +87,7 @@ const controlFieldClass =
 
 const fieldLabelClass = 'text-sm font-semibold text-gray-900 sm:text-base';
 
-function CoatingThicknessHint() {
+function CoatingThicknessHint({ subline }: { subline: string }) {
   return (
     <div
       className="rounded-lg border border-primary/15 bg-gradient-to-br from-teal-50/80 to-white px-3 py-2.5 sm:px-4 sm:py-3"
@@ -95,9 +96,7 @@ function CoatingThicknessHint() {
       <p className="text-sm font-semibold text-gray-800">
         {resinCalculatorCopy.coatingThicknessEn}
       </p>
-      <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
-        {resinCalculatorCopy.coatingThicknessSub}
-      </p>
+      <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{subline}</p>
     </div>
   );
 }
@@ -564,7 +563,14 @@ export default function ResinCalculatorClient({
                               />
                             </FormControl>
                             <FormMessage />
-                            {isThickness ? <CoatingThicknessHint /> : null}
+                            {isThickness ? (
+                              <CoatingThicknessHint
+                                subline={getCoatingThicknessSubline(
+                                  selectedUnit,
+                                  resinCalculatorCopy.coatingThicknessSub,
+                                )}
+                              />
+                            ) : null}
                           </FormItem>
                         )}
                       />

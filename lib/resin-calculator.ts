@@ -26,7 +26,16 @@ export type MeasurementUnit = {
   value: string;
   custom: string;
   status?: string;
+  description?: string | null;
 };
+
+export function getCoatingThicknessSubline(
+  unit: MeasurementUnit | null,
+  fallback: string,
+): string {
+  const text = unit?.description?.trim();
+  return text ? text : fallback;
+}
 
 export type ResinCalculatorResult = {
   resin: number;
