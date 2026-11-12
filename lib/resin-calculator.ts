@@ -41,26 +41,22 @@ export type ResinCalculatorResult = {
   resin: number;
   hardener: number;
   cost: number;
-  wastageNote: string;
+  wastageLine: string | null;
 };
 
-function formatWastageNoteFromRatio(ratio: unknown): string {
-  if (!ratio || typeof ratio !== 'object') {
-    return 'Note: Including 0% wastage';
-  }
+function formatWastageLineFromRatio(ratio: unknown): string | null {
+  if (!ratio || typeof ratio !== 'object') return null;
   const r = ratio as { title?: string; wastage?: string | number };
   const title = typeof r.title === 'string' ? r.title.trim() : '';
   if (title) {
-    if (/^note:/i.test(title)) return title;
-    return `Note: ${title}`;
+    return title.replace(/^note:\s*/i, '');
   }
   const w = Number(r.wastage);
   if (Number.isFinite(w)) {
-    const pct =
-      w > 0 && w <= 1 ? Math.round(w * 100) : Math.round(w);
-    return `Note: Including ${pct}% wastage`;
+    const pct = w > 0 && w <= 1 ? Math.round(w * 100) : Math.round(w);
+    return `Including ${pct}% wastage`;
   }
-  return 'Note: Including 0% wastage';
+  return null;
 }
 
 type ApiList<T> = {
@@ -163,6 +159,6 @@ export function parseCalculatorResult(
     resin,
     hardener,
     cost,
-    wastageNote: formatWastageNoteFromRatio(data.resin_ratio),
+    wastageLine: formatWastageLineFromRatio(data.resin_ratio),
   };
 }

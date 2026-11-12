@@ -93,10 +93,7 @@ function CoatingThicknessHint({ subline }: { subline: string }) {
       className="rounded-lg border border-primary/15 bg-gradient-to-br from-teal-50/80 to-white px-3 py-2.5 sm:px-4 sm:py-3"
       role="note"
     >
-      <p className="text-sm font-semibold text-gray-800">
-        {resinCalculatorCopy.coatingThicknessEn}
-      </p>
-      <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">{subline}</p>
+      <p className="text-sm text-gray-800 sm:text-base">{subline}</p>
     </div>
   );
 }
@@ -615,19 +612,21 @@ export default function ResinCalculatorClient({
               </p>
             )}
             {result && selectedRatio && (
-              <div className="space-y-4">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <ResultMetricCard
-                    label={`${resinCalculatorCopy.totalRequiredEn} (${formatRatioLabel(selectedRatio)})`}
-                    value={String(
-                      roundResultDisplay(result.resin + result.hardener),
-                    )}
-                    suffix="g"
-                  />
+              <div className="space-y-3">
+                <div className="mx-auto w-4/5 min-w-0 sm:w-1/2">
                   <ResultMetricCard
                     label={resinCalculatorCopy.estimatedCostEn}
                     value={String(roundResultDisplay(result.cost))}
                   />
+                </div>
+                <ResultMetricCard
+                  label={`${resinCalculatorCopy.totalRequiredEn} (${formatRatioLabel(selectedRatio)})`}
+                  value={String(
+                    roundResultDisplay(result.resin + result.hardener),
+                  )}
+                  suffix="g"
+                />
+                <div className="grid grid-cols-2 gap-3">
                   <ResultMetricCard
                     label={resinCalculatorCopy.resinLabel}
                     value={String(roundResultDisplay(result.resin))}
@@ -639,9 +638,11 @@ export default function ResinCalculatorClient({
                     suffix="g"
                   />
                 </div>
-                <p className="text-center text-xs text-muted-foreground sm:text-sm">
-                  {result.wastageNote}
-                </p>
+                {result.wastageLine ? (
+                  <p className="text-center text-xs text-muted-foreground sm:text-sm">
+                    {result.wastageLine}
+                  </p>
+                ) : null}
                 <button
                   type="button"
                   onClick={handleRecalculate}

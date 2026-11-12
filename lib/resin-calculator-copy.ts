@@ -12,7 +12,6 @@ export const resinCalculatorCopy = {
   measurementUnitBn: 'পরিমাপের একক (ইঞ্চি/সেমি)',
   measurementUnitPlaceholderEn: 'Select measurement unit',
   measurementUnitPlaceholderBn: 'পরিমাপের একক নির্বাচন করুন',
-  coatingThicknessEn: 'Recommended Resin Coating Thickness:',
   coatingThicknessSub: 'Per Coating—1.5mm',
   optional: 'Optional',
   priceEn: 'What is the price of a 1,000g (1 kg) resin set?',
@@ -25,7 +24,7 @@ export const resinCalculatorCopy = {
   recalculateBn: 'পুনরায় হিসাব করুন',
   resinLabel: 'Resin (A)',
   hardenerLabel: 'Hardener (B)',
-  estimatedCostEn: 'Estimated Cost',
+  estimatedCostEn: 'Resin Estimated Cost',
   totalRequiredEn: 'Total Resin+Hardener Required',
   customInputLabel: 'Water weight in gm',
 } as const;
